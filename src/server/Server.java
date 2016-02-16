@@ -54,7 +54,7 @@ public class Server {
 	
 	private void createListener(){
 		boolean found = false;
-		int portNum = 1234;
+		int portNum = 10401;
 		InetAddress addr = null;
 		
 		try {
