@@ -1,90 +1,39 @@
 package server;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.util.HashMap;
 
-public class Server {
-	private ServerSocket listener;
-	private Thread serverListener;
-	private int portNumber = 0;
+import server.room.*;
+
+public class Server {	
+	
+	private static boolean active; 
+	private final static HashMap<String,Room> Rooms = new HashMap<String, Room>();; //Have max limit?
 	
 	public static void main(String[] args) {
-		Server server = new Server();
-	}
-	
-	Server(){
-		createListener();
-		serverListener = new Thread(){
-			public void run(){
-				try {
-					//listening to the socket for clients.
-					while(!Thread.currentThread().isInterrupted()){
-						Socket clientSocket = null;
-						System.out.println("Server: Waiting for a client on the port: "+portNumber);
-						clientSocket = listener.accept();
-						System.out.println("Server: Client found, passing to ClientHandler.");
-						/*
-						 * Do we want to have the player class to also be the client handler
-						 * or would they be separate, i.e. player data in separate object to the
-						 * socket and thread?
-						 */
-					}
-				} catch (IOException ioe) {
-					System.err.println("Server: there was an error connecting to the client. "+ioe.getMessage());
-				} finally {
-					//closing the socket and thread.
-					try {
-						if(listener != null){
-							listener.close();
-						}
-						System.out.println("Closing the listener");
-						
-						Thread.currentThread().interrupt();
-						} catch (IOException ioe) {
-							System.err.println("Server: There was an error closing the socket. "+ioe.getMessage());
-						}
-					}
-				}
-			};
-			serverListener.start();
-	}
-	
-	private void createListener(){
-		boolean found = false;
-		int portNum = 10401;
-		InetAddress addr = null;
+		ServerListener serverListener = new ServerListener();
+		serverListener.run();//creating a Thread in which to listen for new clients.
 		
-		try {
-			addr = InetAddress.getByName("localhost");
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			System.err.println("InetAddress unresolved for local host");
-			System.exit(1);
-		}
+		active = true;
+		while(active){ /*read from command line for input?*/ }//loop forever until Server closed. (need to do anything here?
 		
-		while(!found){
-			try {
-				listener = setListener(portNum, addr);
-				found = true;
-			} catch (Exception e) {
-				System.err.println(e.getMessage());
-				System.err.println("Server: Port "+portNum+" unavailable, attempting new port "+(portNum+1));
-				found = false;
-			}
-		}
-		portNumber = portNum;
+		//code for closing down rooms and server
+		
 	}
 	
-	private ServerSocket setListener(int portNum, InetAddress addr) throws Exception{
-		ServerSocket temp = null;
-		try {
-			temp = new ServerSocket(portNum, 0, addr);
-		} catch (IOException ioe) {
-			throw new Exception("Failed to secure socket: " + ioe.getMessage());
-		}
-		return temp;
+	//returning a room for the StateMachine to be able to perform actions within Rooms.
+	public static Room getRoom(String roomKey){
+		return Rooms.get(roomKey);
 	}
+	
+	//Allowing the StateMachine to add Clients to a room, provided a valid room key is given.
+	public static boolean addClientToRoom(String roomKey /*, String nickName, MAC Address (not sure what data type)*/){
+		if(Rooms.containsKey(roomKey)){
+			//activeRooms.get(roomKey).addClient/Player(nickName, MAC Address);
+			return true;
+		}
+		return false;
+	}
+	
+	
+	
 }
