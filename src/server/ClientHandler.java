@@ -7,17 +7,19 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
 
-public class ClientHandler implements Runnable{
+public class ClientHandler extends Thread{
 	private final StateMachine sm;
 	private final Socket clientSocket;
 	private BufferedReader reader;//might not need if sending bytes rather than strings
 	private PrintWriter writer;
+	private final Integer clientID;
 	
-	ClientHandler(Socket cs){
-		sm = new StateMachine();
+	ClientHandler(Socket cs, Integer clientID){
+		this.clientID = clientID;
+		sm = new StateMachine(clientID);
 		clientSocket = cs;
 		try{
-			// Wrap the input stream in a BufferedReader. (Potentially uneeded)
+			// Wrap the input stream in a BufferedReader. (Potentially unneeded)
 			reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			// Wrap the output stream in a BufferedWriter.
 			writer = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -43,7 +45,8 @@ public class ClientHandler implements Runnable{
 				clientPacket = new byte[0];
 			}
 		} catch (Exception e){
-			
+			System.err.println(e.getMessage());
+			Server.closeServer();
 		}
 	}
 	
@@ -65,6 +68,17 @@ public class ClientHandler implements Runnable{
 		if(checksum == checksum_)newPacket[0] = 1; else newPacket[0] = 0;
 		
 		return newPacket;
+	}
+	
+	public void close(){
+		//code to close Thread
+		if(clientSocket != null){
+			try {
+				clientSocket.close();
+			} catch (IOException ioe) {
+				System.err.println(ioe.getMessage());
+			}
+		}
 	}
 	
 }

@@ -7,15 +7,17 @@ import server.room.*;
 public class Server {	
 	
 	private static boolean active; 
-	private final static HashMap<String,Room> Rooms = new HashMap<String, Room>();; //Have max limit?
+	private static final HashMap<String,Room> Rooms = new HashMap<String, Room>();; //Have max limit?
+	private static Thread serverListener;
 	
 	public static void main(String[] args) {
-		ServerListener serverListener = new ServerListener();
+		serverListener = new Thread( new ServerListener());
 		serverListener.run();//creating a Thread in which to listen for new clients.
 		
 		active = true;
 		while(active){ /*read from command line for input?*/ }//loop forever until Server closed. (need to do anything here?
 		
+		System.exit(0);
 		//code for closing down rooms and server
 		
 	}
@@ -34,6 +36,17 @@ public class Server {
 		return false;
 	}
 	
-	
+	public static void closeServer(){
+		((ServerListener) serverListener).closeConnections();
+		try {
+			Thread.currentThread().wait();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		if(!serverListener.isInterrupted()){
+			serverListener.interrupt();
+		}
+		active = false;
+	}
 	
 }

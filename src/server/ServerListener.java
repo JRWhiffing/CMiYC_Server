@@ -5,11 +5,14 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 
-public class ServerListener implements Runnable{
+public class ServerListener extends Thread{
 
 	private int portNumber;//port number
 	private ServerSocket listener;
+	private final HashMap<Integer, Thread> clients = new HashMap<Integer, Thread>();//various Threads
+	private Integer numberOfClients = 0;
 	
 	ServerListener(){ //setting up the Socket before running the Thread.
 		createListener();
@@ -24,10 +27,13 @@ public class ServerListener implements Runnable{
 				System.out.println("Server: Waiting for a client on the port: "+portNumber);
 				clientSocket = listener.accept();
 				System.out.println("Server: Client found, passing to ClientHandler.");
-				/*
-				 * Pass clientSocket to a Client Handler Thread (not sure where to create the class)
-				 * and then continue listening for clients. 
-				 */
+				numberOfClients++;
+				if(clientSocket != null){
+					clients.put(numberOfClients, new Thread( new ClientHandler(clientSocket, numberOfClients)));
+					clients.get(numberOfClients).run();
+				} else {
+					System.err.println("Unable to use client Socket.");
+				}
 			}
 		} catch (IOException ioe) {
 			System.err.println("Server: there was an error connecting to the client. "+ioe.getMessage());
@@ -84,6 +90,26 @@ public class ServerListener implements Runnable{
 			throw new Exception("Failed to secure socket: " + ioe.getMessage());
 		}
 		return temp;
+	}
+
+	public void closeConnections(){
+		for(int i = numberOfClients; i > 0; i--){
+			if(clients.containsKey(i)){
+				((ClientHandler) clients.get(i)).close();
+				if(!clients.get(i).isInterrupted()){
+					clients.get(i).interrupt();
+				}
+			}
+		}
+		if(listener != null){
+			try {
+				listener.close();
+			} catch (IOException ioe) {
+				System.err.println(ioe.getMessage());
+				System.exit(1);
+			}
+		}
+		notifyAll();
 	}
 	
 }
