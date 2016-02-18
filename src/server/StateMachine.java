@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 import server.packets.*;
-import server.packets.broadcast.*;
-import server.packets.lobbyinfo.*;
 
 public class StateMachine {
 	
@@ -28,11 +26,12 @@ public class StateMachine {
 			System.out.print(packetReader.nextByte());//getting rid of the senderID
 			dataID = packetReader.nextByte();
 			System.out.print(" | " + dataID);
+			char test = 0x00;
 		} else {
 			dataID = 0x00; //if the checksum failed set the id to 0x00 as this will be handled by the default case.
 		}
 		
-		byte[] serverPacket = new byte[]{0};
+		byte[] serverPacket = new byte[]{0x00};
 		switch (dataID){//each case is a protocol.
 		
 		case 0x01 :
@@ -44,7 +43,7 @@ public class StateMachine {
 			
 		default : //The NAK response to requesting that the last packet be resent.
 			System.err.println("Unrecognized Data ID");
-			serverPacket = NAK.NAK0x01;
+			//Packet.NAK0x01;
 			serverPacket = getChecksum(serverPacket);
 			break;
 		}
@@ -61,7 +60,7 @@ public class StateMachine {
 		}
 		newPacket[newPacket.length - 1] = checksum; //adding the checksum to the packet.
 		
-		return new byte[0];
+		return newPacket;
 	}
 	
 	private char readChar(){//will read a character from the packet.
