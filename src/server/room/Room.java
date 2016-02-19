@@ -2,6 +2,7 @@ package server.room;
 
 public class Room {
 
+	private int roomNumber;
 	//Players
 	//Game (Object?)
 	//Name
@@ -12,4 +13,7 @@ public class Room {
 	//Votes
 	//etc.
 	
+	public int getRoomNumber(){
+		return roomNumber;
+	}
 }
