@@ -38,8 +38,8 @@ public abstract class Packet {//will need to test for construction of packets, w
 		byte[] character_ = new byte[2];
 		ByteBuffer.wrap(character_).putChar(character);
 		packet = Arrays.copyOf(packet, packet.length + 2);
-		packet[packet.length - 1] = character_[0];
-		packet[packet.length] = character_[1];
+		packet[packet.length - 2] = character_[0];
+		packet[packet.length - 1] = character_[1];
 		
 		//printPacket();
 	}
@@ -71,13 +71,15 @@ public abstract class Packet {//will need to test for construction of packets, w
 	}
 	
 	public void putString(String string, int length){//need to include padding in the event the string is not of a preset size.
-		byte[] string_ = string.getBytes();
+		char[] string_ = string.toCharArray();
 		for(int i = 0; i < string_.length; i++){
-			putByte(string_[i]);
+			putChar(string_[i]);
 		}
-		while(string_.length < (length * 2)){
+		int l = length - string.length();
+		while(l > 0){
 			putByte((byte) 0x00);//2 bytes is a char 0x00, 0x7C is '|'
 			putByte((byte) 0x7C);
+			l--;
 		}
 	}
 	
@@ -120,7 +122,7 @@ public abstract class Packet {//will need to test for construction of packets, w
 		}
 		newPacket[newPacket.length - 1] = checksum; //adding the checksum to the packet.
 		
-		printPacket();
+		System.out.println(toString() + checksum + " | ");
 		
 		return newPacket;
 	}
