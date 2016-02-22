@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.util.Arrays;
 
 import server.packets.ClientPacket;
+import server.packets.ServerPacket;
 
 public class DummyClient {
 	
@@ -36,7 +37,12 @@ public class DummyClient {
 						System.exit(0);
 					}
 					if (command.equals("test1")){
+						cp = new ClientPacket();
+						cp.putByte(ClientPacket.JOIN);
+						cp.putString("Hello", 5);
 						
+						temp.getOutputStream().write(cp.getPacket());
+						temp.getOutputStream().flush();
 					} else if(command.equals("char")){
 						cp = new ClientPacket();
 						cp.putByte(ClientPacket.LOCATION_ID);
@@ -45,6 +51,18 @@ public class DummyClient {
 						
 						temp.getOutputStream().write(cp.getPacket());
 						temp.getOutputStream().flush();
+					} else if(command.equals("test2")){
+						cp = new ClientPacket();
+						cp.putByte(ClientPacket.ABILITY_USAGE);
+						
+						temp.getOutputStream().write(cp.getPacket());
+						temp.getOutputStream().flush();
+					} else if(command.equals("quit")){
+						try {
+							temp.close();
+						} catch (IOException e) {
+							System.err.println("You have been disconnected" + e.getMessage());
+						}
 					}
 				} else {
 					if(temp.getInputStream().available() != 0){
@@ -52,6 +70,8 @@ public class DummyClient {
 						byte[] serverPacket = new byte[0];
 						int read = temp.getInputStream().read(bytes, 0, bytes.length);
 						serverPacket = Arrays.copyOfRange(bytes, 0, read);
+						ServerPacket sp = new ServerPacket(serverPacket);
+						System.out.println(sp.toString());
 					}
 				}
 			} catch (final RuntimeException e) {
@@ -60,7 +80,7 @@ public class DummyClient {
 				System.exit(1);
 			} catch (final IOException e) {
 				// Die if something goes wrong.
-				System.err.println(e.toString());
+				System.err.println(e.getMessage());
 				System.exit(1);
 			}
 		}
