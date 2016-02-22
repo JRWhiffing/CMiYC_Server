@@ -5,7 +5,6 @@ import java.net.Socket;
 import java.util.Arrays;
 
 import server.Server;
-import server.packets.ServerPacket;
 
 public class ClientHandler extends Thread{
 	private final int clientID;
@@ -33,6 +32,8 @@ public class ClientHandler extends Thread{
 		} catch (Exception e){
 			System.err.println(e.getMessage());
 			Server.closeServer();
+		} finally {
+			close();
 		}
 	}
 	
@@ -76,6 +77,7 @@ public class ClientHandler extends Thread{
 	
 	public void close(){
 		if (clientSocket != null){
+			System.out.println("ClientHandler" + clientID + ": Client " + clientID + " has gone.");
 			try {
 				clientSocket.close();
 			} catch (IOException ioe) {

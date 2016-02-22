@@ -30,7 +30,7 @@ public class ServerListener extends Thread{
 				numberOfClients++;
 				if(clientSocket != null){
 					clients.put(numberOfClients, new ClientHandler(clientSocket, numberOfClients));
-					 clients.get(numberOfClients).run();
+					clients.get(numberOfClients).run();
 				} else {
 					System.err.println("Unable to use client Socket.");
 				}
@@ -43,7 +43,7 @@ public class ServerListener extends Thread{
 				if(listener != null){
 					listener.close();
 				}
-				System.out.println("Closing the listener");
+				System.err.println("Closing the listener");
 				
 				Thread.currentThread().interrupt();
 				} catch (IOException ioe) {
@@ -107,6 +107,11 @@ public class ServerListener extends Thread{
 			}
 		}
 		Thread.currentThread().interrupt();
+	}
+	
+	public void closeThread(int clientNum){
+		clients.get(clientNum).close();
+		
 	}
 	
 	public void sendPacket(int clientID, byte[] sp){
