@@ -11,7 +11,7 @@ public class ServerListener extends Thread{
 
 	private int portNumber;//port number
 	private ServerSocket listener;
-	private final HashMap<Integer, ClientHandler> clients = new HashMap<Integer, ClientHandler>();//various Threads
+	private final HashMap<Integer, ClientHandler[]> clients = new HashMap<Integer, ClientHandler[]>();//various Threads
 	private int numberOfClients = 0;
 	
 	ServerListener(){ //setting up the Socket before running the Thread.
@@ -29,8 +29,8 @@ public class ServerListener extends Thread{
 				System.out.println("Server: Client found, passing to ClientHandler.");
 				numberOfClients++;
 				if(clientSocket != null){
-					clients.put(numberOfClients, new ClientHandler(clientSocket, numberOfClients));
-					clients.get(numberOfClients).run();
+					clients.put(numberOfClients, new ClientHandler[]{(new ClientHandler(clientSocket, numberOfClients)),});
+					clients.get(numberOfClients)[0].run();
 				} else {
 					System.err.println("Unable to use client Socket.");
 				}
@@ -95,7 +95,8 @@ public class ServerListener extends Thread{
 	public void closeConnections(){
 		for(int i = numberOfClients; i > 0; i--){
 			if(clients.containsKey(i)){
-				clients.get(i).close();
+				clients.get(i)[0].close();
+				clients.get(i)[1].close();
 			}
 		}
 		if(listener != null){
@@ -110,7 +111,8 @@ public class ServerListener extends Thread{
 	}
 	
 	public void closeThread(int clientNum){
-		clients.get(clientNum).close();
+		clients.get(clientNum)[0].close();
+		clients.get(clientNum)[1].close();
 		
 	}
 	
@@ -118,7 +120,7 @@ public class ServerListener extends Thread{
 		System.out.println("Still Going");
 		if(clients.containsKey(clientID)){
 			System.out.println("Client Thread Found");
-			clients.get(clientID).sendPacket(sp);
+			clients.get(clientID)[1].sendPacket(sp);
 		}
 	}
 	

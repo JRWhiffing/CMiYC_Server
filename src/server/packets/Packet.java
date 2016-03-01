@@ -7,7 +7,7 @@ public abstract class Packet {//will need to test for construction of packets, w
 	
 	protected byte[] packet = new byte[0];
 	
-	public byte getByte(){
+	protected byte getByte(){
 		byte byte_ = packet[0];
 		packet = Arrays.copyOfRange(packet, 1, packet.length);
 		
@@ -16,14 +16,14 @@ public abstract class Packet {//will need to test for construction of packets, w
 		return byte_;
 	}
 	
-	public void putByte(byte byte_){
+	protected void putByte(byte byte_){
 		packet = Arrays.copyOf(packet, packet.length + 1);
 		packet[packet.length - 1] = byte_;
 		
 		//printPacket();
 	}
 	
-	public char getChar(){
+	protected char getChar(){
 		char character;
 		byte[] character_ = new byte[]{packet[0], packet[1]};
 		character = ByteBuffer.wrap(character_).getChar();
@@ -34,7 +34,7 @@ public abstract class Packet {//will need to test for construction of packets, w
 		return character;
 	}
 	
-	public void putChar(char character){
+	protected void putChar(char character){
 		byte[] character_ = new byte[2];
 		ByteBuffer.wrap(character_).putChar(character);
 		packet = Arrays.copyOf(packet, packet.length + 2);
@@ -44,7 +44,7 @@ public abstract class Packet {//will need to test for construction of packets, w
 		//printPacket();
 	}
 	
-	public double getDouble(){
+	protected double getDouble(){
 		double d_;
 		byte[] double_;
 		
@@ -57,7 +57,7 @@ public abstract class Packet {//will need to test for construction of packets, w
 		return d_;
 	}
 	
-	public void putDouble(double d_){
+	protected void putDouble(double d_){
 		byte[] double_ = new byte[8];
 		ByteBuffer.wrap(double_).putDouble(d_);
 		
@@ -70,7 +70,7 @@ public abstract class Packet {//will need to test for construction of packets, w
 		//printPacket();
 	}
 	
-	public void putString(String string, int length){//need to include padding in the event the string is not of a preset size.
+	protected void putString(String string, int length){//need to include padding in the event the string is not of a preset size.
 		char[] string_ = string.toCharArray();
 		for(int i = 0; i < string_.length; i++){
 			putChar(string_[i]);
@@ -83,7 +83,7 @@ public abstract class Packet {//will need to test for construction of packets, w
 		}
 	}
 	
-	public String getString(int length){
+	protected String getString(int length){
 		String string_ = "";
 		char temp;
 		for(int i = 0; i < length; i++){
@@ -96,35 +96,20 @@ public abstract class Packet {//will need to test for construction of packets, w
 		return string_;
 	}
 	
-	public void putRoomKey(String key){
-		putString(key, 5);
-	}
-	
-	public String getRoomKey(){
-		return getString(5);//5 Digit base 36 (alphabet and numbers) code?
-	}
-	
-	public void putName(String name){
-		putString(name, 15);
-	}
-	
-	public String getName(){
-		return getString(15);//character limit of 15?
-	}
-	
 	public byte[] getPacket(){//used to perform a checksum on a packet and return it.
-		byte[] newPacket = new byte[packet.length + 1];
-		byte checksum = 0x00;
-		
-		for(int i = 0; i < packet.length; i++){
-			checksum += packet[i];
-			newPacket[i] = packet[i];
-		}
-		newPacket[newPacket.length - 1] = checksum; //adding the checksum to the packet.
-		
-		System.out.println(toString() + checksum + " | ");
-		
-		return newPacket;
+//		byte[] newPacket = new byte[packet.length + 1];
+//		byte checksum = 0x00;
+//		
+//		for(int i = 0; i < packet.length; i++){
+//			checksum += packet[i];
+//			newPacket[i] = packet[i];
+//		}
+//		newPacket[newPacket.length - 1] = checksum; //adding the checksum to the packet.
+//		
+//		System.out.println(toString() + checksum + " | ");
+//		
+//		return newPacket;
+		return packet;
 	}
 	
 	@Override
@@ -169,4 +154,75 @@ public abstract class Packet {//will need to test for construction of packets, w
 	//Votes Toggle IDs
 	public static final byte VOTES_ENABLED = 0X01;
 	public static final byte VOTES_DISABLED = 0X01;
+	
+	/*----------------------------------------------------------*/
+	
+	//Client IDs
+	public static final byte CLIENT_LOCATION = 0x01;
+	public static final byte PING_RESPONSE = 0x02;
+	public static final byte CATCH_PERFORMED = 0x03;
+	public static final byte CAPTURED = 0x04;
+	public static final byte ABILITY_USAGE = 0x05;
+	public static final byte VOTE = 0x06;
+	public static final byte REPORT = 0x07;
+	public static final byte QUIT = 0x08;
+	public static final byte JOIN = 0x09;
+	public static final byte HOST_ACTION = 0x0A;
+	public static final byte CLIENT_ACK = 0x0B;
+	public static final byte CLIENT_NAK = 0x0C;
+	public static final byte BAD_SPAWN = 0x0D;
+	public static final byte PLAYER_READY = 0x0E;
+	
+	//Client Host Action IDs
+	public static final byte HOST_ACTION_START_ROUND = 0x01;
+	public static final byte HOST_ACTION_END_ROUND = 0x02;
+	public static final byte HOST_ACTION_KICK_PLAYER = 0x03;
+	public static final byte HOST_ACTION_CREATE_ROOM = 0x04;
+	public static final byte HOST_ACTION_CLOSE_ROOM = 0x05;
+	public static final byte HOST_ACTION_TIME_LIMIT = 0x06;
+	public static final byte HOST_ACTION_SCORE_LIMIT = 0x07;
+	public static final byte HOST_ACTION_CHANGE_GAMEMODE = 0x08;
+	public static final byte HOST_ACTION_SET_BOUNDARIES = 0x09;
+	public static final byte HOST_ACTION_BOUNDARY_UPDATES = 0x0A;
+	public static final byte HOST_ACTION_CHANGE_HOST = 0x0B;
+	public static final byte HOST_ACTION_ALLOW_VOTING = 0x0C;
+	
+	/*----------------------------------------------------------*/
+	
+	//Server IDs
+		public static final byte SERVER_LOCATION = 0x01;
+		public static final byte PING = 0x02;
+		public static final byte BROADCAST = 0x03;
+		public static final byte TARGET = 0x04;
+		public static final byte SPAWN_REGION = 0x05;
+		public static final byte ABILITY_ACTION = 0x06;
+		public static final byte GAME_START = 0x07;
+		public static final byte GAME_END = 0x08;
+		public static final byte ROOM_CLOSE = 0x09;
+		public static final byte ROOM_KEY = 0x0A;
+		public static final byte LOBBYINFO = 0x0B;
+		public static final byte KICK = 0x0C;
+		public static final byte SERVER_ACK = 0x0D;
+		public static final byte SERVER_NAK = 0x0E;
+		public static final byte HOST = 0x0F;
+		
+		//Broadcast IDs
+		public static final byte BROADCAST_TIME_REMAINING = 0x01;
+		public static final byte BROADCAST_LEADERBOARD = 0x02;
+		public static final byte BROADCAST_CAPTURE = 0x03;
+		public static final byte BROADCAST_VOTES = 0x04;
+		public static final byte BROADCAST_QUIT = 0x05;
+		public static final byte BROADCAST_BOUNDARY_UPDATE = 0x06;
+		public static final byte BROADCAST_NEW_HOST = 0x07;
+		public static final byte BROADCAST_NEW_PLAYER = 0x08;
+		public static final byte BROADCAST_PLAYER_READY = 0x09;
+		
+		//Lobby Information IDs
+		public static final byte LOBBYINFO_GAMETYPE = 0x01;
+		public static final byte LOBBYINFO_TIME_LIMIT = 0x02;
+		public static final byte LOBBYINFO_SCORE_LIMIT = 0x03;
+		public static final byte LOBBYINFO_BOUNDARIES = 0x04;
+		public static final byte LOBBYINFO_LEADERBOARD = 0x05;
+		public static final byte LOBBYINFO_ROOM_NAME = 0x06;
+		public static final byte LOBBYINFO_VOTES = 0x07;
 }
