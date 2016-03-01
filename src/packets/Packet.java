@@ -156,9 +156,8 @@ public abstract class Packet {//will need to test for construction of packets, w
 	public static final byte GAMETYPE_MAN_HUNT = 0X03;
 	
 	//NAK IDs
-	public static final byte NAK_RESEND = 0x01;
-	public static final byte NAK_INVALID_ROOM_KEY = 0x02;
-	public static final byte NAK_NOT_ENOUGH_PLAYERS = 0x03;
+	public static final byte NAK_INVALID_ROOM_KEY = 0x01;
+	public static final byte NAK_NOT_ENOUGH_PLAYERS = 0x02;
 	
 	//Disconnect IDs
 	public static final byte DISCONNECT_QUIT = 0X01;
@@ -168,10 +167,6 @@ public abstract class Packet {//will need to test for construction of packets, w
 	//Kick IDs
 	public static final byte KICK_POOR_CONNECTION = 0X01;
 	public static final byte KICK_KICKED = 0X02;
-	
-	//Votes Toggle IDs
-	public static final byte VOTES_ENABLED = 0X01;
-	public static final byte VOTES_DISABLED = 0X01;
 	
 	//Location ID -- same for server and client
 	public static final byte LOCATION = 0x01;
@@ -188,8 +183,7 @@ public abstract class Packet {//will need to test for construction of packets, w
 	public static final byte QUIT = 0x08;
 	public static final byte JOIN = 0x09;
 	public static final byte HOST_ACTION = 0x0A;
-	public static final byte CLIENT_ACK = 0x0B;
-	public static final byte CLIENT_NAK = 0x0C;
+	public static final byte ACK = 0x0B;
 	public static final byte BAD_SPAWN = 0x0D;
 	public static final byte PLAYER_READY = 0x0E;
 	
@@ -201,7 +195,7 @@ public abstract class Packet {//will need to test for construction of packets, w
 		public static final byte HOST_ACTION_CLOSE_ROOM = 0x05;
 		public static final byte HOST_ACTION_TIME_LIMIT = 0x06;
 		public static final byte HOST_ACTION_SCORE_LIMIT = 0x07;
-		public static final byte HOST_ACTION_CHANGE_GAMEMODE = 0x08;
+		public static final byte HOST_ACTION_CHANGE_GAMETYPE = 0x08;
 		public static final byte HOST_ACTION_SET_BOUNDARIES = 0x09;
 		public static final byte HOST_ACTION_BOUNDARY_UPDATES = 0x0A;
 		public static final byte HOST_ACTION_CHANGE_HOST = 0x0B;
@@ -221,8 +215,7 @@ public abstract class Packet {//will need to test for construction of packets, w
 	public static final byte ROOM_KEY = 0x0A;
 	public static final byte LOBBYINFO = 0x0B;
 	public static final byte KICK = 0x0C;
-	public static final byte SERVER_ACK = 0x0D;
-	public static final byte SERVER_NAK = 0x0E;
+	public static final byte NAK = 0x0E;
 	public static final byte HOST = 0x0F;
 		
 		//Broadcast IDs

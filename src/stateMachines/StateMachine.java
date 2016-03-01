@@ -2,11 +2,11 @@ package stateMachines;
 
 import java.util.Arrays;
 
-import server.Server;
 import packets.*;
 //needed?
 //import server.packets.serverPackets.*;
 import packets.clientPackets.*;
+import server.Server;
 
 public class StateMachine {
 	
@@ -87,11 +87,7 @@ public class StateMachine {
 			//Server will complete an action depending on the ID
 			break;
 			
-		case Packet.CLIENT_NAK : //NAK Resend packet
-			//Server will resend packet to client
-			break;
-			
-		case Packet.CLIENT_ACK : //ACK Client Acknowledgement of last packet
+		case Packet.ACK : //ACK Client Acknowledgement of last packet
 			//Confirmation that packet was sent
 			//No response required by server
 			break;

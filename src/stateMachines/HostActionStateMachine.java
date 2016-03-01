@@ -1,9 +1,9 @@
-package server.stateMachines;
+package stateMachines;
 
 import java.util.Arrays;
 
-import server.packets.Packet;
-import server.packets.clientPackets.hostPackets.*;
+import packets.Packet;
+import packets.clientPackets.hostPackets.*;
 import server.Server;
 
 public class HostActionStateMachine {
@@ -25,7 +25,7 @@ public class HostActionStateMachine {
 			
 			break;
 			
-		case Packet.HOST_ACTION_CHANGE_GAMEMODE :
+		case Packet.HOST_ACTION_CHANGE_GAMETYPE :
 			
 			break;
 		

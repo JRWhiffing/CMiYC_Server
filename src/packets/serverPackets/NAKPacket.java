@@ -5,7 +5,7 @@ import packets.Packet;
 public class NAKPacket extends Packet {
 	
 	public NAKPacket(){
-		putByte(Packet.SERVER_NAK);
+		putByte(Packet.NAK);
 	}
 	
 	public NAKPacket(byte[] data){
