@@ -3,20 +3,22 @@ package server.stateMachines;
 import java.util.Arrays;
 
 import server.packets.Packet;
+import server.packets.clientPackets.hostPackets.*;
+import server.Server;
 
 public class HostActionStateMachine {
 
 	private Packet clientPacket;
 	private Packet serverPacket;
 	
-	public Packet parseHostAction(byte[] hostAction){
+	public void processHostAction(byte[] hostAction){
 		byte hostID = hostAction[0]; //Host Action ID
 		hostAction = Arrays.copyOf(hostAction, 1);//removing the host ID from the packet so only data is left
 		
 		switch (hostID){
 		
 		case Packet.HOST_ACTION_ALLOW_VOTING :
-			
+			//clientPacket = new AllowVotingPacket
 			break;
 		
 		case Packet.HOST_ACTION_BOUNDARY_UPDATES:
@@ -68,8 +70,6 @@ public class HostActionStateMachine {
 			
 			break;
 		}
-		
-		return serverPacket;
 	}
 	
 }

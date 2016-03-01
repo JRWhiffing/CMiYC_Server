@@ -13,11 +13,11 @@ public class NAKPacket extends Packet {
 	}
 	
 	public void invalidRoomKey(){
-		super.putByte(NAK_INVALID_ROOM_KEY);
+		super.putByte(Packet.NAK_INVALID_ROOM_KEY);
 	}
 	
 	public void notEnoughPlayers(){
-		super.putByte(NAK_NOT_ENOUGH_PLAYERS);
+		super.putByte(Packet.NAK_NOT_ENOUGH_PLAYERS);
 	}
 	
 	public byte getNAKID(){

@@ -24,7 +24,7 @@ public class ServerInput extends Thread{
 				byte[] clientPacket = new byte[0];
 				System.out.println("Message Recieved, Processing.");
 				clientPacket = Arrays.copyOfRange(temp, 0, read);
-				sm.onPacketRecieved(clientPacket);
+				sm.processPacket(clientPacket);
 				temp = new byte[512];
 			}
 		} catch (Exception e){

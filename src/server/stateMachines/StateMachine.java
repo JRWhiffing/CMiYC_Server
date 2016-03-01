@@ -4,13 +4,13 @@ import java.util.Arrays;
 
 import server.Server;
 import server.packets.*;
-import server.packets.serverPackets.*;
-import server.packets.clientPackets.*;
+//needed?
+//import server.packets.serverPackets.*;
+//import server.packets.clientPackets.*;
 
 public class StateMachine {
 	
 	private final int clientID;
-	private Packet serverPacket;
 	private Packet clientPacket;
 	private final HostActionStateMachine hasm;
 	
@@ -22,7 +22,7 @@ public class StateMachine {
 	
 	//Must have method for each protocol, either hear or from across System.
 	
-	public void onPacketRecieved(byte[] packet){//not sure on best way to pass data to StateMachine
+	public void processPacket(byte[] packet){//not sure on best way to pass data to StateMachine
 		byte dataID = packet[0];
 		packet = Arrays.copyOf(packet, 1);//removing the data ID from the packet so only data is left
 		
@@ -77,8 +77,8 @@ public class StateMachine {
 			break;
 			
 		case Packet.HOST_ACTION : //Action completed by a host
-			serverPacket = hasm.parseHostAction(packet);
-			sendPacket();
+			hasm.processHostAction(packet);
+			//sendPacket();
 			//Separate Case statement will be needed for this
 			//Server will complete an action depending on the ID
 			break;
@@ -107,7 +107,8 @@ public class StateMachine {
 		}
 	}
 	
-	private void sendPacket(){
+	//will the state machine actually send packets, or will the methods called within the server send the packets?
+	private void sendPacket(Packet serverPacket){
 		System.out.println("Returning Packet");
 		Server.sendPacket(clientID, serverPacket);
 	}
