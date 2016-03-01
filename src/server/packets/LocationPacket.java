@@ -2,10 +2,12 @@ package server.packets;
 
 import server.packets.Packet;
 
+//Location is a packet that can be used by both the Server and Client as in both instances it will be identical.
+
 public class LocationPacket extends Packet {
 	
 	public LocationPacket(){
-		super.putByte((byte)0x01);
+		super.putByte(Packet.LOCATION);
 	}
 	
 	public LocationPacket(byte[] data){

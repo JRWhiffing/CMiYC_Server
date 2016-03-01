@@ -3,6 +3,7 @@ package server;
 import java.util.HashMap;
 import java.util.Random;
 
+import server.packets.Packet;
 import server.room.*;
 
 public class Server {	
@@ -29,9 +30,9 @@ public class Server {
 		System.exit(0);
 	}
 	
-	public static void sendPacket(int clientID, byte[] sp){
+	public static void sendPacket(int clientID, Packet serverPacket){
 		System.out.println("Still Returning");
-		serverListener.sendPacket(clientID, sp);
+		serverListener.sendPacket(clientID, serverPacket);
 	}
 	
 	public static void closeServer(){
@@ -39,7 +40,7 @@ public class Server {
 		active = false;
 	}
 	
-	private static String generateRoomKey(){
+	private synchronized static String generateRoomKey(){
 		Random random = new Random();
 		int char_;
 		String key = "";

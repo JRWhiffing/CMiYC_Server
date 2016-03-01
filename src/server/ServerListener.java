@@ -7,12 +7,14 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
+import server.packets.Packet;
+
 public class ServerListener extends Thread{
 
 	private int portNumber;//port number
 	private ServerSocket listener;
-	private final HashMap<Integer, ClientHandler[]> clients = new HashMap<Integer, ClientHandler[]>();//various Threads
-	private int numberOfClients = 0;
+	private final HashMap<Integer, ClientHandler> clients = new HashMap<Integer, ClientHandler>();//various Threads
+	private int latestClientID = 0;
 	
 	ServerListener(){ //setting up the Socket before running the Thread.
 		createListener();
@@ -27,10 +29,9 @@ public class ServerListener extends Thread{
 				System.out.println("Server: Waiting for a client on the port: "+portNumber);
 				clientSocket = listener.accept();
 				System.out.println("Server: Client found, passing to ClientHandler.");
-				numberOfClients++;
+				latestClientID++;
 				if(clientSocket != null){
-					clients.put(numberOfClients, new ClientHandler[]{(new ClientHandler(clientSocket, numberOfClients)),});
-					clients.get(numberOfClients)[0].run();
+					clients.put(latestClientID, new ClientHandler(clientSocket, latestClientID));
 				} else {
 					System.err.println("Unable to use client Socket.");
 				}
@@ -93,10 +94,9 @@ public class ServerListener extends Thread{
 	}
 
 	public void closeConnections(){
-		for(int i = numberOfClients; i > 0; i--){
+		for(int i = latestClientID; i > 0; i--){
 			if(clients.containsKey(i)){
-				clients.get(i)[0].close();
-				clients.get(i)[1].close();
+				clients.get(i).close();
 			}
 		}
 		if(listener != null){
@@ -111,16 +111,15 @@ public class ServerListener extends Thread{
 	}
 	
 	public void closeThread(int clientNum){
-		clients.get(clientNum)[0].close();
-		clients.get(clientNum)[1].close();
+		clients.get(clientNum).close();
 		
 	}
 	
-	public void sendPacket(int clientID, byte[] sp){
+	public void sendPacket(int clientID, Packet serverPacket){
 		System.out.println("Still Going");
 		if(clients.containsKey(clientID)){
 			System.out.println("Client Thread Found");
-			clients.get(clientID)[1].sendPacket(sp);
+			clients.get(clientID).sendPacket(serverPacket);
 		}
 	}
 	
