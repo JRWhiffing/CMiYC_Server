@@ -11,7 +11,6 @@ import server.Server;
 public class StateMachine {
 	
 	private final int clientID;
-	private Packet clientPacket;
 	private final HostActionStateMachine hasm;
 	
 	public StateMachine(Integer clientID){
@@ -29,9 +28,9 @@ public class StateMachine {
 		switch (dataID){//each case is a protocol.
 		
 		case Packet.LOCATION : //Location
-			clientPacket = new LocationPacket(packet);
+			LocationPacket lp = new LocationPacket(packet);
 			double[] location = new double[2];
-			location = ((LocationPacket) clientPacket).getLocation();
+			location = lp.getLocation();
 			System.out.println(location[0] + " | " + location[1]);
 			//sendPacket();
 			break;
@@ -51,21 +50,24 @@ public class StateMachine {
 			break;
 			
 		case Packet.ABILITY_USAGE : //Ability Usage
-			clientPacket = new AbilityUsagePacket(packet);
-			byte ability = ((AbilityUsagePacket) clientPacket).getAbility(); //Ability Data Type might need changing?
+			AbilityUsagePacket aup = new AbilityUsagePacket(packet);
+			byte ability = aup.getAbility(); //Ability Data Type might need changing?
+			System.out.println(ability);
 			//Some sort of ability manipulation needed here
 			//Server may need response if ability changes an element of the game
 			break;
 			
 		case Packet.VOTE : //Vote in a Lobby
-			clientPacket = new VotePacket(packet);
-			byte gameMode = ((VotePacket) clientPacket).getVote(); 
+			VotePacket vp = new VotePacket(packet);
+			byte gametype = vp.getVote();
+			System.out.println(gametype);
 			//Server sends a response updating vote count
 			break;
 			
 		case Packet.REPORT : //Report?
-			clientPacket = new ReportPacket(packet);
-			int reportedPlayerID = ((ReportPacket) clientPacket).getReport();
+			ReportPacket rp = new ReportPacket(packet);
+			int reportedPlayerID = rp.getReport();
+			System.out.println(reportedPlayerID);
 			//??
 			break;
 			
@@ -75,14 +77,17 @@ public class StateMachine {
 			break;
 		
 		case Packet.JOIN : //Client joins
-			String roomKey; //Room Key
-			double[] macAddress = new double[6]; //Mac Address
+			JoinPacket jp = new JoinPacket(packet);
+			String roomKey = jp.getRoomKey(); //Room Key
+			double[] macAddress = jp.getMACAddress(); //Mac Address
+			
+			System.out.println(roomKey + " | " + macAddress[0] + "-" + macAddress[1] + "-"
+					 + macAddress[2] + "-" + macAddress[3] + "-" + macAddress[4] + "-" + macAddress[5]);
 			//Server checks room key and completes some kind of action
 			break;
 			
 		case Packet.HOST_ACTION : //Action completed by a host
 			hasm.processHostAction(packet);
-			//sendPacket();
 			//Separate Case statement will be needed for this
 			//Server will complete an action depending on the ID
 			break;

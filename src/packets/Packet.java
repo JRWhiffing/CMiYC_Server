@@ -164,6 +164,10 @@ public abstract class Packet {//will need to test for construction of packets, w
 	public static final byte DISCONNECT_POOR_CONNECTION = 0X02;
 	public static final byte DISCONNECT_KICK = 0X03;
 	
+	//Votes IDs
+	public static final byte VOTES_ENABLED= 0x01;
+	public static final byte VOTES_DISABLED= 0x02;
+	
 	//Kick IDs
 	public static final byte KICK_POOR_CONNECTION = 0X01;
 	public static final byte KICK_KICKED = 0X02;
@@ -184,8 +188,8 @@ public abstract class Packet {//will need to test for construction of packets, w
 	public static final byte JOIN = 0x09;
 	public static final byte HOST_ACTION = 0x0A;
 	public static final byte ACK = 0x0B;
-	public static final byte BAD_SPAWN = 0x0D;
-	public static final byte PLAYER_READY = 0x0E;
+	public static final byte BAD_SPAWN = 0x0C;
+	public static final byte PLAYER_READY = 0x0D;
 	
 	//Client Host Action IDs
 		public static final byte HOST_ACTION_START_ROUND = 0x01;
@@ -215,8 +219,8 @@ public abstract class Packet {//will need to test for construction of packets, w
 	public static final byte ROOM_KEY = 0x0A;
 	public static final byte LOBBYINFO = 0x0B;
 	public static final byte KICK = 0x0C;
-	public static final byte NAK = 0x0E;
-	public static final byte HOST = 0x0F;
+	public static final byte NAK = 0x0D;
+	public static final byte HOST = 0x0E;
 		
 		//Broadcast IDs
 		public static final byte BROADCAST_TIME_REMAINING = 0x01;

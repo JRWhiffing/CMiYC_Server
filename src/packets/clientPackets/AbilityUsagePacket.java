@@ -5,7 +5,7 @@ import packets.Packet;
 public class AbilityUsagePacket extends Packet{
 
 	public AbilityUsagePacket(){
-		putByte(ABILITY_USAGE);
+		putByte(Packet.ABILITY_USAGE);
 	}
 	
 	public AbilityUsagePacket(byte[] data){

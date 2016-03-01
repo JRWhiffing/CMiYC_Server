@@ -9,7 +9,6 @@ import server.Server;
 public class HostActionStateMachine {
 
 	private Packet clientPacket;
-	private Packet serverPacket;
 	
 	public void processHostAction(byte[] hostAction){
 		byte hostID = hostAction[0]; //Host Action ID
