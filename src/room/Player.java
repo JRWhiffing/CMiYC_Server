@@ -1,4 +1,4 @@
-package server.room;
+package room;
 
 public class Player {
 

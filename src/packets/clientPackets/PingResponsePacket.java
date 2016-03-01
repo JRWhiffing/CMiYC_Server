@@ -1,6 +1,6 @@
-package server.packets.clientPackets;
+package packets.clientPackets;
 
-import server.packets.Packet;
+import packets.Packet;
 
 public class PingResponsePacket extends Packet {
 	

@@ -2,7 +2,7 @@ package server;
 
 import java.net.Socket;
 
-import server.packets.Packet;
+import packets.Packet;
 
 public class ClientHandler {
 	private final int clientID;

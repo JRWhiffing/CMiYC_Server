@@ -7,13 +7,14 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Arrays;
 
-import server.packets.ClientPacket;
-import server.packets.ServerPacket;
+import packets.Packet;
+import packets.clientPackets.*;
+import packets.serverPackets.*;
 
 public class DummyClient {
 	
 	static Socket temp;
-	static private ClientPacket cp;
+	static private Packet cp;
 	
 	public static void main(String[] args){
 		try {
@@ -37,23 +38,23 @@ public class DummyClient {
 						System.exit(0);
 					}
 					if (command.equals("test1")){
-						cp = new ClientPacket();
-						cp.putByte(ClientPacket.JOIN);
-						cp.putString("Hello", 5);
+//						cp = new ClientPacket();
+//						cp.putByte(ClientPacket.JOIN);
+//						cp.putString("Hello", 5);
 						
 						temp.getOutputStream().write(cp.getPacket());
 						temp.getOutputStream().flush();
 					} else if(command.equals("char")){
-						cp = new ClientPacket();
-						cp.putByte(ClientPacket.LOCATION_ID);
-						cp.putDouble(1000);
-						cp.putDouble(750);
+//						cp = new ClientPacket();
+//						cp.putByte(ClientPacket.LOCATION_ID);
+//						cp.putDouble(1000);
+//						cp.putDouble(750);
 						
 						temp.getOutputStream().write(cp.getPacket());
 						temp.getOutputStream().flush();
 					} else if(command.equals("test2")){
-						cp = new ClientPacket();
-						cp.putByte(ClientPacket.ABILITY_USAGE);
+//						cp = new ClientPacket();
+//						cp.putByte(ClientPacket.ABILITY_USAGE);
 						
 						temp.getOutputStream().write(cp.getPacket());
 						temp.getOutputStream().flush();
@@ -70,8 +71,8 @@ public class DummyClient {
 						byte[] serverPacket = new byte[0];
 						int read = temp.getInputStream().read(bytes, 0, bytes.length);
 						serverPacket = Arrays.copyOfRange(bytes, 0, read);
-						ServerPacket sp = new ServerPacket(serverPacket);
-						System.out.println(sp.toString());
+						//Packet sp = new ServerPacket(serverPacket);
+						//System.out.println(sp.toString());
 					}
 				}
 			} catch (final RuntimeException e) {

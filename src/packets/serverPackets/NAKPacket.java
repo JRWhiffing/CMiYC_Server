@@ -1,6 +1,6 @@
-package server.packets.serverPackets;
+package packets.serverPackets;
 
-import server.packets.Packet;
+import packets.Packet;
 
 public class NAKPacket extends Packet {
 	

@@ -1,6 +1,6 @@
-package server.packets.clientPackets.hostPackets;
+package packets.clientPackets.hostPackets;
 
-import server.packets.Packet;
+import packets.Packet;
 
 public class HostStartRoundPacket extends Packet {
 

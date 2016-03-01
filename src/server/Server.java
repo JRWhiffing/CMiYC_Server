@@ -3,8 +3,8 @@ package server;
 import java.util.HashMap;
 import java.util.Random;
 
-import server.packets.Packet;
-import server.room.*;
+import packets.Packet;
+import room.*;
 
 public class Server {	
 	

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.LinkedList;
 
-import server.packets.Packet;
+import packets.Packet;
 
 public class ServerOutput extends Thread{
 	private final Socket clientSocket;

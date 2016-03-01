@@ -1,12 +1,12 @@
-package server.stateMachines;
+package stateMachines;
 
 import java.util.Arrays;
 
 import server.Server;
-import server.packets.*;
+import packets.*;
 //needed?
 //import server.packets.serverPackets.*;
-import server.packets.clientPackets.*;
+import packets.clientPackets.*;
 
 public class StateMachine {
 	

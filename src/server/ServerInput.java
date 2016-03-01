@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Arrays;
 
-import server.stateMachines.StateMachine;
+import stateMachines.StateMachine;
 
 public class ServerInput extends Thread{
 	private final Socket clientSocket;

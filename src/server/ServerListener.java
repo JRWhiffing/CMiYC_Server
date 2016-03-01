@@ -7,7 +7,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
-import server.packets.Packet;
+import packets.Packet;
 
 public class ServerListener extends Thread{
 

@@ -1,6 +1,6 @@
-package server.packets;
+package packets;
 
-import server.packets.Packet;
+import packets.Packet;
 
 //Location is a packet that can be used by both the Server and Client as in both instances it will be identical.
 
