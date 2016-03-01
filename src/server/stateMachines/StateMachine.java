@@ -6,7 +6,7 @@ import server.Server;
 import server.packets.*;
 //needed?
 //import server.packets.serverPackets.*;
-//import server.packets.clientPackets.*;
+import server.packets.clientPackets.*;
 
 public class StateMachine {
 	
@@ -51,17 +51,21 @@ public class StateMachine {
 			break;
 			
 		case Packet.ABILITY_USAGE : //Ability Usage
-			byte ability; //Ability Data Type might need changing?
+			clientPacket = new AbilityUsagePacket(packet);
+			byte ability = ((AbilityUsagePacket) clientPacket).getAbility(); //Ability Data Type might need changing?
 			//Some sort of ability manipulation needed here
 			//Server may need response if ability changes an element of the game
 			break;
 			
 		case Packet.VOTE : //Vote in a Lobby
-			byte gameMode; 
+			clientPacket = new VotePacket(packet);
+			byte gameMode = ((VotePacket) clientPacket).getVote(); 
 			//Server sends a response updating vote count
 			break;
 			
 		case Packet.REPORT : //Report?
+			clientPacket = new ReportPacket(packet);
+			int reportedPlayerID = ((ReportPacket) clientPacket).getReport();
 			//??
 			break;
 			

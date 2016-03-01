@@ -5,23 +5,23 @@ import server.packets.Packet;
 public class NAKPacket extends Packet {
 	
 	public NAKPacket(){
-		super.putByte(Packet.SERVER_NAK);
+		putByte(Packet.SERVER_NAK);
 	}
 	
 	public NAKPacket(byte[] data){
-		super.packet = data;
+		packet = data;
 	}
 	
 	public void invalidRoomKey(){
-		super.putByte(Packet.NAK_INVALID_ROOM_KEY);
+		putByte(Packet.NAK_INVALID_ROOM_KEY);
 	}
 	
 	public void notEnoughPlayers(){
-		super.putByte(Packet.NAK_NOT_ENOUGH_PLAYERS);
+		putByte(Packet.NAK_NOT_ENOUGH_PLAYERS);
 	}
 	
 	public byte getNAKID(){
-		return super.getByte();
+		return getByte();
 	}
 	
 }

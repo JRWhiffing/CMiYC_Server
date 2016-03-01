@@ -5,7 +5,7 @@ import server.packets.Packet;
 public class CatchPerformedPacket extends Packet {
 
 	public CatchPerformedPacket(){
-		super.putByte(Packet.CATCH_PERFORMED);
+		putByte(Packet.CATCH_PERFORMED);
 	}
 	
 }

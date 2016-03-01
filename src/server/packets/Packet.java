@@ -70,27 +70,45 @@ public abstract class Packet {//will need to test for construction of packets, w
 		//printPacket();
 	}
 	
-	protected void putString(String string, int length){//need to include padding in the event the string is not of a preset size.
-		char[] string_ = string.toCharArray();
-		for(int i = 0; i < string_.length; i++){
-			putChar(string_[i]);
+	protected int getInt(){
+		byte[] int_;
+		int integer;
+		int_ = Arrays.copyOf(packet, 4);
+		integer = ByteBuffer.wrap(int_).getInt();
+		packet = Arrays.copyOfRange(packet, 4, packet.length);
+		
+		//printPacket();
+		
+		return integer;
+	}
+	
+	protected void putInt(int integer){
+		byte[] int_ = new byte[4];
+		ByteBuffer.wrap(int_).putDouble(integer);
+		
+		packet = Arrays.copyOf(packet, packet.length + 4);
+		
+		for(int i = 0; i < 4; i ++){
+			packet[packet.length - (4-i)] = int_[i];
 		}
-		int l = length - string.length();
-		while(l > 0){
-			putByte((byte) 0x00);//2 bytes is a char 0x00, 0x7C is '|'
-			putByte((byte) 0x7C);
-			l--;
+		
+		//printPacket();
+	}
+	
+	protected void putString(String string){//need to include padding in the event the string is not of a preset size.
+		char[] string_ = string.toCharArray();
+		int length =  string.length();
+		putInt(length);//putting the length of the string first
+		for(int i = 0; i < length; i++){
+			putChar(string_[i]);
 		}
 	}
 	
-	protected String getString(int length){
+	protected String getString(){
 		String string_ = "";
-		char temp;
+		int length = getInt();//getting the length of the string to know how much to read
 		for(int i = 0; i < length; i++){
-			temp = getChar();
-			if(temp != '|'){//removing padding
-				string_ += temp;
-			}
+			string_ += getChar();
 		}
 		
 		return string_;

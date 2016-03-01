@@ -7,20 +7,20 @@ import server.packets.Packet;
 public class LocationPacket extends Packet {
 	
 	public LocationPacket(){
-		super.putByte(Packet.LOCATION);
+		putByte(Packet.LOCATION);
 	}
 	
 	public LocationPacket(byte[] data){
-		super.packet = data;
+		packet = data;
 	}
 	
 	public void putLocation(double longitude, double latitude){
-		super.putDouble(longitude);
-		super.putDouble(latitude);
+		putDouble(longitude);
+		putDouble(latitude);
 	}	
 	
 	public double[] getLocation(){
-		return new double[]{super.getDouble(), super.getDouble()};
+		return new double[]{getDouble(), getDouble()};
 	}
 	
 }
