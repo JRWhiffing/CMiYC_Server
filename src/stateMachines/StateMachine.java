@@ -20,8 +20,6 @@ public class StateMachine {
 		hasm = new HostActionStateMachine(clientID);
 	}
 	
-	//Must have method for each protocol, either hear or from across System.
-	
 	public void processPacket(byte[] packet){//not sure on best way to pass data to StateMachine
 		byte dataID = packet[0];
 		packet = Arrays.copyOf(packet, 1);//removing the data ID from the packet so only data is left
