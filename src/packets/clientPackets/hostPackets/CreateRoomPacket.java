@@ -17,6 +17,10 @@ public class CreateRoomPacket extends Packet {
 		putString(name);
 	}
 	
+	public void putHostName(String name){//the nickname of the player creating the room
+		putString(name);
+	}
+	
 	public void putMACAddress(double[] address){
 		for(int i = 0; i < 6; i++){
 			putDouble(address[i]);
@@ -24,6 +28,10 @@ public class CreateRoomPacket extends Packet {
 	}
 	
 	public String getRoomName(){
+		return getString();
+	}
+	
+	public String getHostName(){
 		return getString();
 	}
 	

@@ -7,29 +7,36 @@ import packets.clientPackets.hostPackets.*;
 import server.Server;
 
 public class HostActionStateMachine {
-
-	private Packet clientPacket;
 	
-	public void processHostAction(byte[] hostAction){
-		byte hostID = hostAction[0]; //Host Action ID
-		hostAction = Arrays.copyOf(hostAction, 1);//removing the host ID from the packet so only data is left
+	private final int clientID;
+	
+	public HostActionStateMachine(int clientID){
+		this.clientID = clientID;
+	}
+
+	public void processHostAction(byte[] data){
+		byte hostID = data[0]; //Host Action ID
+		data = Arrays.copyOf(data, 1);//removing the host ID from the packet so only data is left
 		
 		switch (hostID){
 		
 		case Packet.HOST_ACTION_ALLOW_VOTING :
-			//clientPacket = new AllowVotingPacket
+			//Server.toggleVoting(clientID);
 			break;
 		
 		case Packet.HOST_ACTION_BOUNDARY_UPDATES:
-			
+			BoundaryUpdatesPacket bup = new BoundaryUpdatesPacket(data);
+			//Server.boundaryUpdates(bup.getBoundaryUpdates());
 			break;
 			
 		case Packet.HOST_ACTION_CHANGE_GAMETYPE :
-			
+			GametypePacket gp = new GametypePacket(data);
+			//Server.changeGametype(gp.getGameType());
 			break;
 		
 		case Packet.HOST_ACTION_CHANGE_HOST :
-			
+			ChangeHostPacket chp = new ChangeHostPacket(data);
+			//Server.changeHost(chp.getHostID());
 			break;
 		
 			

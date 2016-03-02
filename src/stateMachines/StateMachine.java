@@ -13,10 +13,10 @@ public class StateMachine {
 	private final int clientID;
 	private final HostActionStateMachine hasm;
 	
-	public StateMachine(Integer clientID){
+	public StateMachine(int clientID){
 		//can be used in the event of knowing which thread to close when disconnecting.
 		this.clientID = clientID;
-		hasm = new HostActionStateMachine();
+		hasm = new HostActionStateMachine(clientID);
 	}
 	
 	//Must have method for each protocol, either hear or from across System.

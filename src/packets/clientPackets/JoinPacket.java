@@ -16,6 +16,10 @@ public class JoinPacket extends Packet {
 		putString(key);
 	}
 	
+	public void putPlayerName(String name){//the name of the player joining the room
+		putString(name);
+	}
+	
 	public void putMACAddress(double[] address){
 		for(int i = 0; i < 6; i++){
 			putDouble(address[i]);
@@ -23,6 +27,10 @@ public class JoinPacket extends Packet {
 	}
 	
 	public String getRoomKey(){
+		return getString();
+	}
+	
+	public String getPlayerName(){
 		return getString();
 	}
 	
