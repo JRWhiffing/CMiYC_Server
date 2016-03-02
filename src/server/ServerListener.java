@@ -115,6 +115,10 @@ public class ServerListener extends Thread{
 		
 	}
 	
+	public void setRoomKey(int clientID, String key){
+		clients.get(clientID).setRoomKey(key);
+	}
+	
 	public void sendPacket(int clientID, Packet serverPacket){
 		System.out.println("Still Going");
 		if(clients.containsKey(clientID)){

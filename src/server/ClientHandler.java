@@ -26,6 +26,10 @@ public class ClientHandler {
 		return (int) clientID;
 	}
 	
+	public void setRoomKey(String key){
+		sInput.setRoomKey(key);
+	}
+	
 	public void close(){
 		sInput.close();
 		sOutput.close();

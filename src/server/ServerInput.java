@@ -48,4 +48,8 @@ public class ServerInput extends Thread{
 		}
 	}
 	
+	public void setRoomKey(String key){
+		sm.setRoomKey(key);
+	}
+	
 }
