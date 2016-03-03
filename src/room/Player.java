@@ -8,6 +8,7 @@ public class Player {
 	private String playerName;
 	private double[] playerMACAddress;
 	private int playerScore;
+	private double playerPing;
 	private double playertarget; //ID of Target - No Needed Anymore?
 	private double[] playerLocation; //Latitude Longitude
 	private int pursuerCount;
@@ -30,6 +31,10 @@ public class Player {
 	public int getPlayerScore() {
 		return playerScore;
 	}
+	
+	public void setPlayerPing(double playerPing) {
+		this.playerPing = playerPing;
+	}
 
 
 	public void setPlayerScore(int playerScore) {
@@ -44,6 +49,10 @@ public class Player {
 		this.playerLocation = playerLocation;
 	}
 	
+	public void removePlayer() {
+		//playerState = DISCONNECTED;
+	
+	}
 	
 	
 	

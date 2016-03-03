@@ -31,44 +31,45 @@ public class PacketParser {
 			break;
 			
 		case Packet.PING_RESPONSE : //Ping Response
-			//Server.pingResponse(roomKey, clientID);
+			double ping = 2.0; //NEEDS TO GENERATE THE PING
+			Server.pingResponse(roomKey, clientID, ping);
 			//Server needs to send back ping response - nope, this is the response from the client.
 			break;
 			
 		case Packet.CATCH_PERFORMED : //Catch Performed	
-			//Server.catchPerformed(roomKey, clientID);
+			Server.catchPerformed(roomKey, clientID); //ClientID being the players ID not the targets
 			//Server needs to complete some kind of action to check if player has been caught
 			//If Player has been caught successfully then response needs to be given
 			break;
 			
 		case Packet.CAPTURED : //Captured by pursuer
-			//Server.captured(roomKey, clientID);
+			Server.captured(roomKey, clientID);
 			//Server will need to check if action is correct. Leaderboard and player instances will be updated
 			//Server will need to respond appropiately.
 			break;
 			
 		case Packet.ABILITY_USAGE : //Ability Usage
 			AbilityUsagePacket aup = new AbilityUsagePacket(packet);
-			//Server.abilityUsage(roomKey, clientID, aup.getAbility());
+			Server.abilityUsage(roomKey, clientID, aup.getAbility());
 			//Some sort of ability manipulation needed here
 			//Server may need response if ability changes an element of the game
 			break;
 			
 		case Packet.VOTE : //Vote in a Lobby
 			VotePacket vp = new VotePacket(packet);
-			//Server.vote(roomKey, clientID, vp.getVote());
+			Server.vote(roomKey, clientID, vp.getVote());
 			//Server sends a response updating vote count
 			break;
 			
 		case Packet.REPORT : //Report?
 			ReportPacket rp = new ReportPacket(packet);
-			//Server.playerReported(roomKey, rp.getReport(), clientID);
+			Server.playerReported(roomKey, rp.getReport(), clientID);
 			//Player reported and the player who reported them.
 			//??
 			break;
 			
 		case Packet.QUIT : //Client quits
-			//Server.playerQuit(roomKey, clientID);
+			Server.playerQuit(roomKey, clientID);
 			//Server removes player instance from the game
 			//Server sends broadcast to all clients notifying that a player has left
 			break;
