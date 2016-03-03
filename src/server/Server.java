@@ -66,10 +66,11 @@ public class Server {
 		return key;
 	}
 	
-<<<<<<< HEAD
+
 	public static void playerJoin(String roomKey, double[] MACAddress, String playerName, int clientID) {
-		ROOMS.get(roomKey).addPlayer(playerName, MACAddress, clientID);
-=======
+		Server.ROOMS.get(roomKey).addPlayer(playerName, MACAddress, clientID);
+	}
+	
 	public static synchronized void closeRoom(String key){
 		//Server.ROOMS.get(key).close();
 		//while(Server.ROOMS.get(key).getState() != "Finished"){ }
@@ -82,18 +83,14 @@ public class Server {
 				}
 			}
 		}
->>>>>>> origin/master
 	}
 	
 	public static synchronized void createRoom(int clientID, String roomName, String clientName, double[] MACAddress){
 		String key = generateRoomKey();
-<<<<<<< HEAD
-		ROOMS.put(key, new Room(roomName, clientID, clientName, MACAddress));
-=======
-		//Server.ROOMS.put(key, new Room(roomName, clientID, clientName, MAC Address));
+
+		Server.ROOMS.put(key, new Room(roomName, clientID, clientName, MACAddress));
 		Server.ROOMKEYS.put(lastRoom, key);
 		lastRoom++;
->>>>>>> origin/master
 		RoomKeyPacket rkp = new RoomKeyPacket();
 		rkp.putRoomKey(key);
 		Server.sendPacket(clientID, rkp);
