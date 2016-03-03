@@ -24,7 +24,7 @@ public class LeaderboardPlayer {
 		this.team = team;
 	}
 	
-	public void updatPing(int ping){
+	public void updatePing(int ping){
 		this.ping = ping;
 	}
 	
