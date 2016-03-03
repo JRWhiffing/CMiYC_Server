@@ -21,14 +21,7 @@ public class LeaderboardPlayer {
 	public void updateTeam(int team){
 		this.team = team;
 	}
-	
-<<<<<<< HEAD
-	public void updatePing(int ping){
-		this.ping = ping;
-	}
-	
-=======
->>>>>>> origin/master
+
 	public int getPlayerID(){
 		return id;
 	}
