@@ -8,9 +8,8 @@ public class Player {
 	private String playerName;
 	private double[] playerMACAddress;
 	private int playerScore;
-	private double playertarget; //ID of Target
-	private double playerLocationLatitude;
-	private double playerLocationLongtitude;
+	private double playertarget; //ID of Target - No Needed Anymore?
+	private double[] playerLocation; //Latitude Longitude
 	private int pursuerCount;
 	private int playerTeam;
 	
@@ -25,9 +24,27 @@ public class Player {
 	
 	public Player(String playerName, double[] MACAddress) {
 		this.playerName = playerName;
-		playerMACAddress = MACAddress;
-		
+		playerMACAddress = MACAddress;	
 	}
+
+	public int getPlayerScore() {
+		return playerScore;
+	}
+
+
+	public void setPlayerScore(int playerScore) {
+		this.playerScore = playerScore;
+	}
+
+	public double[] getPlayerLocation() {
+		return playerLocation;
+	}
+
+	public void setPlayerLocation(double[] playerLocation) {
+		this.playerLocation = playerLocation;
+	}
+	
+	
 	
 	
 }

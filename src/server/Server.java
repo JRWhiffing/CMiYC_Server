@@ -71,6 +71,10 @@ public class Server {
 		Server.ROOMS.get(roomKey).addPlayer(playerName, MACAddress, clientID);
 	}
 	
+	public static void setLocation(String roomKey, int clientID, double[] location) {
+		Server.ROOMS.get(roomKey).setPlayerLocation(location, clientID);
+	}
+	
 	public static synchronized void closeRoom(String key){
 		//Server.ROOMS.get(key).close();
 		//while(Server.ROOMS.get(key).getState() != "Finished"){ }
@@ -87,7 +91,6 @@ public class Server {
 	
 	public static synchronized void createRoom(int clientID, String roomName, String clientName, double[] MACAddress){
 		String key = generateRoomKey();
-
 		Server.ROOMS.put(key, new Room(roomName, clientID, clientName, MACAddress));
 		Server.ROOMKEYS.put(lastRoom, key);
 		lastRoom++;

@@ -14,10 +14,9 @@ public class Room {
 	}
 	private int voteCount;
 	private int hostID;
-	private double[] hostMACAddress;
 	private Leaderboard leaderboard;
-	private HashMap<Integer, Integer> targets = new HashMap<Integer, Integer>();
-	private HashMap<Integer, Player> players = new HashMap<Integer, Player>();
+	private HashMap<Integer, Integer> targets = new HashMap<Integer, Integer>(); //Player ID -> Player's Target ID
+	private HashMap<Integer, Player> players = new HashMap<Integer, Player>(); //Player ID -> Player Instance
 	
 	
 	//Players
@@ -31,12 +30,19 @@ public class Room {
 	//etc.
 	
 	public Room(String roomName, int clientID, String hostName, double[] MACAddress) {
-		this.roomName = roomName;	
+		this.roomName = roomName;
+		this.hostID = clientID;
 		players.put(clientID, new Player(hostName, MACAddress));
+		//Create a Leaderboard
+		
 	}
 	
 	public void addPlayer(String playerName, double[] MACAddress, int clientID) {
 		players.put(clientID, new Player(playerName, MACAddress));
+	}
+	
+	public void setPlayerLocation(double[] location,int clientID) {
+		players.get(clientID).setPlayerLocation(location);
 	}
 	
 	public int getRoomNumber(){
