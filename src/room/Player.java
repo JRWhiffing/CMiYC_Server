@@ -3,14 +3,13 @@ package room;
 public class Player {
 
 	private enum playerState {
-		CONNECTED, DISCONNECTED, KICKED, INVITED
+		CONNECTED, DISCONNECTED, KICKED, SETTINGUP
 	}
 	private String playerName;
-	private double playerId;
+	private double[] playerMACAddress;
 	private int playerScore;
-	private double playertarget; //ID of Target
-	private double playerLocationLatitude;
-	private double playerLocationLongtitude;
+	private double playertarget; //ID of Target - No Needed Anymore?
+	private double[] playerLocation; //Latitude Longitude
 	private int pursuerCount;
 	private int playerTeam;
 	
@@ -22,5 +21,30 @@ public class Player {
 	//Target
 	//Location?
 	//etc.
+	
+	public Player(String playerName, double[] MACAddress) {
+		this.playerName = playerName;
+		playerMACAddress = MACAddress;	
+	}
+
+	public int getPlayerScore() {
+		return playerScore;
+	}
+
+
+	public void setPlayerScore(int playerScore) {
+		this.playerScore = playerScore;
+	}
+
+	public double[] getPlayerLocation() {
+		return playerLocation;
+	}
+
+	public void setPlayerLocation(double[] playerLocation) {
+		this.playerLocation = playerLocation;
+	}
+	
+	
+	
 	
 }
