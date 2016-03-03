@@ -12,7 +12,7 @@ public class ClientHandler {
 	public ClientHandler(Socket cs, int clientID){
 		this.clientID = clientID;
 		sInput = new ServerInput(cs, clientID);
-		sOutput = new ServerOutput(cs, clientID);
+		sOutput = new ServerOutput(cs);
 		sInput.run();
 		sOutput.run();
 	}
