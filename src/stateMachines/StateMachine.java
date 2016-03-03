@@ -3,8 +3,6 @@ package stateMachines;
 import java.util.Arrays;
 
 import packets.*;
-//needed?
-//import server.packets.serverPackets.*;
 import packets.clientPackets.*;
 import server.Server;
 
@@ -103,9 +101,14 @@ public class StateMachine {
 			//Game starts..
 			break;
 			
-			
-		default : //?? not sure what should happen in the event the data ID isn't recognised
-			
+		default : 
+			String bytes = dataID + " | ";
+			for(int i = 0; i < packet.length; i ++){
+				bytes += packet[i] + " | ";
+			}
+			System.err.println("Unrecognised packet: \"" + bytes +
+					"\"\n From client: " + clientID + ", in room: " + roomKey);
+			Server.closeClient(roomKey, clientID);
 			break;
 		}
 	}
@@ -113,12 +116,6 @@ public class StateMachine {
 	public void setRoomKey(String key){
 		roomKey = key;
 		hasm.setRoomKey(key);
-	}
-	
-	//will the state machine actually send packets, or will the methods called within the server send the packets?
-	private void sendPacket(Packet serverPacket){
-		System.out.println("Returning Packet");
-		Server.sendPacket(clientID, serverPacket);
 	}
 	
 }

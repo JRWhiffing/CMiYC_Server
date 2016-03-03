@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import packets.Packet;
+import packets.serverPackets.RoomKeyPacket;
 import room.*;
 
 public class Server {	
@@ -30,6 +31,11 @@ public class Server {
 		System.exit(0);
 	}
 	
+	public static void closeClient(String roomKey, int client){
+		//Server.ROOMS.get(roomkey).removePlayer(client);
+		serverListener.closeClient(client);
+	}
+	
 	public static void sendPacket(int clientID, Packet serverPacket){
 		System.out.println("Still Returning");
 		serverListener.sendPacket(clientID, serverPacket);
@@ -50,7 +56,7 @@ public class Server {
 				char_ = random.nextInt(36);
 				key += Integer.toString(char_, 36);
 			}
-			if(ROOMS.containsKey(key)){
+			if(Server.ROOMS.containsKey(key)){
 				key = "";
 			} else {
 				valid = true;
@@ -60,11 +66,13 @@ public class Server {
 		return key;
 	}
 	
-	public static synchronized void createRoom(String roomName, int clientID, String clientName /*MAC ADDRESS??*/){
+	public static synchronized void createRoom(int clientID, String roomName, String clientName, double[] MACAddress){
 		String key = generateRoomKey();
-		//ROOMS.put(key, new Room(roomName));
-		//ROOMS.get(key).addPlayer(clientID, clientName, MAC Address, avatar);
-		
+		//ROOMS.put(key, new Room(roomName, clientID, clientName, MAC Address));
+		RoomKeyPacket rkp = new RoomKeyPacket();
+		rkp.putRoomKey(key);
+		Server.sendPacket(clientID, rkp);
+		serverListener.setRoomKey(clientID, key);
 	}
 	
 }

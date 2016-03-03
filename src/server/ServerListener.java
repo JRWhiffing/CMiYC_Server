@@ -110,7 +110,7 @@ public class ServerListener extends Thread{
 		Thread.currentThread().interrupt();
 	}
 	
-	public void closeThread(int clientNum){
+	public void closeClient(int clientNum){
 		clients.get(clientNum).close();
 		
 	}

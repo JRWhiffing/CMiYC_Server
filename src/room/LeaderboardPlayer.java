@@ -6,14 +6,12 @@ public class LeaderboardPlayer {
 	private final String name;
 	private int score;
 	private int team;
-	private int ping;
 	
-	public LeaderboardPlayer(int playerID, String playerName, int score, int team, int ping){	
+	public LeaderboardPlayer(int playerID, String playerName, int score, int team){	
 		id = playerID;
 		name = playerName;
 		this.score = score;
 		this.team = team;
-		this.ping = ping;
 	}
 	
 	public void updateScore(int points){
@@ -22,10 +20,6 @@ public class LeaderboardPlayer {
 	
 	public void updateTeam(int team){
 		this.team = team;
-	}
-	
-	public void updatPing(int ping){
-		this.ping = ping;
 	}
 	
 	public int getPlayerID(){
@@ -42,10 +36,6 @@ public class LeaderboardPlayer {
 	
 	public int getPlayerTeam(){
 		return team;
-	}
-	
-	public int getPlayerPing(){
-		return ping;
 	}
 	
 }
