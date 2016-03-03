@@ -22,7 +22,6 @@ public class LeaderboardPacket extends Packet {
 			putString(board.getPlayerName(i));
 			putInt(board.getPlayerScore(i));
 			putInt(board.getPlayerTeam(i));
-			putInt(board.getPlayerPing(i));
 		}
 	}
 	
@@ -30,7 +29,7 @@ public class LeaderboardPacket extends Packet {
 		int size = getInt();
 		Leaderboard board = new Leaderboard();
 		for(int i = 0; i < size; i++){
-			board.addExistingPlayer(getInt(), getString(), getInt(), getInt(), getInt());
+			board.addExistingPlayer(getInt(), getString(), getInt(), getInt());
 		}
 		return board;
 	}
