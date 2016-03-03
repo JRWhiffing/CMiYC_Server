@@ -34,8 +34,8 @@ public class ServerInput extends Thread{
 			System.err.println(e.getMessage());
 			Server.closeServer();
 		} finally {
-			close();
 			Server.closeClient(roomKey, clientID);
+			close();
 		}
 	}
 	
