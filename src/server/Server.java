@@ -32,7 +32,9 @@ public class Server {
 	}
 	
 	public static void closeClient(String roomKey, int client){
-		//Server.ROOMS.get(roomkey).removePlayer(client);
+		if(roomKey != null){
+			//Server.ROOMS.get(roomkey).removePlayer(client);
+		}
 		serverListener.closeClient(client);
 	}
 	
@@ -66,7 +68,6 @@ public class Server {
 		return key;
 	}
 	
-
 	public static void playerJoin(String roomKey, double[] MACAddress, String playerName, int clientID) {
 		Server.ROOMS.get(roomKey).addPlayer(playerName, MACAddress, clientID);
 	}

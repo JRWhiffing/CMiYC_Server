@@ -18,7 +18,7 @@ public class DummyClient {
 	
 	public static void main(String[] args){
 		try {
-			temp = new Socket(InetAddress.getByName("localhost"), 10401);
+			temp = new Socket(InetAddress.getByName("138.38.190.177"), 10401);
 			System.out.println("Connecting to server");
 		} catch (Exception e) {
 			System.err.println("There was an issue connecting to the server: "+e.getMessage());

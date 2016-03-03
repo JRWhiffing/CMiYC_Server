@@ -10,8 +10,10 @@ public class ServerOutput extends Thread{
 	private final Socket clientSocket;
 	private LinkedList<Packet> packetQueue;
 	private boolean active;
+	private final int clientID;
 
-	public ServerOutput(Socket cs){
+	public ServerOutput(Socket cs, int clientID){
+		this.clientID = clientID;
 		clientSocket = cs;
 		active = true;
 	}
@@ -36,6 +38,7 @@ public class ServerOutput extends Thread{
 		} catch (IOException ioe) {
 			System.err.println(ioe.getMessage());
 			ioe.printStackTrace(System.err);
+			close();
 		}
 	}
 	

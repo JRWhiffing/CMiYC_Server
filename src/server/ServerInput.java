@@ -4,15 +4,18 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Arrays;
 
-import stateMachines.StateMachine;
+import packetParsers.PacketParser;
 
 public class ServerInput extends Thread{
 	private final Socket clientSocket;
-	private final StateMachine sm;
+	private final PacketParser pp;
+	private final int clientID;
+	private String roomKey = null;
 	
 	public ServerInput(Socket cs, int clientID){
+		this.clientID = clientID;
 		clientSocket = cs;
-		sm = new StateMachine(clientID);
+		pp = new PacketParser(clientID);
 	}
 	
 	@Override
@@ -24,7 +27,7 @@ public class ServerInput extends Thread{
 				byte[] clientPacket = new byte[0];
 				System.out.println("Message Recieved, Processing.");
 				clientPacket = Arrays.copyOfRange(temp, 0, read);
-				sm.processPacket(clientPacket);
+				pp.processPacket(clientPacket);
 				temp = new byte[512];
 			}
 		} catch (Exception e){
@@ -32,6 +35,7 @@ public class ServerInput extends Thread{
 			Server.closeServer();
 		} finally {
 			close();
+			Server.closeClient(roomKey, clientID);
 		}
 	}
 	
@@ -49,7 +53,8 @@ public class ServerInput extends Thread{
 	}
 	
 	public void setRoomKey(String key){
-		sm.setRoomKey(key);
+		roomKey = key;
+		pp.setRoomKey(key);
 	}
 	
 }

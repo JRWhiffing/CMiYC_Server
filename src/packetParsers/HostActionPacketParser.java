@@ -1,4 +1,4 @@
-package stateMachines;
+package packetParsers;
 
 import java.util.Arrays;
 
@@ -6,12 +6,12 @@ import packets.Packet;
 import packets.clientPackets.hostPackets.*;
 import server.Server;
 
-public class HostActionStateMachine {
+public class HostActionPacketParser {
 	
 	private final int clientID;
 	private String roomKey;//for determining which room to perform changes to.
 	
-	public HostActionStateMachine(int clientID){
+	public HostActionPacketParser(int clientID){
 		this.clientID = clientID;
 	}
 
