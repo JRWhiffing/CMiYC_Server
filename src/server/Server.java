@@ -38,7 +38,7 @@ public class Server {
 		serverListener.closeClient(client);
 	}
 	
-	public static void sendPacket(int clientID, Packet serverPacket){
+	public synchronized static void sendPacket(int clientID, Packet serverPacket){
 		System.out.println("Still Returning");
 		serverListener.sendPacket(clientID, serverPacket);
 	}
@@ -68,44 +68,47 @@ public class Server {
 		return key;
 	}
 	
-	public static void playerJoin(String roomKey, double[] MACAddress, String playerName, int clientID) {
+	public synchronized static void playerJoin(String roomKey, double[] MACAddress, String playerName, int clientID) {
 		Server.ROOMS.get(roomKey).addPlayer(playerName, MACAddress, clientID);
 	}
 	
-	public static void setLocation(String roomKey, int clientID, double[] location) {
+	public synchronized static void setLocation(String roomKey, int clientID, double[] location) {
 		Server.ROOMS.get(roomKey).setPlayerLocation(location, clientID);
 	}
 	
-	public static void pingResponse(String roomKey,int clientID, double ping) {
+	public synchronized static void pingResponse(String roomKey,int clientID, double ping) {
 		Server.ROOMS.get(roomKey).setPlayerPing(ping, clientID);
 	}
 	
-	public static void catchPerformed(String roomKey, int clientID) {
+	public synchronized static void catchPerformed(String roomKey, int clientID) {
 		Server.ROOMS.get(roomKey).catchPerformed(clientID);
 	}
 	
-	public static void captured(String roomKey, int clientID) {
+	public synchronized static void captured(String roomKey, int clientID) {
 		Server.ROOMS.get(roomKey).captured(clientID);
 	}
 	
-	public static void abilityUsage(String roomKey, int clientID, byte ability) {
+	public synchronized static void abilityUsage(String roomKey, int clientID, byte ability) {
 		Server.ROOMS.get(roomKey).abilityUsage(ability, clientID);
 	}
 	
-	public static void vote(String roomKey, int clientID, byte vote) {
+	public synchronized static void vote(String roomKey, int clientID, byte vote) {
 		//Voting -> Game not Room? Server.ROOMS.get(roomKey).voteRoom(vote, clientID);
+		//Assumed the voting would only be used for choosing a gamemode
 	}
 	
-	public static void playerReported(String roomKey,int report, int clientID) {
+	public synchronized static void playerReported(String roomKey,int report, int clientID) {
 		//Does something with reporting - Don't know what this is
+		//if a player gets above a threshold of reports then they are kicked.
+		//the threshold may be dynamic, i.e. 33-50% of players have voted to kick the player
 	}
 	
-	public static void playerQuit(String roomKey, int clientID) {
+	public synchronized static void playerQuit(String roomKey, int clientID) {
 		Server.ROOMS.get(roomKey).quitPlayer(clientID);
 	}
 	
 	
-	public static synchronized void closeRoom(String key){
+	public synchronized static void closeRoom(String key){
 		//Server.ROOMS.get(key).close();
 		//while(Server.ROOMS.get(key).getState() != "Finished"){ }
 		Server.ROOMS.remove(key);
@@ -119,7 +122,7 @@ public class Server {
 		}
 	}
 	
-	public static synchronized void createRoom(int clientID, String roomName, String clientName, double[] MACAddress){
+	public synchronized static void createRoom(int clientID, String roomName, String clientName, double[] MACAddress){
 		String key = generateRoomKey();
 		Server.ROOMS.put(key, new Room(roomName, clientID, clientName, MACAddress));
 		Server.ROOMKEYS.put(lastRoom, key);
