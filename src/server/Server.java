@@ -75,6 +75,35 @@ public class Server {
 		Server.ROOMS.get(roomKey).setPlayerLocation(location, clientID);
 	}
 	
+	public static void pingResponse(String roomKey,int clientID, double ping) {
+		Server.ROOMS.get(roomKey).setPlayerPing(ping, clientID);
+	}
+	
+	public static void catchPerformed(String roomKey, int clientID) {
+		Server.ROOMS.get(roomKey).catchPerformed(clientID);
+	}
+	
+	public static void captured(String roomKey, int clientID) {
+		Server.ROOMS.get(roomKey).captured(clientID);
+	}
+	
+	public static void abilityUsage(String roomKey, int clientID, byte ability) {
+		Server.ROOMS.get(roomKey).abilityUsage(ability, clientID);
+	}
+	
+	public static void vote(String roomKey, int clientID, byte vote) {
+		//Voting -> Game not Room? Server.ROOMS.get(roomKey).voteRoom(vote, clientID);
+	}
+	
+	public static void playerReported(String roomKey,int report, int clientID) {
+		//Does something with reporting - Don't know what this is
+	}
+	
+	public static void playerQuit(String roomKey, int clientID) {
+		Server.ROOMS.get(roomKey).quitPlayer(clientID);
+	}
+	
+	
 	public static synchronized void closeRoom(String key){
 		//Server.ROOMS.get(key).close();
 		//while(Server.ROOMS.get(key).getState() != "Finished"){ }

@@ -41,8 +41,38 @@ public class Room {
 		players.put(clientID, new Player(playerName, MACAddress));
 	}
 	
-	public void setPlayerLocation(double[] location,int clientID) {
+	public void quitPlayer(int clientID) {
+		if (clientID == hostID) {
+			//Set a new host
+		}
+		else {
+			players.get(clientID).removePlayer();
+		}
+		//Needs to save the data of previous player incase they come back?
+		//What if the Player is Host - Needs to Set a New host
+	}
+	
+	public void setPlayerLocation(double[] location, int clientID) {
 		players.get(clientID).setPlayerLocation(location);
+	}
+	
+	public void setPlayerPing(double ping, int clientID) {
+		players.get(clientID).setPlayerPing(ping);
+	}
+	
+	public void catchPerformed(int clientID) {
+		//Check that this is correct
+		//Update ScoreBoard, Change Target HashMap
+	}
+	
+	public void captured(int clientID) {
+		//Check that this is correct
+		//Change Pursuer?
+	}
+	
+	public void abilityUsage(byte ability, int clientID) {
+		//players.get(clientID).abilityUsage(ability);
+		//Player uses ability
 	}
 	
 	public int getRoomNumber(){
