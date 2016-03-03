@@ -75,7 +75,7 @@ public class StateMachine {
 		
 		case Packet.JOIN : //Client joins
 			JoinPacket jp = new JoinPacket(packet);
-			//Server.playerJoin(jp.getRoomKey(), jp.getMACAddress(), jp.getPlayerName());
+			//Server.playerJoin(jp.getRoomKey(), jp.getMACAddress(), jp.getPlayerName(), clientID);
 			//Server checks room key and completes some kind of action
 			break;
 			

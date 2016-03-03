@@ -1,5 +1,7 @@
 package room;
 
+import java.util.HashMap;
+
 public class Room {
 
 	private int roomNumber;
@@ -8,11 +10,15 @@ public class Room {
 	private String roomKey; //String, Int? 
 	//		I'd suggest a 5 digit 36 base (alphabet + 0123456789) number which will be stored as a string
 	private enum State {
-		GAME, LOBBY, STARTING, ENDING, PAUSED, INTERRUPTED
+		GAME, LOBBY, STARTING, ENDING, PAUSED, FINISHED
 	}
 	private int voteCount;
-	private double hostID; //Mac Address of Host
+	private int hostID;
+	private double[] hostMACAddress;
 	private Leaderboard leaderboard;
+	private HashMap<Integer, Integer> targets = new HashMap<Integer, Integer>();
+	private HashMap<Integer, Player> players = new HashMap<Integer, Player>();
+	
 	
 	//Players
 	//Game (Object?)
@@ -23,6 +29,15 @@ public class Room {
 	//Voting
 	//Votes
 	//etc.
+	
+	public Room(String roomName, int clientID, String hostName, double[] MACAddress) {
+		this.roomName = roomName;	
+		players.put(clientID, new Player(hostName, MACAddress));
+	}
+	
+	public void addPlayer(String playerName, double[] MACAddress, int clientID) {
+		players.put(clientID, new Player(playerName, MACAddress));
+	}
 	
 	public int getRoomNumber(){
 		return roomNumber;
@@ -63,9 +78,4 @@ public class Room {
 		return hostID;
 	}
 
-
-	public void setHostID(double hostID) {
-		this.hostID = hostID;
-	}
-	
 }

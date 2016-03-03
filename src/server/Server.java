@@ -66,9 +66,13 @@ public class Server {
 		return key;
 	}
 	
+	public static void playerJoin(String roomKey, double[] MACAddress, String playerName, int clientID) {
+		ROOMS.get(roomKey).addPlayer(playerName, MACAddress, clientID);
+	}
+	
 	public static synchronized void createRoom(int clientID, String roomName, String clientName, double[] MACAddress){
 		String key = generateRoomKey();
-		//ROOMS.put(key, new Room(roomName, clientID, clientName, MAC Address));
+		ROOMS.put(key, new Room(roomName, clientID, clientName, MACAddress));
 		RoomKeyPacket rkp = new RoomKeyPacket();
 		rkp.putRoomKey(key);
 		Server.sendPacket(clientID, rkp);
