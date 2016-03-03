@@ -36,6 +36,7 @@ public class ServerOutput extends Thread{
 		} catch (IOException ioe) {
 			System.err.println(ioe.getMessage());
 			ioe.printStackTrace(System.err);
+			close();
 		}
 	}
 	

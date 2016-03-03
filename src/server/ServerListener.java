@@ -97,6 +97,7 @@ public class ServerListener extends Thread{
 		for(int i = latestClientID; i > 0; i--){
 			if(clients.containsKey(i)){
 				clients.get(i).close();
+				clients.remove(i);
 			}
 		}
 		if(listener != null){
@@ -112,7 +113,7 @@ public class ServerListener extends Thread{
 	
 	public void closeClient(int clientNum){
 		clients.get(clientNum).close();
-		
+		clients.remove(clientNum);
 	}
 	
 	public void setRoomKey(int clientID, String key){

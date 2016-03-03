@@ -1,4 +1,4 @@
-package stateMachines;
+package packetParsers;
 
 import java.util.Arrays;
 
@@ -6,16 +6,16 @@ import packets.*;
 import packets.clientPackets.*;
 import server.Server;
 
-public class StateMachine {
+public class PacketParser {
 	
 	private final int clientID;//to determine which player is making the request.
-	private final HostActionStateMachine hasm;
+	private final HostActionPacketParser happ;
 	private String roomKey;//for determining which room to perform changes to.
 	
-	public StateMachine(int clientID){
+	public PacketParser(int clientID){
 		//can be used in the event of knowing which thread to close when disconnecting.
 		this.clientID = clientID;
-		hasm = new HostActionStateMachine(clientID);
+		happ = new HostActionPacketParser(clientID);
 	}
 	
 	public void processPacket(byte[] packet){//not sure on best way to pass data to StateMachine
@@ -81,7 +81,7 @@ public class StateMachine {
 			break;
 			
 		case Packet.HOST_ACTION : //Action completed by a host
-			hasm.processHostAction(packet);
+			happ.processHostAction(dataID, packet);
 			//Separate Case statement will be needed for this
 			//Server will complete an action depending on the ID
 			break;
@@ -116,7 +116,7 @@ public class StateMachine {
 	
 	public void setRoomKey(String key){
 		roomKey = key;
-		hasm.setRoomKey(key);
+		happ.setRoomKey(key);
 	}
 	
 }

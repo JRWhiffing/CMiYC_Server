@@ -1,4 +1,4 @@
-package stateMachines;
+package packetParsers;
 
 import java.util.Arrays;
 
@@ -6,16 +6,16 @@ import packets.Packet;
 import packets.clientPackets.hostPackets.*;
 import server.Server;
 
-public class HostActionStateMachine {
+public class HostActionPacketParser {
 	
 	private final int clientID;
 	private String roomKey;//for determining which room to perform changes to.
 	
-	public HostActionStateMachine(int clientID){
+	public HostActionPacketParser(int clientID){
 		this.clientID = clientID;
 	}
 
-	public void processHostAction(byte[] data){
+	public void processHostAction(int dataID, byte[] data){
 		byte hostID = data[0]; //Host Action ID
 		data = Arrays.copyOf(data, 1);//removing the host ID from the packet so only data is left
 		
@@ -49,8 +49,6 @@ public class HostActionStateMachine {
 		case Packet.HOST_ACTION_CREATE_ROOM ://don't need room key as won't have one
 			CreateRoomPacket crp = new CreateRoomPacket(data);
 			Server.createRoom(clientID, crp.getRoomName(), crp.getHostName(), crp.getMACAddress());
-			//Creating a new room - Room Name + Mac Address Needed from Packet
-			//Creates new room instance + Room Key
 			//Player sending request is now host of game
 			break;
 			
@@ -95,7 +93,13 @@ public class HostActionStateMachine {
 			break;
 			
 		default : //?? not sure what should happen in the event the data ID isn't recognised - Surely this would not happen though? 
-			
+			String bytes = dataID + " | " + hostID + " | ";
+			for(int i = 0; i < data.length; i ++){
+				bytes += data[i] + " | ";
+			}
+			System.err.println("Unrecognised packet: \"" + bytes +
+					"\"\n From client: " + clientID + ", in room: " + roomKey);
+			Server.closeClient(roomKey, clientID);
 			break;
 		}
 	}

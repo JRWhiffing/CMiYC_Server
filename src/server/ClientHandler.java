@@ -31,8 +31,19 @@ public class ClientHandler {
 	}
 	
 	public void close(){
-		sInput.close();
-		sOutput.close();
+		if(!sInput.isInterrupted()){
+			sInput.close();
+		}
+		if(!sOutput.isInterrupted()){
+			sOutput.close();
+		}
+		while(!sInput.isInterrupted()||!sOutput.isInterrupted()){
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				System.err.println("Sleep failed: " + e.getMessage());;
+			}
+		}
 		System.out.println("ClientHandler" + clientID + ": Client " + clientID + " has gone.");
 	}
 	
