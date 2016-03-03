@@ -91,8 +91,8 @@ public class Server {
 		serverListener.setRoomKey(clientID, key);
 	}
 	
-	public static void printRooms(){
-		
-	}
+//	public static void printRooms(){
+//		
+//	}
 	
 }

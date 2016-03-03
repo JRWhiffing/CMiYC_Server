@@ -80,7 +80,7 @@ public class StateMachine {
 			break;
 			
 		case Packet.HOST_ACTION : //Action completed by a host
-			hasm.processHostAction(packet);
+			hasm.processHostAction(dataID, packet);
 			//Separate Case statement will be needed for this
 			//Server will complete an action depending on the ID
 			break;
