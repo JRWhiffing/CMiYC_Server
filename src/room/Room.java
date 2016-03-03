@@ -68,11 +68,8 @@ public class Room {
 		return hostID;
 	}
 
-<<<<<<< HEAD
-	public void setHostID(double hostID) {
+	public void setHostID(int hostID) {
 		this.hostID = hostID;
 	}
 	
-=======
->>>>>>> 0770fe77b9d2a1b75bf3c504b509cc7eac0b74ed
 }
