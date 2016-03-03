@@ -16,14 +16,14 @@ public class Leaderboard {
 	private int maxPlayerID = 0;
 	
 	public void addPlayer(int playerID, String playerName){
-		leaderboard.add(new LeaderboardPlayer(playerID, playerName, 0, 0, 0));
+		leaderboard.add(new LeaderboardPlayer(playerID, playerName, 0, 0));
 		playerIDMap.put(playerID, leaderboard.size() - 1);
 		if(playerID > maxPlayerID){ maxPlayerID = playerID; }
 	}
 	
 	//re-adding a player who has rejoined the game or reconstructing leaderboard from packet received.
-	public void addExistingPlayer(int playerID, String playerName, int score, int team, int ping){
-		leaderboard.add(new LeaderboardPlayer(playerID, playerName, score, team, ping));
+	public void addExistingPlayer(int playerID, String playerName, int score, int team){
+		leaderboard.add(new LeaderboardPlayer(playerID, playerName, score, team));
 		playerIDMap.put(playerID, leaderboard.size() - 1);
 		if(playerID > maxPlayerID){ maxPlayerID = playerID; }
 	}
@@ -48,10 +48,6 @@ public class Leaderboard {
 		leaderboard.get(playerIDMap.get(playerID)).updateScore(team);
 	}
 	
-	public void updatPing(int playerID, int ping){
-		leaderboard.get(playerIDMap.get(playerID)).updateScore(ping);
-	}
-	
 	public int getPlayerID(int playerID){
 		return leaderboard.get(playerID).getPlayerID();
 	}
@@ -66,10 +62,6 @@ public class Leaderboard {
 	
 	public int getPlayerTeam(int playerID){
 		return leaderboard.get(playerID).getPlayerTeam();
-	}
-	
-	public int getPlayerPing(int playerID){
-		return leaderboard.get(playerID).getPlayerPing();
 	}
 	
 	public int getSize(){

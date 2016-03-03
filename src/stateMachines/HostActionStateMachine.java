@@ -48,7 +48,7 @@ public class HostActionStateMachine {
 			
 		case Packet.HOST_ACTION_CREATE_ROOM ://don't need room key as won't have one
 			CreateRoomPacket crp = new CreateRoomPacket(data);
-			//Server.createRoom(clientID, crp.getRoomName(), crp.getHostName(), crp.getMACAddress());
+			Server.createRoom(clientID, crp.getRoomName(), crp.getHostName(), crp.getMACAddress());
 			//Creating a new room - Room Name + Mac Address Needed from Packet
 			//Creates new room instance + Room Key
 			//Player sending request is now host of game

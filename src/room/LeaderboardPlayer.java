@@ -6,14 +6,12 @@ public class LeaderboardPlayer {
 	private final String name;
 	private int score;
 	private int team;
-	private int ping;
 	
-	public LeaderboardPlayer(int playerID, String playerName, int score, int team, int ping){	
+	public LeaderboardPlayer(int playerID, String playerName, int score, int team){	
 		id = playerID;
 		name = playerName;
 		this.score = score;
 		this.team = team;
-		this.ping = ping;
 	}
 	
 	public void updateScore(int points){
@@ -24,10 +22,13 @@ public class LeaderboardPlayer {
 		this.team = team;
 	}
 	
+<<<<<<< HEAD
 	public void updatePing(int ping){
 		this.ping = ping;
 	}
 	
+=======
+>>>>>>> origin/master
 	public int getPlayerID(){
 		return id;
 	}
@@ -42,10 +43,6 @@ public class LeaderboardPlayer {
 	
 	public int getPlayerTeam(){
 		return team;
-	}
-	
-	public int getPlayerPing(){
-		return ping;
 	}
 	
 }
