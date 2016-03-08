@@ -1,6 +1,14 @@
 package room;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
+
+import packets.Packet;
+import packets.serverPackets.*;
+import server.Server;
 
 public class Room {
 
@@ -13,9 +21,9 @@ public class Room {
 	private int voteCount;
 	private int hostID;
 	private Leaderboard leaderboard;
-	private HashMap<Integer, Integer> targets = new HashMap<Integer, Integer>(); //Player ID -> Player's Target ID
-	private HashMap<Integer, Player> players = new HashMap<Integer, Player>(); //Player ID -> Player Instance
-	
+	private List<Player> players = Collections.synchronizedList( new ArrayList<Player>());
+	private HashMap<Integer, Integer> playerIDMap = new HashMap<Integer, Integer>(); //Player ID -> Player Instance
+	private int maxPlayerID = 0;
 	
 	//Players
 	//Game (Object?)
@@ -30,31 +38,63 @@ public class Room {
 	public Room(String roomName, int clientID, String hostName, double[] MACAddress) {
 		this.roomName = roomName;
 		this.hostID = clientID;
-		players.put(clientID, new Player(hostName, MACAddress));
+		addPlayer(hostName, MACAddress, clientID);
 		//Create a Leaderboard
 		
 	}
 	
+	private void assignTargets(int clientID){
+		switch (currentGame.getType()) {
+		case Packet.GAMETYPE_DEFAULT:
+			ArrayList<Player> validTargets = new ArrayList<Player>();
+			int previousTarget = playerIDMap.get(players.get(playerIDMap.get(clientID)).getPreviousTarget());
+			for(int i = 0; i < players.size(); i++){
+				if(players.get(i).getTarget() != clientID && i != previousTarget && i != playerIDMap.get(clientID)){
+					validTargets.add(players.get(i));
+				}
+			}
+			if(validTargets.isEmpty()){
+				NAKPacket np = new NAKPacket();
+				np.setNAK(Packet.NAK_NO_VALID_TARGETS);
+				Server.sendPacket(clientID, np);
+				break;
+			}
+			Random rng = new Random();
+			int target = rng.nextInt(validTargets.size());
+			int targetID = validTargets.get(target).getID();
+			players.get(playerIDMap.get(clientID)).setPlayerTarget(target);
+			TargetPacket tp = new TargetPacket();
+			tp.putTargetID(target);
+			Server.sendPacket(clientID, tp);
+			break;
+		case Packet.GAMETYPE_TEAM:
+			
+			break;
+		case Packet.GAMETYPE_MAN_HUNT:
+			
+			break;
+		}
+	}
+	
 	public void addPlayer(String playerName, double[] MACAddress, int clientID) {
-		players.put(clientID, new Player(playerName, MACAddress));
+		//for loop for checking if disconnected player has the same MAC as above, if so rejoin, else new player.
+		players.add(new Player(playerName, MACAddress));
+		playerIDMap.put(clientID, players.size());
+		if(clientID > maxPlayerID){ maxPlayerID = clientID; }
 	}
 	
 	public void quitPlayer(int clientID) {
 		if (clientID == hostID) {
 			//Set a new host
 		}
-		else {
-			players.get(clientID).removePlayer();
-		}
-		//Needs to save the data of previous player incase they come back?
-		//What if the Player is Host - Needs to Set a New host
+		//players.get(playerIDMap.get(clientID)).setState("Disconnected");
 	}
 	
 	public void setPlayerLocation(double[] location, int clientID) {
 		players.get(clientID).setPlayerLocation(location);
 	}
 	
-	public void setPlayerPing(double ping, int clientID) {
+	public void setPlayerPing(int ping, int clientID) {
 		players.get(clientID).setPlayerPing(ping);
 	}
 	

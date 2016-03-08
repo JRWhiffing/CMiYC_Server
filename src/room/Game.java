@@ -1,13 +1,17 @@
 package room;
 
+import packets.Packet;
+
 public class Game {
 
 	private enum GameType {
-		TEAM, SINGLE //etc.
+		TEAM, SINGLE, MANHUNT //etc.
 	}
+	private GameType gameType;
+	private Leaderboard leaderboard;
 	private int scoreLimit;
 	private int timeLimit;
-	private double boundaries;
+	private double[] boundaries;
 	private double boundariesUpdateInterval;
 	private double boundariesUpdatePercentage;
 	private int playerCount;
@@ -21,5 +25,44 @@ public class Game {
 	//Boundary Update Interval
 	//Boundary Update Percentage
 	//etc.
+	
+	public Game(byte type, int score, int time, double[] boundaries, double bUpdateInterval, double bUpdatePercentage){
+		changeGameType(type);
+		scoreLimit = score;
+		timeLimit = time;
+		this.boundaries = boundaries;
+		boundariesUpdateInterval = bUpdateInterval;
+		boundariesUpdatePercentage = bUpdatePercentage;
+	}
+	
+	public void changeGameType(byte type){
+		switch (type){
+		case Packet.GAMETYPE_TEAM:
+			gameType = GameType.TEAM;
+			break;
+		case Packet.GAMETYPE_DEFAULT:
+			gameType = GameType.SINGLE;
+			break;
+		case Packet.GAMETYPE_MAN_HUNT:
+			gameType = GameType.MANHUNT;
+			break;
+		}
+	}
+
+	public byte getType(){
+		byte type = 0x00;
+		switch (gameType) {
+		case TEAM:
+			type = Packet.GAMETYPE_TEAM;
+			break;
+		case SINGLE:
+			type = Packet.GAMETYPE_DEFAULT;
+			break;
+		case MANHUNT:
+			type = Packet.GAMETYPE_MAN_HUNT;
+			break;
+		}
+		return type;
+	}
 	
 }

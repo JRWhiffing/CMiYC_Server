@@ -158,6 +158,8 @@ public abstract class Packet {//will need to test for construction of packets, w
 	//NAK IDs
 	public static final byte NAK_INVALID_ROOM_KEY = 0x01;
 	public static final byte NAK_NOT_ENOUGH_PLAYERS = 0x02;
+	public static final byte NAK_ROOM_FULL = 0x03;
+	public static final byte NAK_NO_VALID_TARGETS = 0x04;
 	
 	//Disconnect IDs
 	public static final byte DISCONNECT_QUIT = 0X01;

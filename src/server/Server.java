@@ -76,7 +76,7 @@ public class Server {
 		Server.ROOMS.get(roomKey).setPlayerLocation(location, clientID);
 	}
 	
-	public synchronized static void pingResponse(String roomKey,int clientID, double ping) {
+	public synchronized static void pingResponse(String roomKey,int clientID, int ping) {
 		Server.ROOMS.get(roomKey).setPlayerPing(ping, clientID);
 	}
 	

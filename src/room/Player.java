@@ -6,10 +6,12 @@ public class Player {
 		CONNECTED, DISCONNECTED, KICKED, SETTINGUP
 	}
 	private String playerName;
+	private int clientID;
 	private double[] playerMACAddress;
 	private int playerScore;
-	private double playerPing;
-	private double playertarget; //ID of Target - No Needed Anymore?
+	private int playerPing;
+	private int playerTarget = -1; //ID of Target - No Needed Anymore?
+	private int previousTarget;
 	private double[] playerLocation; //Latitude Longitude
 	private int pursuerCount;
 	private int playerTeam;
@@ -27,12 +29,19 @@ public class Player {
 		this.playerName = playerName;
 		playerMACAddress = MACAddress;	
 	}
+	
+	public void setPlayerTarget(int targetID){
+		if(playerTarget != -1){
+			previousTarget = playerTarget;
+		}
+		playerTarget = targetID;
+	}
 
 	public int getPlayerScore() {
 		return playerScore;
 	}
 	
-	public void setPlayerPing(double playerPing) {
+	public void setPlayerPing(int playerPing) {
 		this.playerPing = playerPing;
 	}
 
@@ -54,6 +63,17 @@ public class Player {
 	
 	}
 	
+	public int getPreviousTarget(){
+		return previousTarget;
+	}
+	
+	public int getTarget(){
+		return playerTarget;
+	}
+	
+	public int getID(){
+		return clientID;
+	}
 	
 	
 }

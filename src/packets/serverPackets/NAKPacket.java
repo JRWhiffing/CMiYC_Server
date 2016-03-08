@@ -12,6 +12,10 @@ public class NAKPacket extends Packet {
 		packet = data;
 	}
 	
+	public void setNAK(byte nak){
+		putByte(nak);
+	}
+	
 	public void invalidRoomKey(){
 		putByte(Packet.NAK_INVALID_ROOM_KEY);
 	}
