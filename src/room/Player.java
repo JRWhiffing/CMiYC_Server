@@ -3,7 +3,7 @@ package room;
 public class Player {
 
 	private enum playerState {
-		CONNECTED, DISCONNECTED, KICKED, SETTINGUP
+		CONNECTED, DISCONNECTED, KICKED, SETTINGUP, CAUGHT, CHANGING
 	}
 	private String playerName;
 	private double[] playerMACAddress;
@@ -12,6 +12,7 @@ public class Player {
 	private double[] playerLocation; //Longitude Latitude
 	private int pursuerCount;
 	private int playerTeam;
+	private playerState state;
 	
 	
 	//Connected (i.e. they haven't lost connection)
@@ -26,16 +27,41 @@ public class Player {
 		this.playerName = playerName;
 		playerMACAddress = MACAddress;	
 	}
-
-	public int getPlayerScore() {
-		return playerScore;
+	
+	public boolean checkCaught() {
+		if(state == playerState.CAUGHT) {
+			return true;
+		}
+		return false;
+	}
+	
+	public void beenCaught() {
+		state = playerState.CHANGING;
+	}
+	
+	public void captured() {
+		state = playerState.CAUGHT;
+	}
+	
+	public void removePlayer() {
+		state = playerState.DISCONNECTED;
 	}
 	
 	public void setPlayerPing(double playerPing) {
 		this.playerPing = playerPing;
 	}
+	
+	public boolean checkContinue() {
+		if(state == playerState.CHANGING) {
+			return true;
+		}
+		return false;
+	}
 
-
+	public int getPlayerScore() {
+		return playerScore;
+	}
+	
 	public void setPlayerScore(int playerScore) {
 		this.playerScore = playerScore;
 	}
@@ -47,12 +73,5 @@ public class Player {
 	public void setPlayerLocation(double[] playerLocation) {
 		this.playerLocation = playerLocation;
 	}
-	
-	public void removePlayer() {
-		//State playerState = playerState.DISCONNECTED;
-	
-	}
-	
-	
 	
 }

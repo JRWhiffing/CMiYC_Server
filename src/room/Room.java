@@ -59,13 +59,41 @@ public class Room {
 	}
 	
 	public void catchPerformed(int clientID) {
-		//Check that this is correct
-		//Update ScoreBoard, Change Target HashMap
+		int targetID = targets.get(clientID);
+		if (checkCaptured(targetID)) {
+			players.get(targetID).beenCaught(); //Changes the state of the player to changing
+			//Increase Score for player on leaderboard
+			//Change the Target
+		}
+		else {
+			//Something needs to happen if response didn't come in
+		}
 	}
 	
+	public boolean checkCaptured(int targetID) {
+		long currentTime = System.currentTimeMillis();
+		long maxTime = currentTime + 10000; //Checks for 10 seconds
+		while(System.currentTimeMillis() < maxTime) {
+			if (players.get(targetID).checkCaught()) {
+				return true;
+			}
+		}
+		return false;
+		//Needs to see if captured has been called by the targetID
+	}
+	
+	
+	///Player presses caught button but pursuer hasn't pressed button yet. - This may need changing if the caught button only appears when pursuer presses button
 	public void captured(int clientID) {
-		//Check that this is correct
-		//Change Pursuer?
+		players.get(clientID).captured();
+		long currentTime = System.currentTimeMillis();
+		long maxTime = currentTime + 10000; //Checks for 10 seconds
+		while(System.currentTimeMillis() < maxTime) {
+			if (players.get(clientID).checkContinue()) {
+				//Change the pursuer
+			}
+		}
+		//Something needs to happen if player has not been caught
 	}
 	
 	public void abilityUsage(byte ability, int clientID) {
