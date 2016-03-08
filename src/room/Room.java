@@ -94,12 +94,12 @@ public class Room {
 		players.get(clientID).setPlayerLocation(location);
 	}
 	
-	public void setPlayerPing(int ping, int clientID) {
+	public void setPlayerPing(double ping, int clientID) {
 		players.get(clientID).setPlayerPing(ping);
 	}
 	
 	public void catchPerformed(int clientID) {
-		int targetID = targets.get(clientID);
+		int targetID = 1; // THIS NEEDS CHANGING targets.get(clientID);
 		if (checkCaptured(targetID)) {
 			players.get(targetID).beenCaught(); //Changes the state of the player to changing
 			//Increase Score for player on leaderboard

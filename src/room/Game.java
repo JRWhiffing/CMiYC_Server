@@ -11,7 +11,7 @@ public class Game {
 	private Leaderboard leaderboard;
 	private int scoreLimit;
 	private int timeLimit;
-	private double[] boundaries;
+	private double boundaries;
 	private double boundariesUpdateInterval;
 	private double boundariesUpdatePercentage;
 	private int playerCountLimit;
@@ -32,6 +32,7 @@ public class Game {
 	public double getBoundaries() {
 		return boundaries;
 	}
+	
 	public void setBoundaries(double boundaries) {
 		this.boundaries = boundaries;
 	}
@@ -66,7 +67,7 @@ public class Game {
 	//Boundary Update Percentage
 	//etc.
 	
-	public Game(byte type, int score, int time, double[] boundaries, double bUpdateInterval, double bUpdatePercentage){
+	public Game(byte type, int score, int time, double boundaries, double bUpdateInterval, double bUpdatePercentage){
 		changeGameType(type);
 		scoreLimit = score;
 		timeLimit = time;

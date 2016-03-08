@@ -9,15 +9,11 @@ public class Player {
 	private int clientID;
 	private double[] playerMACAddress;
 	private int playerScore;
-<<<<<<< HEAD
 	private double playerPing;
 	private double[] playerLocation; //Longitude Latitude
-=======
-	private int playerPing;
+
 	private int playerTarget = -1; //ID of Target - No Needed Anymore?
 	private int previousTarget;
-	private double[] playerLocation; //Latitude Longitude
->>>>>>> refs/remotes/origin/JBranch
 	private int pursuerCount;
 	private int playerTeam;
 	private playerState state;
@@ -36,7 +32,6 @@ public class Player {
 		playerMACAddress = MACAddress;	
 	}
 	
-<<<<<<< HEAD
 	public boolean checkCaught() {
 		if(state == playerState.CAUGHT) {
 			return true;
@@ -54,7 +49,8 @@ public class Player {
 	
 	public void removePlayer() {
 		state = playerState.DISCONNECTED;
-=======
+	}
+
 	public void setPlayerTarget(int targetID){
 		if(playerTarget != -1){
 			previousTarget = playerTarget;
@@ -64,10 +60,9 @@ public class Player {
 
 	public int getPlayerScore() {
 		return playerScore;
->>>>>>> refs/remotes/origin/JBranch
 	}
 	
-	public void setPlayerPing(int playerPing) {
+	public void setPlayerPing(double playerPing) {
 		this.playerPing = playerPing;
 	}
 	
@@ -76,10 +71,6 @@ public class Player {
 			return true;
 		}
 		return false;
-	}
-
-	public int getPlayerScore() {
-		return playerScore;
 	}
 	
 	public void setPlayerScore(int playerScore) {
@@ -94,13 +85,6 @@ public class Player {
 		this.playerLocation = playerLocation;
 	}
 	
-<<<<<<< HEAD
-=======
-	public void removePlayer() {
-		//playerState = DISCONNECTED;
-	
-	}
-	
 	public int getPreviousTarget(){
 		return previousTarget;
 	}
@@ -112,7 +96,4 @@ public class Player {
 	public int getID(){
 		return clientID;
 	}
-	
-	
->>>>>>> refs/remotes/origin/JBranch
 }
