@@ -37,6 +37,7 @@ public class Leaderboard {
 				playerIDMap.put(i, playerIDMap.get(i)-1);
 			}
 		}
+		playerIDMap.remove(playerID);
 		maxPlayerID = tempMaxPlayerID;
 	}
 	
