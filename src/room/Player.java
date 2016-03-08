@@ -9,8 +9,7 @@ public class Player {
 	private double[] playerMACAddress;
 	private int playerScore;
 	private double playerPing;
-	private double playertarget; //ID of Target - No Needed Anymore?
-	private double[] playerLocation; //Latitude Longitude
+	private double[] playerLocation; //Longitude Latitude
 	private int pursuerCount;
 	private int playerTeam;
 	
@@ -50,7 +49,7 @@ public class Player {
 	}
 	
 	public void removePlayer() {
-		//playerState = DISCONNECTED;
+		//State playerState = playerState.DISCONNECTED;
 	
 	}
 	
