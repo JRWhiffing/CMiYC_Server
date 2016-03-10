@@ -22,7 +22,7 @@ public class Room {
 	private int hostID;
 	private Leaderboard leaderboard;
 	private List<Player> players = Collections.synchronizedList( new ArrayList<Player>());
-	private HashMap<Integer, Integer> playerIDMap = new HashMap<Integer, Integer>(); //Player ID -> Player Instance
+	private HashMap<Integer, Integer> playerIDMap = new HashMap<Integer, Integer>(); //Player ClientID -> Player Instance in players
 	private int maxPlayerID = 0;
 	
 	//Players
@@ -67,6 +67,7 @@ public class Room {
 			tp.putTargetID(target);
 			Server.sendPacket(clientID, tp);
 			break;
+			
 		case Packet.GAMETYPE_TEAM:
 			
 			break;
@@ -87,15 +88,15 @@ public class Room {
 		if (clientID == hostID) {
 			//Set a new host
 		}
-		//players.get(playerIDMap.get(clientID)).setState("Disconnected");
+		players.get(playerIDMap.get(clientID)).removePlayer();
 	}
 	
 	public void setPlayerLocation(double[] location, int clientID) {
-		players.get(clientID).setPlayerLocation(location);
+		players.get(playerIDMap.get(clientID)).setPlayerLocation(location);
 	}
 	
 	public void setPlayerPing(int ping, int clientID) {
-		players.get(clientID).setPlayerPing(ping);
+		players.get(playerIDMap.get(clientID)).setPlayerPing(ping);
 	}
 	
 	public void catchPerformed(int clientID) {
@@ -114,7 +115,7 @@ public class Room {
 		long currentTime = System.currentTimeMillis();
 		long maxTime = currentTime + 10000; //Checks for 10 seconds
 		while(System.currentTimeMillis() < maxTime) {
-			if (players.get(targetID).checkCaught()) {
+			if (players.get(playerIDMap.get(targetID)).checkCaught()) {
 				return true;
 			}
 		}
@@ -125,11 +126,11 @@ public class Room {
 	
 	///Player presses caught button but pursuer hasn't pressed button yet. - This may need changing if the caught button only appears when pursuer presses button
 	public void captured(int clientID) {
-		players.get(clientID).captured();
+		players.get(playerIDMap.get(clientID)).captured();
 		long currentTime = System.currentTimeMillis();
 		long maxTime = currentTime + 10000; //Checks for 10 seconds
 		while(System.currentTimeMillis() < maxTime) {
-			if (players.get(clientID).checkContinue()) {
+			if (players.get(playerIDMap.get(clientID)).checkContinue()) {
 				//Change the pursuer
 			}
 		}
