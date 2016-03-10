@@ -29,7 +29,7 @@ public class LeaderboardPacket extends Packet {
 		int size = getInt();
 		Leaderboard board = new Leaderboard();
 		for(int i = 0; i < size; i++){
-			board.addExistingPlayer(getInt(), getString(), getInt(), getInt());
+			board.addExistingPlayer(getInt(), getString(), getInt(), getInt(), false);
 		}
 		return board;
 	}

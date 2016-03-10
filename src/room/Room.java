@@ -18,19 +18,15 @@ public class Room {
 	private enum State {
 		GAME, LOBBY, STARTING, ENDING, PAUSED, FINISHED
 	}
+	private State roomState;
 	private int voteCount;
 	private int hostID;
 	private Leaderboard leaderboard;
 	private List<Player> players = Collections.synchronizedList( new ArrayList<Player>());
 	private HashMap<Integer, Integer> playerIDMap = new HashMap<Integer, Integer>(); //Player ClientID -> Player Instance in players
 	private int maxPlayerID = 0;
+	private int roomSize;
 	
-	//Players
-	//Game (Object?)
-	//Name
-	//Key
-	//State? i.e. Game , Lobby , Starting , Ending, etc.
-	//Host?
 	//Voting
 	//Votes
 	//etc.
@@ -40,8 +36,11 @@ public class Room {
 		this.hostID = clientID;
 		addPlayer(hostName, MACAddress, clientID);
 		leaderboard = new Leaderboard();
-		leaderboard.addPlayer(clientID, hostName);		
+		leaderboard.addPlayer(clientID, hostName);	
+		roomState = State.LOBBY;
 	}
+	
+	//need to weight higher scoring players as more likely targets, also only a max of 3 pursuers.
 	
 	private void assignTargets(int clientID){
 		switch (currentGame.getType()) {
@@ -51,7 +50,11 @@ public class Room {
 			for(int i = 0; i < players.size(); i++){
 				if(players.get(i).getTarget() != clientID && i != previousTarget && i != playerIDMap.get(clientID)
 				   && players.get(i).getState().equals("CONNECTED")){
-					validTargets.add(players.get(i));
+					if((players.size() > 4 && players.get(i).getPursuerCount() < 3) || 
+					   (players.size() == 4 && players.get(i).getPursuerCount() < 2) || 
+					   (players.size() == 3 && players.get(i).getPursuerCount() < 1)){
+						validTargets.add(players.get(i));
+					}
 				}
 			}
 			if(validTargets.isEmpty()){
@@ -63,13 +66,15 @@ public class Room {
 			Random rng = new Random();
 			int target = rng.nextInt(validTargets.size());
 			int targetID = validTargets.get(target).getID();
-			players.get(playerIDMap.get(clientID)).setPlayerTarget(target);
+			players.get(playerIDMap.get(clientID)).setPlayerTarget(targetID);
+			players.get(playerIDMap.get(targetID)).addPursuer();
 			TargetPacket tp = new TargetPacket();
-			tp.putTargetID(target);
+			tp.putTargetID(targetID);
 			Server.sendPacket(clientID, tp);
 			break;
 			
 		case Packet.GAMETYPE_TEAM:
+			
 			
 			break;
 		case Packet.GAMETYPE_MAN_HUNT:
@@ -78,7 +83,12 @@ public class Room {
 		}
 	}
 	
-	public void broadcast(Packet broadcastPacket){
+	private void assignTeams(){
+		Random rng = new Random();
+		
+	}
+	
+	private void broadcast(Packet broadcastPacket){
 		for(int i = 0; i < players.size(); i++){
 			if(!players.get(i).getState().equals("DISCONNECTED") && !players.get(i).getState().equals("KICKED")){
 				Server.sendPacket(players.get(i).getID(), broadcastPacket);
@@ -87,14 +97,30 @@ public class Room {
 	}
 	
 	public void addPlayer(String playerName, double[] MACAddress, int clientID) {
-		//for loop for checking if disconnected player has the same MAC as above, if so rejoin, else new player.
+		//need to broadcast relevant leaderboard and player joined
+		if(roomSize == 16){
+			NAKPacket np = new NAKPacket();
+			np.setNAK(Packet.NAK_ROOM_FULL);
+			Server.sendPacket(clientID, np);
+			return;
+		}
+		for(int i = 0; i < players.size(); i++){
+			if(players.get(i).getState().equals("DISCONNECTED") && players.get(i).getMACAddress().equals(MACAddress)){
+				players.get(i).setID(clientID);
+				playerIDMap.put(clientID, i);
+				players.get(i).rejoined();
+				return;
+			}
+		}
 		players.add(new Player(playerName, MACAddress));
 		playerIDMap.put(clientID, players.size());
 		leaderboard.addPlayer(clientID, playerName);
 		if(clientID > maxPlayerID){ maxPlayerID = clientID; }
+		roomSize++;
 	}
 	
 	public void quitPlayer(int clientID) {
+		roomSize--;
 		players.get(playerIDMap.get(clientID)).removePlayer();
 		leaderboard.removePlayer(clientID);
 		if (clientID == hostID) {
@@ -173,21 +199,9 @@ public class Room {
 	public void setRoomName(String roomName) {
 		this.roomName = roomName;
 	}
-
-	public Game getCurrentGame() {
-		return currentGame;
-	}
-
-	public void setCurrentGame(Game currentGame) {
-		this.currentGame = currentGame;
-	}
 	
-	public double getHostID() {
-		return hostID;
-	}
-
-	public void setHostID(int hostID) {
-		this.hostID = hostID;
+	public int size(){
+		return roomSize;
 	}
 	
 }
