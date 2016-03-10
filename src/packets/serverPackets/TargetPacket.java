@@ -12,12 +12,19 @@ public class TargetPacket extends Packet {
 		packet = data;
 	}
 	
-	public void putTargetID(int targetID){
-		putInt(targetID);
+	public void putTargetID(int[] targetID){
+		putInt(targetID.length);
+		for(int i = 0; i < targetID.length; i++){
+			putInt(targetID[i]);
+		}
 	}
 	
-	public int getTargetID(){
-		return getInt();
+	public int[] getTargetID(){
+		int[] target = new int[getInt()];
+		for(int i = 0; i < target.length; i++){
+			target[i] = getInt();
+		}
+		return target;
 	}
 	
 }

@@ -69,15 +69,16 @@ public class Room {
 			players.get(playerIDMap.get(clientID)).setPlayerTarget(targetID);
 			players.get(playerIDMap.get(targetID)).addPursuer();
 			TargetPacket tp = new TargetPacket();
-			tp.putTargetID(targetID);
+			tp.putTargetID(new int[]{targetID});
 			Server.sendPacket(clientID, tp);
 			break;
 			
 		case Packet.GAMETYPE_TEAM:
-			
+			//send IDs of other team;
 			
 			break;
 		case Packet.GAMETYPE_MAN_HUNT:
+			//send IDs of other team;
 			
 			break;
 		}
@@ -127,6 +128,10 @@ public class Room {
 				Server.sendPacket(players.get(i).getID(), broadcastPacket);
 			}
 		}
+	}
+	
+	private void startGame(){
+		
 	}
 	
 	public void addPlayer(String playerName, double[] MACAddress, int clientID) {
