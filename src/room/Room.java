@@ -42,13 +42,8 @@ public class Room {
 		roomState = State.LOBBY;
 	}
 	
-<<<<<<< HEAD
-	private void assignTargets(int clientID) {
-=======
-	//need to weight higher scoring players as more likely targets, also only a max of 3 pursuers.
-	
 	private void assignTargets(int clientID){
->>>>>>> origin/master
+		//need to weight higher scoring players as more likely targets, also only a max of 3 pursuers.
 		switch (currentGame.getType()) {
 		case Packet.GAMETYPE_DEFAULT:
 			ArrayList<Player> validTargets = new ArrayList<Player>();
@@ -90,9 +85,6 @@ public class Room {
 		}
 	}
 	
-<<<<<<< HEAD
-	public void broadcast(Packet broadcastPacket) {
-=======
 	private void assignTeams(){
 		int team1 = roomSize / 2;
 		int team2 = roomSize - team1;
@@ -132,7 +124,6 @@ public class Room {
 	}
 	
 	private void broadcast(Packet broadcastPacket){
->>>>>>> origin/master
 		for(int i = 0; i < players.size(); i++){
 			if(!players.get(i).getState().equals("DISCONNECTED") && !players.get(i).getState().equals("KICKED")){
 				Server.sendPacket(players.get(i).getID(), broadcastPacket);
