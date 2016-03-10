@@ -39,8 +39,8 @@ public class Room {
 		this.roomName = roomName;
 		this.hostID = clientID;
 		addPlayer(hostName, MACAddress, clientID);
-		//Create a Leaderboard
-		
+		leaderboard = new Leaderboard();
+		leaderboard.addPlayer(clientID, hostName);		
 	}
 	
 	private void assignTargets(int clientID){
@@ -90,14 +90,24 @@ public class Room {
 		//for loop for checking if disconnected player has the same MAC as above, if so rejoin, else new player.
 		players.add(new Player(playerName, MACAddress));
 		playerIDMap.put(clientID, players.size());
+		leaderboard.addPlayer(clientID, playerName);
 		if(clientID > maxPlayerID){ maxPlayerID = clientID; }
 	}
 	
 	public void quitPlayer(int clientID) {
-		if (clientID == hostID) {
-			//Set a new host
-		}
 		players.get(playerIDMap.get(clientID)).removePlayer();
+		leaderboard.removePlayer(clientID);
+		if (clientID == hostID) {
+			setNewHost();			
+		}
+	}
+	
+	public void setNewHost() {
+		Random rng = new Random();
+		int numberOfPlayersInGame = players.size(); //Number of players in game
+		int newHost = rng.nextInt(numberOfPlayersInGame);
+		hostID = newHost; //Use this integer number in the arraylist to get the player in that position
+		//Send message to new host telling them they have become the host
 	}
 	
 	public void setPlayerLocation(double[] location, int clientID) {
@@ -111,8 +121,9 @@ public class Room {
 	public void catchPerformed(int clientID) {
 		int targetID = 1; // THIS NEEDS CHANGING targets.get(clientID);
 		if (checkCaptured(targetID)) {
-			players.get(targetID).beenCaught(); //Changes the state of the player to changing
-			//Increase Score for player on leaderboard
+			players.get(playerIDMap.get(targetID)).beenCaught(); //Changes the state of the player to changing
+			leaderboard.updatePlayerScore(clientID, 100);
+			//SEND LEADERBOARD PACKETS TO ALL CLIENTS
 			//Change the Target
 		}
 		else {
