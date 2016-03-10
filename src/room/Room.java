@@ -8,6 +8,7 @@ import java.util.Random;
 
 import packets.Packet;
 import packets.serverPackets.*;
+import packets.serverPackets.broadcastPackets.*;
 import server.Server;
 
 public class Room {
@@ -103,11 +104,20 @@ public class Room {
 	}
 	
 	public void setNewHost() {
+		ArrayList<Integer> playersAvailable = new ArrayList<Integer>();
+		for(int i = 0; i < players.size(); i++){
+			if(!players.get(i).getState().equals("DISCONNECTED") && !players.get(i).getState().equals("KICKED")){
+				playersAvailable.add(players.get(i).getID());
+			}
+		}
 		Random rng = new Random();
-		int numberOfPlayersInGame = players.size(); //Number of players in game
+		int numberOfPlayersInGame = playersAvailable.size(); //Number of players in game
 		int newHost = rng.nextInt(numberOfPlayersInGame);
-		hostID = newHost; //Use this integer number in the arraylist to get the player in that position
-		//Send message to new host telling them they have become the host
+		hostID = playersAvailable.get(newHost); //Use this integer number in the arraylist to get the player in that position
+		Server.sendPacket(hostID, new HostPacket()); //Alert client that they are the new host
+		NewHostPacket nhp = new NewHostPacket();
+		nhp.putPlayerID(hostID);
+		broadcast(nhp); //Tell all clients there is a new host
 	}
 	
 	public void setPlayerLocation(double[] location, int clientID) {
