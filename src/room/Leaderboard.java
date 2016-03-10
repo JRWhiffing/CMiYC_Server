@@ -59,6 +59,7 @@ public class Leaderboard {
 	
 	public int getPlayerScore(int playerID){
 		return leaderboard.get(playerID).getPlayerScore();
+		
 	}
 	
 	public int getPlayerTeam(int playerID){
@@ -67,6 +68,24 @@ public class Leaderboard {
 	
 	public int getSize(){
 		return leaderboard.size();
+	}
+	
+	private void sortLeadboard(){
+		
+	}
+	
+	@Override
+	public String toString(){
+		String leaderBoard = "";
+		
+		for (int i = 0; i < leaderboard.size(); i++){
+			leaderBoard += "Player: " + leaderboard.get(i).getPlayerID() + "\n";
+			leaderBoard += "\tName: " + leaderboard.get(i).getPlayerName() + "\n";
+			leaderBoard += "\tScore: " + leaderboard.get(i).getPlayerScore() + "\n";
+			leaderBoard += "\tTeam: " + leaderboard.get(i).getPlayerTeam() + "\n";
+		}
+		
+		return leaderBoard;
 	}
 	
 }

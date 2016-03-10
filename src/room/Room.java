@@ -49,7 +49,8 @@ public class Room {
 			ArrayList<Player> validTargets = new ArrayList<Player>();
 			int previousTarget = playerIDMap.get(players.get(playerIDMap.get(clientID)).getPreviousTarget());
 			for(int i = 0; i < players.size(); i++){
-				if(players.get(i).getTarget() != clientID && i != previousTarget && i != playerIDMap.get(clientID)){
+				if(players.get(i).getTarget() != clientID && i != previousTarget && i != playerIDMap.get(clientID)
+				   && players.get(i).getState().equals("CONNECTED")){
 					validTargets.add(players.get(i));
 				}
 			}
@@ -74,6 +75,14 @@ public class Room {
 		case Packet.GAMETYPE_MAN_HUNT:
 			
 			break;
+		}
+	}
+	
+	public void broadcast(Packet broadcastPacket){
+		for(int i = 0; i < players.size(); i++){
+			if(!players.get(i).getState().equals("DISCONNECTED") && !players.get(i).getState().equals("KICKED")){
+				Server.sendPacket(players.get(i).getID(), broadcastPacket);
+			}
 		}
 	}
 	

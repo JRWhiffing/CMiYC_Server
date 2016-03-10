@@ -3,7 +3,7 @@ package room;
 public class Player {
 
 	private enum playerState {
-		CONNECTED, DISCONNECTED, KICKED, SETTINGUP, CAUGHT, CHANGING
+		CONNECTED, DISCONNECTED, KICKED, CAUGHT, CHANGING
 	}
 	private String playerName;
 	private int clientID;
@@ -30,6 +30,28 @@ public class Player {
 	public Player(String playerName, double[] MACAddress) {
 		this.playerName = playerName;
 		playerMACAddress = MACAddress;	
+	}
+	
+	public String getState(){
+		String playerstate = "";
+		switch (state){
+		case CONNECTED:
+			playerstate = "CONNNECTED";
+			break;
+		case DISCONNECTED:
+			playerstate = "DISCONNNECTED";
+			break;
+		case KICKED:
+			playerstate = "KICKED";
+			break;
+		case CAUGHT:
+			playerstate = "CAUGHT";
+			break;
+		case CHANGING:
+			playerstate = "CHANGING";
+			break;
+		}
+		return playerstate;	
 	}
 	
 	public boolean checkCaught() {
