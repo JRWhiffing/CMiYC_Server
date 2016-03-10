@@ -132,6 +132,10 @@ public class Player {
 		clientID = id;
 	}
 	
+	public void setTeam(int team){
+		playerTeam = team;
+	}
+	
 	public double[] getMACAddress(){
 		return playerMACAddress;
 	}

@@ -84,8 +84,41 @@ public class Room {
 	}
 	
 	private void assignTeams(){
+		int team1 = roomSize / 2;
+		int team2 = roomSize - team1;
 		Random rng = new Random();
-		
+		for(int i = 0; i < players.size(); i++){
+			if(players.get(i).getState().equals("CONNECTED")){
+				if(team1 == 0){
+					players.get(i).setTeam(2);
+					leaderboard.updateTeam(players.get(i).getID(), 2);
+					team2--;
+				} else if(team2 == 0){
+					players.get(i).setTeam(1);
+					leaderboard.updateTeam(players.get(i).getID(), 1);
+					team1--;
+				} else{
+					int team = rng.nextInt(2);
+					if(team == 1){
+						players.get(i).setTeam(1);
+						leaderboard.updateTeam(players.get(i).getID(), 1);
+						team1--;
+					} else {
+						players.get(i).setTeam(2);
+						leaderboard.updateTeam(players.get(i).getID(), 2);
+						team2--;
+					}
+				}
+			}
+		}
+	}
+	
+	private void removeTeams(){
+		for(int i = 0; i < players.size(); i++){
+			if(players.get(i).getState().equals("CONNECTED")){
+				leaderboard.updateTeam(players.get(i).getID(), 0);
+			}
+		}
 	}
 	
 	private void broadcast(Packet broadcastPacket){
@@ -145,7 +178,7 @@ public class Room {
 	}
 	
 	public void catchPerformed(int clientID) {
-		int targetID = 1; // THIS NEEDS CHANGING targets.get(clientID);
+		int targetID = players.get(playerIDMap.get(clientID)).getTarget(); // Target of player performing catch
 		if (checkCaptured(targetID)) {
 			players.get(playerIDMap.get(targetID)).beenCaught(); //Changes the state of the player to changing
 			leaderboard.updatePlayerScore(clientID, 100);
