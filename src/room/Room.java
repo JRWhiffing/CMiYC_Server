@@ -39,12 +39,13 @@ public class Room {
 	public Room(String roomName, int clientID, String hostName, double[] MACAddress) {
 		this.roomName = roomName;
 		this.hostID = clientID;
+		currentGame = new Game((byte)0x00, 0, 0, 0, new double[] {0.0,0.0}, 0, 0);
 		addPlayer(hostName, MACAddress, clientID);
 		leaderboard = new Leaderboard();
 		leaderboard.addPlayer(clientID, hostName);		
 	}
 	
-	private void assignTargets(int clientID){
+	private void assignTargets(int clientID) {
 		switch (currentGame.getType()) {
 		case Packet.GAMETYPE_DEFAULT:
 			ArrayList<Player> validTargets = new ArrayList<Player>();
@@ -79,7 +80,7 @@ public class Room {
 		}
 	}
 	
-	public void broadcast(Packet broadcastPacket){
+	public void broadcast(Packet broadcastPacket) {
 		for(int i = 0; i < players.size(); i++){
 			if(!players.get(i).getState().equals("DISCONNECTED") && !players.get(i).getState().equals("KICKED")){
 				Server.sendPacket(players.get(i).getID(), broadcastPacket);
@@ -101,6 +102,10 @@ public class Room {
 		if (clientID == hostID) {
 			setNewHost();			
 		}
+	}
+	
+	public void changeHost(int hostID) {
+		setNewHost(); //THIS FUNCTION WILL CHANGE THE HOST BUT IT CANNOT BE THE CURRENT HOST SO NEED TO DO SOMETHING WITH THAT
 	}
 	
 	public void setNewHost() {
@@ -165,6 +170,23 @@ public class Room {
 			}
 		}
 		//Something needs to happen if player has not been caught
+	}
+	
+	public void setTimeLimit(int time) {
+		currentGame.setTimeLimit(time);
+	}
+	
+	public void setBoundaryLimit(double[] boundaries, int radius) {
+		currentGame.setBoundariesCentre(boundaries);
+		currentGame.setBoundariesRadius(radius);
+	}
+	
+	public void setScoreLimit(int score) {
+		currentGame.setScoreLimit(score);
+	}
+	
+	public void endGame() {
+		//Functionality to end the game
 	}
 	
 	public void abilityUsage(byte ability, int clientID) {

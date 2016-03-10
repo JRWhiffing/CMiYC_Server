@@ -37,11 +37,11 @@ public class HostActionPacketParser {
 		
 		case Packet.HOST_ACTION_CHANGE_HOST :
 			ChangeHostPacket chp = new ChangeHostPacket(data);
-			//Server.changeHost(roomKey, chp.getHostID());
+			Server.changeHost(roomKey, chp.getHostID());
 			break;
 		
 		case Packet.HOST_ACTION_CLOSE_ROOM :
-			//Server.closeRoom(roomKey);
+			Server.closeRoom(roomKey);
 			//Current room is closed - No Additional Data Needed
 			//Server informs all players that room is closing
 			break;
@@ -53,7 +53,7 @@ public class HostActionPacketParser {
 			break;
 			
 		case Packet.HOST_ACTION_END_ROUND :
-			//Server.endRound(roomKey);
+			Server.endGame(roomKey);
 			//Round is ended - No Additional Data Needed
 			//Server needs to inform all Clients within the room that the round is over
 			break;
@@ -67,27 +67,27 @@ public class HostActionPacketParser {
 			
 		case Packet.HOST_ACTION_SCORE_LIMIT :
 			ScoreLimitPacket slp = new ScoreLimitPacket(data);
-			//Server.setScoreLimit(roomKey slp.getScoreLimit());
+			Server.setScoreLimit(roomKey, slp.getScoreLimit());
 			//Alter score limit - Score Limit is Needed from Packet
 			//Server informs all players of updated score for next game
 			break;
 			
 		case Packet.HOST_ACTION_SET_BOUNDARIES :
 			SetBoundariesPacket sbp = new SetBoundariesPacket(data);
-			//Server.setBoundaries(roomKey, sbp.getBoundariesCentre(), sbp.getBoundaryRadius);
+			Server.setBoundaries(roomKey, sbp.getBoundariesCentre(), sbp.getBoundaryRadius());
 			//Alter boundary - Longitude + Latitude + Radius are Needed from Packet
 			//Server informs all players of updated boundary for next game
 			break;
 			
 		case Packet.HOST_ACTION_START_ROUND :
-			//Server.startRound(roomKey);
+			Server.startGame(roomKey);
 			//Round is started - No Additional Data Needed
 			//Needs to check if theres enough players BEFORE starting the game
 			break;
 			
 		case Packet.HOST_ACTION_TIME_LIMIT :
 			TimeLimitPacket tlp = new TimeLimitPacket(data);
-			//Server.setTimeLimit(roomKey, tlp.getTimeLimit());
+			Server.setTimeLimit(roomKey, tlp.getTimeLimit());
 			//Alter the time limit - Time Limit (In Minutes) is Needed from Packet
 			//Server informs all players of updated time for next game
 			break;

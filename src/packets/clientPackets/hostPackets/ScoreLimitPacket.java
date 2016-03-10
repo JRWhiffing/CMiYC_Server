@@ -16,4 +16,8 @@ public class ScoreLimitPacket extends Packet {
 	public void putScoreLimit(int score){//score in 10s/100s/1,000s?
 		putInt(score);
 	}
+	
+	public int getScoreLimit() {
+		return getInt();
+	}
 }

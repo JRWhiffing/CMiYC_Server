@@ -1,7 +1,10 @@
 package server;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import packets.Packet;
 import packets.serverPackets.RoomKeyPacket;
@@ -107,8 +110,31 @@ public class Server {
 		Server.ROOMS.get(roomKey).quitPlayer(clientID);
 	}
 	
+	public synchronized static void setTimeLimit(String roomKey, int time) {
+		Server.ROOMS.get(roomKey).setTimeLimit(time);
+	}
 	
-	public synchronized static void closeRoom(String key){
+	public synchronized static void setBoundaries(String roomKey, double[] boundaries, int radius) {
+		Server.ROOMS.get(roomKey).setBoundaryLimit(boundaries, radius);
+	}
+	
+	public synchronized static void setScoreLimit(String roomKey, int score) {
+		Server.ROOMS.get(roomKey).setScoreLimit(score);
+	}
+	
+	public synchronized static void changeHost(String roomKey, int hostID) {
+		Server.ROOMS.get(roomKey).changeHost(hostID);
+	}
+	
+	public synchronized static void endGame(String roomKey) {
+		Server.ROOMS.get(roomKey).endGame();
+	}
+	
+	public synchronized static void startGame(String roomKey) {
+		//Server.ROOMS.get(roomKey).startGame();
+	}
+	
+	public synchronized static void closeRoom(String key) {
 		//Server.ROOMS.get(key).close();
 		//while(Server.ROOMS.get(key).getState() != "Finished"){ }
 		Server.ROOMS.remove(key);
@@ -131,6 +157,35 @@ public class Server {
 		rkp.putRoomKey(key);
 		Server.sendPacket(clientID, rkp);
 		serverListener.setRoomKey(clientID, key);
+	}
+	
+	
+	///TIMER IMPLEMENTATION - DOES NOT WORK BECAUSE ENDGAME HAS TO BE STATIC
+	/**
+	 * Creates and starts a timer based on the room and the time limit
+	 * Should be called when the game is started
+	 * @param key The Room Key
+	 * @param time The time limit of the game
+	 */
+	public static void startTimer(String key, int time) {
+		Timer gameTimer = new Timer();
+		gameTimer.schedule(new EndGame(key), (long)time);
+	}
+	
+	/**
+	 * TimerTask which calls the run function when the timer reaches its time
+	 *
+	 */
+	 static class EndGame extends TimerTask {
+		String roomKey;
+		
+		public EndGame(String roomKey) {
+			this.roomKey = roomKey;
+		}
+		
+		public void run() {
+			Server.ROOMS.get(roomKey).endGame();
+		}
 	}
 	
 //	public static void printRooms(){
