@@ -3,7 +3,7 @@ package room;
 public class Player {
 
 	private enum playerState {
-		CONNECTED, DISCONNECTED, KICKED, CAUGHT, CHANGING
+		CONNECTED, DISCONNECTED, KICKED, CAUGHT, INACTIVE, CHANGING
 	}
 	private String playerName;
 	private int clientID;
@@ -30,6 +30,7 @@ public class Player {
 	public Player(String playerName, double[] MACAddress) {
 		this.playerName = playerName;
 		playerMACAddress = MACAddress;	
+		state = playerState.CONNECTED;
 	}
 	
 	public String getState(){
@@ -50,6 +51,9 @@ public class Player {
 		case CHANGING:
 			playerstate = "CHANGING";
 			break;
+		case INACTIVE:
+			playerstate = "INACTIVE";
+			break;
 		}
 		return playerstate;	
 	}
@@ -67,10 +71,15 @@ public class Player {
 	
 	public void captured() {
 		state = playerState.CAUGHT;
+		pursuerCount = 0;
 	}
 	
 	public void removePlayer() {
 		state = playerState.DISCONNECTED;
+	}
+	
+	public void rejoined(){
+		state = playerState.CONNECTED;
 	}
 
 	public void setPlayerTarget(int targetID){
@@ -117,5 +126,25 @@ public class Player {
 	
 	public int getID(){
 		return clientID;
+	}
+	
+	public void setID(int id){
+		clientID = id;
+	}
+	
+	public void setTeam(int team){
+		playerTeam = team;
+	}
+	
+	public double[] getMACAddress(){
+		return playerMACAddress;
+	}
+	
+	public void addPursuer(){
+		pursuerCount++;
+	}
+	
+	public int getPursuerCount(){
+		return pursuerCount;
 	}
 }

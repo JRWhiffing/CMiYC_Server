@@ -19,19 +19,15 @@ public class Room {
 	private enum State {
 		GAME, LOBBY, STARTING, ENDING, PAUSED, FINISHED
 	}
+	private State roomState;
 	private int voteCount;
 	private int hostID;
 	private Leaderboard leaderboard;
 	private List<Player> players = Collections.synchronizedList( new ArrayList<Player>());
 	private HashMap<Integer, Integer> playerIDMap = new HashMap<Integer, Integer>(); //Player ClientID -> Player Instance in players
 	private int maxPlayerID = 0;
+	private int roomSize;
 	
-	//Players
-	//Game (Object?)
-	//Name
-	//Key
-	//State? i.e. Game , Lobby , Starting , Ending, etc.
-	//Host?
 	//Voting
 	//Votes
 	//etc.
@@ -42,10 +38,17 @@ public class Room {
 		currentGame = new Game((byte)0x00, 0, 0, 0, new double[] {0.0,0.0}, 0, 0);
 		addPlayer(hostName, MACAddress, clientID);
 		leaderboard = new Leaderboard();
-		leaderboard.addPlayer(clientID, hostName);		
+		leaderboard.addPlayer(clientID, hostName);	
+		roomState = State.LOBBY;
 	}
 	
+<<<<<<< HEAD
 	private void assignTargets(int clientID) {
+=======
+	//need to weight higher scoring players as more likely targets, also only a max of 3 pursuers.
+	
+	private void assignTargets(int clientID){
+>>>>>>> origin/master
 		switch (currentGame.getType()) {
 		case Packet.GAMETYPE_DEFAULT:
 			ArrayList<Player> validTargets = new ArrayList<Player>();
@@ -53,7 +56,11 @@ public class Room {
 			for(int i = 0; i < players.size(); i++){
 				if(players.get(i).getTarget() != clientID && i != previousTarget && i != playerIDMap.get(clientID)
 				   && players.get(i).getState().equals("CONNECTED")){
-					validTargets.add(players.get(i));
+					if((players.size() > 4 && players.get(i).getPursuerCount() < 3) || 
+					   (players.size() == 4 && players.get(i).getPursuerCount() < 2) || 
+					   (players.size() == 3 && players.get(i).getPursuerCount() < 1)){
+						validTargets.add(players.get(i));
+					}
 				}
 			}
 			if(validTargets.isEmpty()){
@@ -65,22 +72,67 @@ public class Room {
 			Random rng = new Random();
 			int target = rng.nextInt(validTargets.size());
 			int targetID = validTargets.get(target).getID();
-			players.get(playerIDMap.get(clientID)).setPlayerTarget(target);
+			players.get(playerIDMap.get(clientID)).setPlayerTarget(targetID);
+			players.get(playerIDMap.get(targetID)).addPursuer();
 			TargetPacket tp = new TargetPacket();
-			tp.putTargetID(target);
+			tp.putTargetID(new int[]{targetID});
 			Server.sendPacket(clientID, tp);
 			break;
 			
 		case Packet.GAMETYPE_TEAM:
+			//send IDs of other team;
 			
 			break;
 		case Packet.GAMETYPE_MAN_HUNT:
+			//send IDs of other team;
 			
 			break;
 		}
 	}
 	
+<<<<<<< HEAD
 	public void broadcast(Packet broadcastPacket) {
+=======
+	private void assignTeams(){
+		int team1 = roomSize / 2;
+		int team2 = roomSize - team1;
+		Random rng = new Random();
+		for(int i = 0; i < players.size(); i++){
+			if(players.get(i).getState().equals("CONNECTED")){
+				if(team1 == 0){
+					players.get(i).setTeam(2);
+					leaderboard.updateTeam(players.get(i).getID(), 2);
+					team2--;
+				} else if(team2 == 0){
+					players.get(i).setTeam(1);
+					leaderboard.updateTeam(players.get(i).getID(), 1);
+					team1--;
+				} else{
+					int team = rng.nextInt(2);
+					if(team == 1){
+						players.get(i).setTeam(1);
+						leaderboard.updateTeam(players.get(i).getID(), 1);
+						team1--;
+					} else {
+						players.get(i).setTeam(2);
+						leaderboard.updateTeam(players.get(i).getID(), 2);
+						team2--;
+					}
+				}
+			}
+		}
+	}
+	
+	private void removeTeams(){
+		for(int i = 0; i < players.size(); i++){
+			if(players.get(i).getState().equals("CONNECTED")){
+				leaderboard.updateTeam(players.get(i).getID(), 0);
+			}
+		}
+	}
+	
+	private void broadcast(Packet broadcastPacket){
+>>>>>>> origin/master
 		for(int i = 0; i < players.size(); i++){
 			if(!players.get(i).getState().equals("DISCONNECTED") && !players.get(i).getState().equals("KICKED")){
 				Server.sendPacket(players.get(i).getID(), broadcastPacket);
@@ -88,15 +140,35 @@ public class Room {
 		}
 	}
 	
+	private void startGame(){
+		
+	}
+	
 	public void addPlayer(String playerName, double[] MACAddress, int clientID) {
-		//for loop for checking if disconnected player has the same MAC as above, if so rejoin, else new player.
+		//need to broadcast relevant leaderboard and player joined
+		if(roomSize == 16){
+			NAKPacket np = new NAKPacket();
+			np.setNAK(Packet.NAK_ROOM_FULL);
+			Server.sendPacket(clientID, np);
+			return;
+		}
+		for(int i = 0; i < players.size(); i++){
+			if(players.get(i).getState().equals("DISCONNECTED") && players.get(i).getMACAddress().equals(MACAddress)){
+				players.get(i).setID(clientID);
+				playerIDMap.put(clientID, i);
+				players.get(i).rejoined();
+				return;
+			}
+		}
 		players.add(new Player(playerName, MACAddress));
 		playerIDMap.put(clientID, players.size());
 		leaderboard.addPlayer(clientID, playerName);
 		if(clientID > maxPlayerID){ maxPlayerID = clientID; }
+		roomSize++;
 	}
 	
 	public void quitPlayer(int clientID) {
+		roomSize--;
 		players.get(playerIDMap.get(clientID)).removePlayer();
 		leaderboard.removePlayer(clientID);
 		if (clientID == hostID) {
@@ -134,7 +206,7 @@ public class Room {
 	}
 	
 	public void catchPerformed(int clientID) {
-		int targetID = 1; // THIS NEEDS CHANGING targets.get(clientID);
+		int targetID = players.get(playerIDMap.get(clientID)).getTarget(); // Target of player performing catch
 		if (checkCaptured(targetID)) {
 			players.get(playerIDMap.get(targetID)).beenCaught(); //Changes the state of the player to changing
 			leaderboard.updatePlayerScore(clientID, 100);
@@ -205,21 +277,9 @@ public class Room {
 	public void setRoomName(String roomName) {
 		this.roomName = roomName;
 	}
-
-	public Game getCurrentGame() {
-		return currentGame;
-	}
-
-	public void setCurrentGame(Game currentGame) {
-		this.currentGame = currentGame;
-	}
 	
-	public double getHostID() {
-		return hostID;
-	}
-
-	public void setHostID(int hostID) {
-		this.hostID = hostID;
+	public int size(){
+		return roomSize;
 	}
 	
 }
