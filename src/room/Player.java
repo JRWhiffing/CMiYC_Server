@@ -9,7 +9,7 @@ public class Player {
 	private int clientID;
 	private double[] playerMACAddress;
 	private int playerScore;
-	private double playerPing;
+	private int playerPing;
 	private double[] playerLocation; //Longitude Latitude
 
 	private int playerTarget = -1; //ID of Target - No Needed Anymore?
@@ -62,7 +62,7 @@ public class Player {
 		return playerScore;
 	}
 	
-	public void setPlayerPing(double playerPing) {
+	public void setPlayerPing(int playerPing) {
 		this.playerPing = playerPing;
 	}
 	

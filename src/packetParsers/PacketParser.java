@@ -31,7 +31,7 @@ public class PacketParser {
 			break;
 			
 		case Packet.PING_RESPONSE : //Ping Response
-			double ping = 2.0; //NEEDS TO GENERATE THE PING
+			int ping = 2; //NEEDS TO GENERATE THE PING
 			Server.pingResponse(roomKey, clientID, ping);
 			//Server needs to send back ping response - nope, this is the response from the client.
 			break;

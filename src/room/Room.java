@@ -94,7 +94,7 @@ public class Room {
 		players.get(clientID).setPlayerLocation(location);
 	}
 	
-	public void setPlayerPing(double ping, int clientID) {
+	public void setPlayerPing(int ping, int clientID) {
 		players.get(clientID).setPlayerPing(ping);
 	}
 	
@@ -152,7 +152,6 @@ public class Room {
 	public void setRoomName(String roomName) {
 		this.roomName = roomName;
 	}
-
 
 	public Game getCurrentGame() {
 		return currentGame;
