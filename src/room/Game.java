@@ -3,7 +3,7 @@ package room;
 import packets.Packet;
 
 public class Game {
-
+	
 	private enum GameType {
 		TEAM, SINGLE, MANHUNT //etc.
 	}
@@ -16,6 +16,14 @@ public class Game {
 	private double boundariesUpdatePercentage;
 	private int playerCountLimit;
 	
+	public Game(byte type, int score, int time, double boundaries, double bUpdateInterval, double bUpdatePercentage){
+		changeGameType(type);
+		scoreLimit = score;
+		timeLimit = time;
+		this.boundaries = boundaries;
+		boundariesUpdateInterval = bUpdateInterval;
+		boundariesUpdatePercentage = bUpdatePercentage;
+	}
 	
 	public int getScoreLimit() {
 		return scoreLimit;
@@ -66,15 +74,6 @@ public class Game {
 	//Boundary Update Interval
 	//Boundary Update Percentage
 	//etc.
-	
-	public Game(byte type, int score, int time, double boundaries, double bUpdateInterval, double bUpdatePercentage){
-		changeGameType(type);
-		scoreLimit = score;
-		timeLimit = time;
-		this.boundaries = boundaries;
-		boundariesUpdateInterval = bUpdateInterval;
-		boundariesUpdatePercentage = bUpdatePercentage;
-	}
 	
 	public void changeGameType(byte type){
 		switch (type){

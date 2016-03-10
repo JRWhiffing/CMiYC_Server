@@ -1,7 +1,4 @@
-/server/
+/packetParsers/
 /packets/
 /room/
-/stateMachines/
-/Server.class
-/PacketParsers/
-/packetParsers/
+/server/
