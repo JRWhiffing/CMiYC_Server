@@ -345,9 +345,32 @@ public class Room {
 		//Functionality to end the game
 	}
 	
+	/**
+	 * Method that allows a player to use an ability
+	 * Case statement is used to distinguish between abilities and their functionality
+	 * @param ability - The ability that is used
+	 * @param clientID - The integer ID of the player using the ability
+	 */
 	public void abilityUsage(byte ability, int clientID) {
-		//players.get(clientID).abilityUsage(ability);
-		//Player uses ability
+		switch (ability) {
+		case Packet.ABILITY_HIDE :
+
+			break;
+			
+		case Packet.ABILITY_PING :
+			
+			break;
+			
+		case Packet.ABILITY_DECOY :
+			
+			break;
+			
+		case Packet.ABILITY_SNEAK :	
+			
+		default:
+			//ERROR
+			break;
+		}
 	}
 	
 	public int getRoomNumber(){
