@@ -14,7 +14,7 @@ import server.Server;
 /**
  * Class for room functionality
  * Each game will have its own Room instance, this is used to look after the game instance and all the player instances
- * @author James and Adam
+ * @authors James and Adam
  *
  */
 public class Room {
@@ -59,49 +59,58 @@ public class Room {
 	
 	private void startGame(){
 		//Needs to check what the vote result is countVotes() - Will return the game mode voted for
+		roomState = State.STARTING;
 	}
 	
 	public void endGame() {
+		roomState = State.ENDING;
 		//Functionality to end the game
 	}
 	
+	/**
+	 * Method for when a catch has been performed by a player
+	 * @param clientID - The integer ID of the player that has performed the capture
+	 */
 	public void catchPerformed(int clientID) {
-		int targetID = players.get(playerIDMap.get(clientID)).getTarget(); // Target of player performing catch
+		int targetID = players.get(playerIDMap.get(clientID)).getTarget(); // ID of Target that has been caught
+		//PACKET NEEDS TO BE SENT TO THE TARGET TO ACTIVATE THE BUTTON THAT ALLOWS THEM TO BE CAUGHT
+		//Checks if the capture is successful
 		if (checkCaptured(targetID)) {
-			players.get(playerIDMap.get(targetID)).beenCaught(); //Changes the state of the player to changing
+			players.get(playerIDMap.get(targetID)).setState("CHANGING"); //Changes the state of the player to changing
 			leaderboard.updatePlayerScore(clientID, 100);
 			//SEND LEADERBOARD PACKETS TO ALL CLIENTS
-			//Change the Target
+			//Change the Target assignTargets(clientID);
 		}
 		else {
 			//Something needs to happen if response didn't come in
 		}
 	}
 	
+	/**
+	 * Method that check if the catch has been successful
+	 * @param targetID - The integer ID of the target
+	 * @return - Boolean as to whether the capture was successful or not
+	 */
 	private boolean checkCaptured(int targetID) {
-		long currentTime = System.currentTimeMillis();
+		long currentTime = System.currentTimeMillis(); //Find current system time
 		long maxTime = currentTime + 10000; //Checks for 10 seconds
+		//Loops for 10 seconds, waiting for a response
 		while(System.currentTimeMillis() < maxTime) {
 			if (players.get(playerIDMap.get(targetID)).checkCaught()) {
-				return true;
+				return true; //Returns true if the target states that they have been caught
 			}
 		}
-		return false;
-		//Needs to see if captured has been called by the targetID
+		return false; //Returns false if no response from target
 	}
 	
 	
 	///Player presses caught button but pursuer hasn't pressed button yet. - This may need changing if the caught button only appears when pursuer presses button
+	/**
+	 * Method for when a player has been captured
+	 * @param clientID - The integer ID of the player that has been captured
+	 */
 	public void captured(int clientID) {
-		players.get(playerIDMap.get(clientID)).captured();
-		long currentTime = System.currentTimeMillis();
-		long maxTime = currentTime + 10000; //Checks for 10 seconds
-		while(System.currentTimeMillis() < maxTime) {
-			if (players.get(playerIDMap.get(clientID)).checkContinue()) {
-				//Change the pursuer
-			}
-		}
-		//Something needs to happen if player has not been caught
+		players.get(playerIDMap.get(clientID)).setState("CAUGHT"); //Changes the player's state to being captured
 	}
 	
 	private void assignTargets(int clientID){
@@ -205,7 +214,7 @@ public class Room {
 			if(players.get(i).getState().equals("DISCONNECTED") && players.get(i).getMACAddress().equals(MACAddress)) {
 				players.get(i).setID(clientID);
 				playerIDMap.put(clientID, i);
-				players.get(i).rejoined();
+				players.get(i).setState("CONNECTED");
 				return;
 			}
 		}
@@ -226,7 +235,7 @@ public class Room {
 	 */
 	public void quitPlayer(int clientID) {
 		roomSize--;
-		players.get(playerIDMap.get(clientID)).removePlayer();
+		players.get(playerIDMap.get(clientID)).setState("DISCONNECTED");
 		leaderboard.removePlayer(clientID);
 		//Needs to set a new host if the player is the host
 		if (clientID == hostID) {
