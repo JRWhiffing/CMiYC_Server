@@ -106,12 +106,20 @@ public class Server {
 		//the threshold may be dynamic, i.e. 33-50% of players have voted to kick the player
 	}
 	
+	public synchronized static void kickPlayer(String roomKey, int clientID) {
+		Server.ROOMS.get(roomKey).quitPlayer(clientID); //Should do the same as when the player quits? Unless we dont want to keep a record of their data
+	}
+	
 	public synchronized static void playerQuit(String roomKey, int clientID) {
 		Server.ROOMS.get(roomKey).quitPlayer(clientID);
 	}
 	
 	public synchronized static void setTimeLimit(String roomKey, int time) {
 		Server.ROOMS.get(roomKey).setTimeLimit(time);
+	}
+	
+	public synchronized static void setBoundariesUpdates(String roomKey, int[] updates) {
+		Server.ROOMS.get(roomKey).setBoundariesUpdates(updates);
 	}
 	
 	public synchronized static void setBoundaries(String roomKey, double[] boundaries, int radius) {
@@ -122,8 +130,17 @@ public class Server {
 		Server.ROOMS.get(roomKey).setScoreLimit(score);
 	}
 	
-	public synchronized static void changeHost(String roomKey, int hostID) {
-		Server.ROOMS.get(roomKey).changeHost(hostID);
+	public synchronized static void toggleVoting(String roomKey) {
+		Server.ROOMS.get(roomKey).toggleVoting();
+	}
+	
+	public synchronized static void changeHost(String roomKey, int clientID) {
+		//The ID is the new hosts ID not the current hosts
+		Server.ROOMS.get(roomKey).changeHost(clientID);
+	}
+	
+	public synchronized static void changeGameType(String roomKey, byte gameType) {
+		Server.ROOMS.get(roomKey).changeGameType(gameType);
 	}
 	
 	public synchronized static void endGame(String roomKey) {

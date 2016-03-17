@@ -42,6 +42,10 @@ public class Room {
 		roomState = State.LOBBY;
 	}
 	
+	public void changeGameType(byte gameType) {
+		currentGame.changeGameType(gameType);
+	}
+	
 	private void assignTargets(int clientID){
 		//need to weight higher scoring players as more likely targets, also only a max of 3 pursuers.
 		switch (currentGame.getType()) {
@@ -168,7 +172,8 @@ public class Room {
 	}
 	
 	public void changeHost(int hostID) {
-		setNewHost(); //THIS FUNCTION WILL CHANGE THE HOST BUT IT CANNOT BE THE CURRENT HOST SO NEED TO DO SOMETHING WITH THAT
+		//Changes the host to the new ID
+		this.hostID = hostID;
 	}
 	
 	public void setNewHost() {
@@ -194,6 +199,10 @@ public class Room {
 	
 	public void setPlayerPing(int ping, int clientID) {
 		players.get(playerIDMap.get(clientID)).setPlayerPing(ping);
+	}
+	
+	public void toggleVoting() {
+		currentGame.allowVoting();
 	}
 	
 	public void catchPerformed(int clientID) {
@@ -242,6 +251,11 @@ public class Room {
 	public void setBoundaryLimit(double[] boundaries, int radius) {
 		currentGame.setBoundariesCentre(boundaries);
 		currentGame.setBoundariesRadius(radius);
+	}
+	
+	public void setBoundariesUpdates(int[] updates) {
+		currentGame.setBoundariesUpdateInterval(updates[0]);
+		currentGame.setBoundariesUpdatePercentage(updates[1]);
 	}
 	
 	public void setScoreLimit(int score) {

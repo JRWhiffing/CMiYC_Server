@@ -13,17 +13,19 @@ public class Game {
 	private int timeLimit;
 	private double[] boundariesCentre;
 	private int boundaryRadius;
-	private double boundariesUpdateInterval;
-	private double boundariesUpdatePercentage;
+	private int boundariesUpdateInterval;
+	private int boundariesUpdatePercentage;
 	private int playerCountLimit;
+	private boolean votingAllowed;
 	
-	public Game(byte type, int score, int time, int boundaryRadius, double[] boundariesCentre, double bUpdateInterval, double bUpdatePercentage){
+	public Game(byte type, int score, int time, int boundaryRadius, double[] boundariesCentre, int bUpdateInterval, int bUpdatePercentage){
 		changeGameType(type);
 		scoreLimit = score;
 		timeLimit = time;
 		this.boundariesCentre = boundariesCentre;
 		boundariesUpdateInterval = bUpdateInterval;
 		boundariesUpdatePercentage = bUpdatePercentage;
+		votingAllowed = false;
 	}
 	
 	public int getScoreLimit() {
@@ -54,13 +56,13 @@ public class Game {
 	public double getBoundariesUpdateInterval() {
 		return boundariesUpdateInterval;
 	}
-	public void setBoundariesUpdateInterval(double boundariesUpdateInterval) {
+	public void setBoundariesUpdateInterval(int boundariesUpdateInterval) {
 		this.boundariesUpdateInterval = boundariesUpdateInterval;
 	}
 	public double getBoundariesUpdatePercentage() {
 		return boundariesUpdatePercentage;
 	}
-	public void setBoundariesUpdatePercentage(double boundariesUpdatePercentage) {
+	public void setBoundariesUpdatePercentage(int boundariesUpdatePercentage) {
 		this.boundariesUpdatePercentage = boundariesUpdatePercentage;
 	}
 	public int getPlayerCountLimit() {
@@ -68,6 +70,9 @@ public class Game {
 	}
 	public void setPlayerCountLimit(int playerCountLimit) {
 		this.playerCountLimit = playerCountLimit;
+	}
+	public void allowVoting() {
+		this.votingAllowed = true;
 	}
 	
 	
@@ -82,32 +87,44 @@ public class Game {
 	//Boundary Update Percentage
 	//etc.
 	
-	public void changeGameType(byte type){
-		switch (type){
+	public void changeGameType(byte type) {
+		switch (type) {
+		
 		case Packet.GAMETYPE_TEAM:
 			gameType = GameType.TEAM;
 			break;
+			
 		case Packet.GAMETYPE_DEFAULT:
 			gameType = GameType.SINGLE;
 			break;
+			
 		case Packet.GAMETYPE_MAN_HUNT:
 			gameType = GameType.MANHUNT;
 			break;
+			
+		default:
+			gameType = GameType.SINGLE; //Might not be needed
+			break;
+			
 		}
 	}
 
-	public byte getType(){
+	public byte getType() {
 		byte type = 0x00;
 		switch (gameType) {
+		
 		case TEAM:
 			type = Packet.GAMETYPE_TEAM;
 			break;
+			
 		case SINGLE:
 			type = Packet.GAMETYPE_DEFAULT;
 			break;
+			
 		case MANHUNT:
 			type = Packet.GAMETYPE_MAN_HUNT;
 			break;
+			
 		}
 		return type;
 	}
