@@ -122,7 +122,7 @@ public class PacketParser {
 			
 		default : 
 			String bytes = dataID + " | ";
-			for(int i = 0; i < packet.length; i ++){
+			for (int i = 0; i < packet.length; i ++) {
 				bytes += packet[i] + " | ";
 			}
 			System.err.println("Unrecognised packet: \"" + bytes +

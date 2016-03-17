@@ -10,6 +10,13 @@ import packets.Packet;
 import packets.serverPackets.RoomKeyPacket;
 import room.*;
 
+/**
+ * Class for Server Functionality
+ * Multiple clients can access the Server and so methods needs to be synchronized
+ * A room hashmap stores all the rooms in the server
+ * @authors James and Adam
+ *
+ */
 public class Server {	
 	
 	private static boolean active; 
@@ -19,55 +26,77 @@ public class Server {
 	private static int lastRoom = 0;
 	private static ServerListener serverListener;
 	
+	/**
+	 * Main Method for starting the server. Creates and starts up the Server Listener
+	 * @param args - Input arguments
+	 */
 	public static void main(String[] args) {
 		serverListener = new ServerListener();
-		serverListener.run();//creating a Thread in which to listen for new clients.
+		serverListener.run(); //Creates a Thread to listen for new clients.
+		active = true; //Server is active
 		
-		active = true;
-		//loop forever until Server closed. (need to do anything here?)
+		//Loops forever until Server is closed.
 		while(active){
 			/*read from command line for input?*/ 
 		}
 		
-		//code for closing down rooms and server
+		//Code for closing down rooms and server
 		
 		System.exit(0);
 	}
 	
-	public static void closeClient(String roomKey, int client){
+	/**
+	 * Method for closing a client
+	 * @param roomKey - The room key used to find the room the client is in
+	 * @param clientID - Integer ID of the Client
+	 */
+	public static void closeClient(String roomKey, int clientID) {
 		if(roomKey != null){
-			//Server.ROOMS.get(roomkey).removePlayer(client);
+			//Server.ROOMS.get(roomKey).removePlayer(client);
 		}
-		serverListener.closeClient(client);
+		serverListener.closeClient(clientID);
 	}
 	
-	public synchronized static void sendPacket(int clientID, Packet serverPacket){
+	/**
+	 * Method for sending a packet to a client
+	 * @param clientID - Integer ID of the Client
+	 * @param serverPacket - Packet that needs to be sent to client
+	 */
+	public synchronized static void sendPacket(int clientID, Packet serverPacket) {
 		System.out.println("Still Returning");
 		serverListener.sendPacket(clientID, serverPacket);
 	}
 	
-	public static void closeServer(){
+	/**
+	 * Method for closing the server
+	 */
+	public static void closeServer() {
 		serverListener.closeConnections();
-		active = false;
+		active = false; //Server is not active
 	}
 	
-	private synchronized static String generateRoomKey(){
+	/**
+	 * Method for creating a new Room Key
+	 * @return - Returns the new Room Key as a String
+	 */
+	private synchronized static String generateRoomKey() {
 		Random random = new Random();
 		int char_;
 		String key = "";
 		boolean valid = false;
-		while (!valid){
-			for(int i = 0; i < 5; i++){
+		while (!valid) {
+			//Generates a 5 character random room key
+			for(int i = 0; i < 5; i++) {
 				char_ = random.nextInt(36);
 				key += Integer.toString(char_, 36);
 			}
-			if(Server.ROOMS.containsKey(key)){
+			//Checks if there is a room key already with that string
+			if(Server.ROOMS.containsKey(key)) {
 				key = "";
 			} else {
-				valid = true;
+				valid = true; //If not then exit while loop
 			}
 		}
-		
 		return key;
 	}
 	
@@ -139,7 +168,6 @@ public class Server {
 	}
 	
 	public synchronized static void changeHost(String roomKey, int clientID) {
-		//The ID is the new hosts ID not the current hosts
 		Server.ROOMS.get(roomKey).changeHost(clientID);
 	}
 	
