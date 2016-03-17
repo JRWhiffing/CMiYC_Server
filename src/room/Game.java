@@ -18,6 +18,11 @@ public class Game {
 	private int playerCountLimit;
 	private boolean votingAllowed;
 	
+	private int teamVoteCount = 0;
+	private int singleVoteCount = 0;
+	private int manhuntVoteCount = 0;
+	
+	
 	public Game(byte type, int score, int time, int boundaryRadius, double[] boundariesCentre, int bUpdateInterval, int bUpdatePercentage){
 		changeGameType(type);
 		scoreLimit = score;
@@ -26,6 +31,34 @@ public class Game {
 		boundariesUpdateInterval = bUpdateInterval;
 		boundariesUpdatePercentage = bUpdatePercentage;
 		votingAllowed = false;
+	}
+	
+	
+	public void increaseTeamVoteCount() {
+		teamVoteCount++;
+	}
+	
+	public void increaseSingleVoteCount() {
+		singleVoteCount++;
+	}
+	
+	public void increaseManhuntVoteCount() {
+		manhuntVoteCount++;
+	}
+	
+	/**
+	 * Method that compares all the iterators and declares a winning game mode
+	 * If there is a draw then the default game mode is returned
+	 * @return - The winning game mode as a byte
+	 */
+	public byte checkVoteCounts() {
+		if((teamVoteCount > singleVoteCount) && (teamVoteCount > manhuntVoteCount)) {
+			return Packet.GAMETYPE_TEAM;
+		}
+		if((manhuntVoteCount > singleVoteCount) && (manhuntVoteCount > teamVoteCount)) {
+			return Packet.GAMETYPE_MAN_HUNT;
+		}
+		return Packet.GAMETYPE_DEFAULT;
 	}
 	
 	public int getScoreLimit() {
@@ -73,6 +106,9 @@ public class Game {
 	}
 	public void allowVoting() {
 		this.votingAllowed = true;
+	}
+	public boolean getVotingAllowed() {
+		return votingAllowed;
 	}
 	
 	

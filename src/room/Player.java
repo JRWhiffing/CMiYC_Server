@@ -10,7 +10,10 @@ public class Player {
 	private double[] playerMACAddress;
 	private int playerScore;
 	private int playerPing;
+	private int reportedID;
+	private int reportedCount;
 	private double[] playerLocation; //Longitude Latitude
+	private byte vote; //Player's vote
 
 	private int playerTarget = -1; //ID of Target - No Needed Anymore?
 	private int previousTarget;
@@ -31,6 +34,8 @@ public class Player {
 		this.playerName = playerName;
 		playerMACAddress = MACAddress;	
 		state = playerState.CONNECTED;
+		reportedID = -1;
+		reportedCount = 0;
 	}
 	
 	public String getState(){
@@ -72,6 +77,10 @@ public class Player {
 	public void captured() {
 		state = playerState.CAUGHT;
 		pursuerCount = 0;
+	}
+	
+	public void kickPlayer() {
+		state = playerState.KICKED;
 	}
 	
 	public void removePlayer() {
@@ -147,4 +156,33 @@ public class Player {
 	public int getPursuerCount(){
 		return pursuerCount;
 	}
+	
+	public int getReportedID() {
+		return reportedID;
+	}
+	
+	public void setReportedID(int reportedID) {
+		this.reportedID = reportedID;
+	}
+	
+	public void increaseReportedCount() {
+		reportedCount++;
+	}
+	
+	public int getReportedCount() {
+		return reportedCount;
+	}
+	
+	public void resetReportedCount() {
+		reportedCount = 0;
+	}
+
+	public byte getPlayerVote() {
+		return vote;
+	}
+
+	public void setPlayerVote(byte vote) {
+		this.vote = vote;
+	}
+	
 }

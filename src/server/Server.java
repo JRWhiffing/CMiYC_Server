@@ -124,15 +124,24 @@ public class Server {
 		Server.ROOMS.get(roomKey).abilityUsage(ability, clientID);
 	}
 	
+	/**
+	 * Method calls the Room Class' voteGameMode method
+	 * @param roomKey - The room key of the room
+	 * @param clientID - The integer ID of the player that has cast the vote
+	 * @param vote - The vote that was cast by the player
+	 */
 	public synchronized static void vote(String roomKey, int clientID, byte vote) {
-		//Voting -> Game not Room? Server.ROOMS.get(roomKey).voteRoom(vote, clientID);
-		//Assumed the voting would only be used for choosing a gamemode
+		Server.ROOMS.get(roomKey).voteGameMode(vote, clientID);
 	}
 	
-	public synchronized static void playerReported(String roomKey,int report, int clientID) {
-		//Does something with reporting - Don't know what this is
-		//if a player gets above a threshold of reports then they are kicked.
-		//the threshold may be dynamic, i.e. 33-50% of players have voted to kick the player
+	/**
+	 * Method calls the Room Class' report method
+	 * @param roomKey - The room key of the room
+	 * @param reportedID - The integer ID of the reported player
+	 * @param clientID - The integer ID of the player reporting the reported player
+	 */
+	public synchronized static void playerReported(String roomKey, int reportedID, int clientID) {
+		Server.ROOMS.get(roomKey).report(reportedID, clientID);
 	}
 	
 	public synchronized static void kickPlayer(String roomKey, int clientID) {

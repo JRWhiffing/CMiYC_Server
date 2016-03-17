@@ -83,7 +83,6 @@ public class PacketParser {
 		case Packet.REPORT :
 			ReportPacket reportPacket = new ReportPacket(packet);
 			Server.playerReported(roomKey, reportPacket.getReport(), clientID);
-			//Some action needs to happen
 			break;
 			
 		//The client wishes to quit the game	

@@ -20,17 +20,12 @@ public class Room {
 		GAME, LOBBY, STARTING, ENDING, PAUSED, FINISHED
 	}
 	private State roomState;
-	private int voteCount;
 	private int hostID;
 	private Leaderboard leaderboard;
 	private List<Player> players = Collections.synchronizedList( new ArrayList<Player>());
 	private HashMap<Integer, Integer> playerIDMap = new HashMap<Integer, Integer>(); //Player ClientID -> Player Instance in players
 	private int maxPlayerID = 0;
 	private int roomSize;
-	
-	//Voting
-	//Votes
-	//etc.
 	
 	public Room(String roomName, int clientID, String hostName, double[] MACAddress) {
 		this.roomName = roomName;
@@ -136,7 +131,7 @@ public class Room {
 	}
 	
 	private void startGame(){
-		
+		//Needs to check what the vote result is countVotes() - Will return the game mode voted for
 	}
 	
 	public void addPlayer(String playerName, double[] MACAddress, int clientID) {
@@ -162,6 +157,7 @@ public class Room {
 		roomSize++;
 	}
 	
+	//Currently this does kicking + Removing - May want to change this at a later point
 	public void quitPlayer(int clientID) {
 		roomSize--;
 		players.get(playerIDMap.get(clientID)).removePlayer();
@@ -203,6 +199,89 @@ public class Room {
 	
 	public void toggleVoting() {
 		currentGame.allowVoting();
+	}
+	
+	/**
+	 * Method that adds a player's vote to their player instance
+	 * @param vote - The game mode vote as a byte
+	 * @param clientID - The integer ID of the player that has cast the vote
+	 */
+	public void voteGameMode(byte vote, int clientID) {
+		if (currentGame.getVotingAllowed()) {
+			players.get(playerIDMap.get(clientID)).setPlayerVote(vote);
+		}
+		//Else send packet to clients telling them that voting is not allowed ??
+	}
+	
+	/**
+	 * Method that counts all the votes and returns the winning game mode
+	 * @return - The game mode that won the most votes
+	 */
+	private byte countVotes() {
+		for(int i = 0; i < players.size(); i++){
+			if(!players.get(i).getState().equals("DISCONNECTED") && !players.get(i).getState().equals("KICKED")){
+				addVote(players.get(i).getPlayerVote());
+			}
+		}
+		return currentGame.checkVoteCounts();	
+	}
+	
+	/**
+	 * Method that adds the vote byte to the count iterators in the game class
+	 * @param vote - Byte that corresponds to a game type
+	 */
+	private void addVote(byte vote) {
+		switch (vote) {
+		case Packet.GAMETYPE_DEFAULT:
+			currentGame.increaseSingleVoteCount();
+			break;
+			
+		case Packet.GAMETYPE_TEAM:
+			currentGame.increaseTeamVoteCount();
+			break;
+			
+		case Packet.GAMETYPE_MAN_HUNT:
+			currentGame.increaseManhuntVoteCount();
+			break;
+			
+		default:
+			//ERROR
+			break;
+		}
+	}
+	
+	/**
+	 * Method used to report a player. 
+	 * If more than a third of players report one player then they get kicked
+	 * @param reportedID - The integer ID of the reported player
+	 * @param clientID - The integer ID of the player reporting the reported player
+	 */
+	public void report(int reportedID, int clientID) {
+		//Host player cannot be removed
+		if(!(reportedID == hostID)) {
+			//A Player can only report 1 player at a time
+			players.get(playerIDMap.get(clientID)).setReportedID(reportedID);
+			//Increases the report count on the reported Player
+			players.get(playerIDMap.get(reportedID)).increaseReportedCount();
+			int count = 0;
+			for(int i = 0; i < players.size(); i++) {
+				if(!players.get(i).getState().equals("DISCONNECTED") && !players.get(i).getState().equals("KICKED") && (players.get(i).getReportedID() == reportedID)) {
+					count++;
+				}
+			}
+			//Checks if a third of the room has reported the player
+			if(count >=  (roomSize / 3)) {
+				//Removes the reported player if the count is too high
+				quitPlayer(reportedID);		
+				//TO DO: NEEDS TO BROADCAST TO ALL PLAYERS THAT THE PLAYER HAS BEEN KICKED
+				//Any Player that has the removed player as a reported player has their reported player reset
+				for(int i = 0; i < players.size(); i++) {
+					if(players.get(i).getReportedID() == reportedID) {
+						players.get(playerIDMap.get(clientID)).setReportedID(-1);
+					}
+				}
+			}
+		}
 	}
 	
 	public void catchPerformed(int clientID) {
