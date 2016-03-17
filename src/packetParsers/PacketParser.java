@@ -6,100 +6,118 @@ import packets.*;
 import packets.clientPackets.*;
 import server.Server;
 
+/**
+ * Class for parsing client packets
+ * Uses a Case statement to distinguish between packets
+ * @authors James and Adam
+ *
+ */
 public class PacketParser {
 	
-	private final int clientID;//to determine which player is making the request.
-	private final HostActionPacketParser happ;
-	private String roomKey;//for determining which room to perform changes to.
+	private final int clientID; //Used to determine which player is making the request
+	private String roomKey; //Used to determine which room to perform changes to
+	private final HostActionPacketParser hostActionParser;
 	
-	public PacketParser(int clientID){
-		//can be used in the event of knowing which thread to close when disconnecting.
+	/**
+	 * Constructor that sets the clientID for the parser
+	 * @param clientID - The integer ID of the client
+	 */
+	public PacketParser(int clientID) {
 		this.clientID = clientID;
-		happ = new HostActionPacketParser(clientID);
+		hostActionParser = new HostActionPacketParser(clientID); //Creates the Host Action Packet Parser for the host
 	}
 	
-	public void processPacket(byte[] packet){//not sure on best way to pass data to StateMachine
-		byte dataID = packet[0];
-		packet = Arrays.copyOf(packet, 1);//removing the data ID from the packet so only data is left
+	/**
+	 * Method for processing client packets
+	 * @param packet - Byte data of the packet
+	 */
+	public void processPacket(byte[] packet) {
+		byte dataID = packet[0]; //First byte is the host packet ID
+		packet = Arrays.copyOf(packet, 1); //Removes the ID from the packet so only data is left
 		
-		switch (dataID){//each case is a protocol.
+		//Each Case is a Protocol
+		switch (dataID) {
 		
-		case Packet.LOCATION : //Location
-			LocationPacket lp = new LocationPacket(packet);
-			Server.setLocation(roomKey, clientID, lp.getLocation());
+		//Location of the Client
+		case Packet.LOCATION :
+			LocationPacket locationPacket = new LocationPacket(packet);
+			Server.setLocation(roomKey, clientID, locationPacket.getLocation());
 			//sendPacket();
 			break;
-			
-		case Packet.PING_RESPONSE : //Ping Response
+		
+		//Ping	
+		case Packet.PING_RESPONSE :
 			int ping = 2; //NEEDS TO GENERATE THE PING
 			Server.pingResponse(roomKey, clientID, ping);
 			//Server needs to send back ping response - nope, this is the response from the client.
 			break;
-			
-		case Packet.CATCH_PERFORMED : //Catch Performed	
-			Server.catchPerformed(roomKey, clientID); //ClientID being the players ID not the targets
+		
+		//The client has caught its target
+		case Packet.CATCH_PERFORMED :
+			Server.catchPerformed(roomKey, clientID); //ClientID being the players ID not the caught player
 			//Server needs to complete some kind of action to check if player has been caught
 			//If Player has been caught successfully then response needs to be given
 			break;
-			
-		case Packet.CAPTURED : //Captured by pursuer
+		
+		//The client has been captured	
+		case Packet.CAPTURED :
 			Server.captured(roomKey, clientID);
-			//Server will need to check if action is correct. Leaderboard and player instances will be updated
 			//Server will need to respond appropiately.
 			break;
-			
-		case Packet.ABILITY_USAGE : //Ability Usage
-			AbilityUsagePacket aup = new AbilityUsagePacket(packet);
-			Server.abilityUsage(roomKey, clientID, aup.getAbility());
-			//Some sort of ability manipulation needed here
+		
+		//The client has used an ability	
+		case Packet.ABILITY_USAGE :
+			AbilityUsagePacket abilityPacket = new AbilityUsagePacket(packet);
+			Server.abilityUsage(roomKey, clientID, abilityPacket.getAbility());
 			//Server may need response if ability changes an element of the game
 			break;
 			
-		case Packet.VOTE : //Vote in a Lobby
-			VotePacket vp = new VotePacket(packet);
-			Server.vote(roomKey, clientID, vp.getVote());
+		//A vote for picking the game type	
+		case Packet.VOTE :
+			VotePacket votePacket = new VotePacket(packet);
+			Server.vote(roomKey, clientID, votePacket.getVote());
 			//Server sends a response updating vote count
 			break;
 			
-		case Packet.REPORT : //Report?
-			ReportPacket rp = new ReportPacket(packet);
-			Server.playerReported(roomKey, rp.getReport(), clientID);
-			//Player reported and the player who reported them.
-			//??
+		//A player has been reported	
+		case Packet.REPORT :
+			ReportPacket reportPacket = new ReportPacket(packet);
+			Server.playerReported(roomKey, reportPacket.getReport(), clientID);
+			//Some action needs to happen
 			break;
 			
+		//The client wishes to quit the game	
 		case Packet.QUIT : //Client quits
 			Server.playerQuit(roomKey, clientID);
-			//Server removes player instance from the game
 			//Server sends broadcast to all clients notifying that a player has left
 			break;
 		
-		case Packet.JOIN : //Client joins
-			JoinPacket jp = new JoinPacket(packet);
-			Server.playerJoin(jp.getRoomKey(), jp.getMACAddress(), jp.getPlayerName(), clientID);
-			//Server checks room key and completes some kind of action
+		//The client wishes to join the game	
+		case Packet.JOIN :
+			JoinPacket joinPacket = new JoinPacket(packet);
+			Server.playerJoin(joinPacket.getRoomKey(), joinPacket.getMACAddress(), joinPacket.getPlayerName(), clientID);
 			break;
-			
-		case Packet.HOST_ACTION : //Action completed by a host
-			happ.processHostAction(dataID, packet);
-			//Separate Case statement will be needed for this
-			//Server will complete an action depending on the ID
+		
+		//The client performs a host action	- Needs to make sure he is host
+		case Packet.HOST_ACTION :
+			//The packet is assessed by the Host Action Parser
+			hostActionParser.processHostAction(dataID, packet);
 			break;
-			
-		case Packet.ACK : //ACK Client Acknowledgement of last packet
-			//Server.ack(roomKey, clientID);
-			//Confirmation that packet was sent
-			//No response required by server
+		
+		//Client sends an acknowledge of the last packet	
+		case Packet.ACK :
+			Server.acknowledgement(roomKey, clientID);
 			break;
-			
-		case Packet.BAD_SPAWN : //Bad Spawn - MAY NOT BE NEEDED ANYMORE IF WE ARENT IMPLEMENTING SPAWN
+		
+		//Not needed anymore	
+		case Packet.BAD_SPAWN :
 			//Server.badSpawn(roomKey, clientID);
 			//Server will provide a new spawn
 			break;
 			
-		case Packet.PLAYER_READY : //Player has reached their spawn - AGAIN MAY NOT BE NEEDED
+		//Not needed anymore	
+		case Packet.PLAYER_READY :
 			//Server.playerReady(roomKey, clientID);
-			//Game starts..
 			break;
 			
 		default : 
@@ -114,9 +132,14 @@ public class PacketParser {
 		}
 	}
 	
-	public void setRoomKey(String key){
+	/**
+	 * Method for setting the room key for both the client packet parser
+	 * and the host action packet parser
+	 * @param key - The Room Key
+	 */
+	public void setRoomKey(String key) {
 		roomKey = key;
-		happ.setRoomKey(key);
+		hostActionParser.setRoomKey(key);
 	}
 	
 }

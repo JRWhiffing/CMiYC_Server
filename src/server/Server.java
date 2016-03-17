@@ -134,6 +134,10 @@ public class Server {
 		Server.ROOMS.get(roomKey).toggleVoting();
 	}
 	
+	public synchronized static void acknowledgement(String roomKey, int clientID) {
+		//NEEDS TO ACKNOWLEDGE SOMETHING
+	}
+	
 	public synchronized static void changeHost(String roomKey, int clientID) {
 		//The ID is the new hosts ID not the current hosts
 		Server.ROOMS.get(roomKey).changeHost(clientID);

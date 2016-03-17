@@ -14,23 +14,23 @@ import server.Server;
  */
 public class HostActionPacketParser {
 	
-	private final int clientID;
-	private String roomKey; //Used to determine which room to perform changes to.
+	private final int clientID; //Used to determine which player is making the request
+	private String roomKey; //Used to determine which room to perform changes to
 	
 	/**
-	 * Constructor that sets the clientID
-	 * @param clientID - ?????????????????????????
+	 * Constructor that sets the clientID for the parser
+	 * @param clientID - The integer ID of the client
 	 */
-	public HostActionPacketParser(int clientID){
+	public HostActionPacketParser(int clientID) {
 		this.clientID = clientID;
 	}
 	
 	/**
 	 * Method for processing the host actions
-	 * @param dataID - The ID of the Data (Either Server or Client)
+	 * @param dataID - The ID of the Data (Should be Host Action)
 	 * @param data - The data of the packet
 	 */
-	public void processHostAction(int dataID, byte[] data){
+	public void processHostAction(int dataID, byte[] data) {
 		byte hostPacketID = data[0]; //First byte is the host packet ID
 		data = Arrays.copyOf(data, 1); //Removes the ID from the packet so only data is left
 		
@@ -128,9 +128,9 @@ public class HostActionPacketParser {
 	
 	/**
 	 * Method for setting the room key
-	 * @param key - The RoomKey 
+	 * @param key - The Room Key 
 	 */
-	public void setRoomKey(String key){
+	public void setRoomKey(String key) {
 		roomKey = key;
 	}
 	
