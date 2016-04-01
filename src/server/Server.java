@@ -1,5 +1,8 @@
 package server;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Timer;
@@ -27,17 +30,53 @@ public class Server {
 	
 	/**
 	 * Main Method for starting the server. Creates and starts up the Server Listener
+	 * Once server has been created then waits for input
 	 * @param args - Input arguments
 	 */
 	public static void main(String[] args) {
 		serverListener = new ServerListener();
-		serverListener.run(); //Creates a Thread to listen for new clients.
+		serverListener.start(); //Creates a Thread to listen for new clients.
 		active = true; //Server is active
-		
-		//Loops forever until Server is closed.
-		while(active){
-			/*read from command line for input?*/ 
+		mainloop:
+		while (active) {
+			BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
+			try {
+				String line = "";
+				while ((line = inputReader.readLine()) != null) {
+					line = line.toUpperCase();
+					switch (line) {
+					
+					//Shows all the room states and number of active players in each room
+					case "SHOW ROOMS" :
+						if (!ROOMS.isEmpty()) {
+							
+							for(int i = 0; i < lastRoom; i++) {
+								System.out.println("ROOM " + i + " with RoomKey " + ROOMKEYS.get(i) +
+								" is in State: " + ROOMS.get(ROOMKEYS.get(i)).getRoomState());
+								System.out.println("ROOM " + i + " has " + ROOMS.get(ROOMKEYS.get(i)).getPlayerCount() + " active players" );
+							}
+						}
+						else {
+							System.out.println("No Rooms have been created");
+						}
+						break;
+					
+					//Shuts down the Server
+					case "EXIT" :
+						break mainloop;
+						
+					//For unrecognised input	
+					default :
+						System.out.println("Unrecognised Input");
+						break;
+							
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+		System.out.println("Server is shutting down...");
 		
 		//Code for closing down rooms and server
 		

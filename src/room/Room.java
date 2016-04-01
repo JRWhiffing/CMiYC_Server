@@ -57,6 +57,37 @@ public class Room {
 		roomState = State.LOBBY;
 	}
 	
+	public String getRoomState() {
+		String state = "";
+		switch (roomState) {
+		
+			case GAME:
+				state = "GAME";
+				break;
+				
+			case LOBBY:
+				state = "LOBBY";
+				break;
+				
+			case STARTING:
+				state = "STARTING";
+				break;
+				
+			case ENDING:
+				state = "ENDING";
+				break;
+				
+			case PAUSED:
+				state = "PAUSED";
+				break;
+				
+			case FINISHED:
+				state = "FINISHED";
+				break;
+		}
+		return state;	
+	}
+	
 	private void startGame(){
 		//Needs to check what the vote result is countVotes() - Will return the game mode voted for
 		roomState = State.STARTING;
@@ -249,6 +280,19 @@ public class Room {
 	 */
 	public void changeHost(int hostID) {
 		this.hostID = hostID;
+	}
+	/**
+	 * Method that returns the number of active players
+	 * @return Integer number of active players in the game
+	 */
+	public int getPlayerCount() {
+		int playerCount = 0;
+		for(int i = 0; i < players.size(); i++) {
+			if(!players.get(i).getState().equals("DISCONNECTED") && !players.get(i).getState().equals("KICKED")) {
+				playerCount++;
+			}
+		}
+		return playerCount;
 	}
 	
 	/**
