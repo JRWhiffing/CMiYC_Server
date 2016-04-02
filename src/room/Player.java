@@ -21,6 +21,7 @@ public class Player {
 	private int reportedCount;
 	private double[] playerLocation; //Longitude Latitude
 	private byte vote; //Player's vote
+	private boolean playerAcknowledgement;
 
 	private int playerTarget; //ID of Target - No Needed Anymore?
 	private int previousTarget;
@@ -39,6 +40,7 @@ public class Player {
 		playerTarget = -1;
 		reportedID = -1;
 		reportedCount = 0;
+		playerAcknowledgement = false;
 	}
 	
 	/**
@@ -175,6 +177,21 @@ public class Player {
 	
 	public double[] getMACAddress(){
 		return playerMACAddress;
+	}
+	
+	/**
+	 * Method that sets the playerAcknowledgement global variable
+	 */
+	public void setPlayerAcknowledgement(boolean playerAcknowledgement) {
+		this.playerAcknowledgement = playerAcknowledgement;
+	}
+	
+	/**
+	 * Method that returns whether the player has acknowledged or not
+	 * @return Boolean of the player acknowledgement
+	 */
+	public boolean getPlayerAcknowledgement() {
+		return playerAcknowledgement;
 	}
 	
 	/**

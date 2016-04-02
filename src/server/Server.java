@@ -211,7 +211,7 @@ public class Server {
 	}
 	
 	public synchronized static void acknowledgement(String roomKey, int clientID) {
-		//NEEDS TO ACKNOWLEDGE SOMETHING
+		Server.ROOMS.get(roomKey).acknowledgePlayer(clientID);
 	}
 	
 	public synchronized static void changeHost(String roomKey, int clientID) {

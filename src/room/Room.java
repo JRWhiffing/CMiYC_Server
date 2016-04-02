@@ -481,6 +481,14 @@ public class Room {
 	}
 	
 	/**
+	 * Method that tells a player instance that they have acknowledged something
+	 * @param clientID - The integer ID of the player acknowledging
+	 */
+	public void acknowledgePlayer(int clientID) {
+		players.get(playerIDMap.get(clientID)).setPlayerAcknowledgement(true);
+	}
+	
+	/**
 	 * Method that allows a player to use an ability
 	 * Case statement is used to distinguish between abilities and their functionality
 	 * @param ability - The ability that is used
