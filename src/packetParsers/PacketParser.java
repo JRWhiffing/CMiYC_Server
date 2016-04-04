@@ -24,7 +24,7 @@ public class PacketParser {
 	 */
 	public PacketParser(int clientID) {
 		this.clientID = clientID;
-		hostActionParser = new HostActionPacketParser(clientID); //Creates the Host Action Packet Parser for the host
+		hostActionParser = new HostActionPacketParser(clientID); //Creates the Host Action Packet Parser for if/when the player is host
 	}
 	
 	/**

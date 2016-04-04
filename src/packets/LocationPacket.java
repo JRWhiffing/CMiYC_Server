@@ -2,24 +2,45 @@ package packets;
 
 import packets.Packet;
 
-//Location is a packet that can be used by both the Server and Client as in both instances it will be identical.
-
+/**
+ * Class used for packets concerning a Player's location.
+ * Get methods unpacks packets and put methods builds packets
+ * @author James and Adam
+ *
+ */
 public class LocationPacket extends Packet {
 	
-	public LocationPacket(){
+	/**
+	 * Constructor that puts the Location Packet ID at the start of the packet array
+	 */
+	public LocationPacket() {
 		putByte(Packet.LOCATION);
 	}
 	
-	public LocationPacket(byte[] data){
+	/**
+	 * Constructor that sets it's argument as the packet array
+	 * @param data - Byte Array that contains the packet data
+	 */
+	public LocationPacket(byte[] data) {
 		packet = data;
 	}
 	
-	public void putLocation(double longitude, double latitude){
+	/**
+	 * Method that puts two doubles into the packet
+	 * @param longitude - Double that corresponds to the longitude coordinate of the Player
+	 * @param latitude - Double that corresponds to the latitude coordinate of the Player
+	 */
+	public void putLocation(double longitude, double latitude) {
 		putDouble(longitude);
 		putDouble(latitude);
 	}	
 	
-	public double[] getLocation(){
+	/**
+	 * Method that extracts two doubles from the packet and returns them
+	 * These two doubles correspond to the longitude and latitude location of a Player
+	 * @return - The two doubles in an array
+	 */
+	public double[] getLocation() {
 		return new double[]{getDouble(), getDouble()};
 	}
 	
