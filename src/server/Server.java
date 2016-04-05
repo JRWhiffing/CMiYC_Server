@@ -51,8 +51,8 @@ public class Server {
 						if (!ROOMS.isEmpty()) {
 							
 							for(int i = 0; i < lastRoom; i++) {
-								System.out.println("ROOM " + i + " with RoomKey " + ROOMKEYS.get(i) +
-								" is in State: " + ROOMS.get(ROOMKEYS.get(i)).getRoomState());
+								System.out.println("ROOM " + i + ROOMS.get(ROOMKEYS.get(i)).getRoomName() + " with RoomKey " + 
+								ROOMKEYS.get(i) + " is in State: " + ROOMS.get(ROOMKEYS.get(i)).getRoomState());
 								System.out.println("ROOM " + i + " has " + ROOMS.get(ROOMKEYS.get(i)).getPlayerCount() + " active players" );
 							}
 						}
@@ -78,7 +78,17 @@ public class Server {
 		}
 		System.out.println("Server is shutting down...");
 		
-		//Code for closing down rooms and server
+		//Loops all rooms and closes them 
+		for (int i = 0; i < lastRoom; i++) {
+			String roomKey = Server.ROOMKEYS.get(i);
+			if (Server.ROOMS.get(roomKey).getRoomState() != "FINISHED") {
+				closeRoom(roomKey);
+			}
+		}
+		//Closes all connections with clients
+		closeServer();
+		
+		System.out.println("Server has Successfully shut down");
 		
 		System.exit(0);
 	}
@@ -90,7 +100,7 @@ public class Server {
 	 */
 	public static void closeClient(String roomKey, int clientID) {
 		if(roomKey != null){
-			//Server.ROOMS.get(roomKey).removePlayer(client);
+			playerQuit(roomKey, clientID);
 		}
 		serverListener.closeClient(clientID);
 	}
@@ -139,6 +149,58 @@ public class Server {
 	}
 	
 	/**
+	 * Method that creates a Room instance and adds the first player into it
+	 * @param clientID - The integer ID of the First Player
+	 * @param roomName - The name of the Room
+	 * @param clientName - The name of the First Player
+	 * @param MACAddress - The MAC Address of the First Player
+	 */
+	public synchronized static void createRoom(int clientID, String roomName, String clientName, double[] MACAddress){
+		String key = generateRoomKey();
+		Server.ROOMS.put(key, new Room(roomName, clientID, clientName, MACAddress));
+		Server.ROOMKEYS.put(lastRoom, key);
+		lastRoom++;
+		RoomKeyPacket rkp = new RoomKeyPacket();
+		rkp.putRoomKey(key);
+		Server.sendPacket(clientID, rkp);
+		serverListener.setRoomKey(clientID, key);
+	}
+	/**
+	 * Method that closes the room
+	 * @param key - The room key of the room as a String
+	 */
+	public synchronized static void closeRoom(String roomKey) {
+		Server.ROOMS.get(roomKey).endGame();
+		//Waits for the Game the End
+		while(Server.ROOMS.get(roomKey).getRoomState() != "FINISHED") { }
+		Server.ROOMS.remove(roomKey);
+		for(int i = 0; i < lastRoom; i++){
+			if(Server.ROOMKEYS.containsKey(i)){
+				if(Server.ROOMKEYS.get(i).equals(roomKey)){
+					Server.ROOMKEYS.remove(i);
+					break;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Method that starts a game
+	 * @param roomKey - The room key of the room
+	 */
+	public synchronized static void startGame(String roomKey) {
+		Server.ROOMS.get(roomKey).startGame();
+	}
+	
+	/**
+	 * Method that ends a game
+	 * @param roomKey - The room key of the room
+	 */
+	public synchronized static void endGame(String roomKey) {
+		Server.ROOMS.get(roomKey).endGame();
+	}
+	
+	/**
 	 * Method for when a new Player has joined
 	 * @param roomKey - The room key of the room
 	 * @param MACAddress - The MAC Address of the Player that has joined
@@ -149,22 +211,50 @@ public class Server {
 		Server.ROOMS.get(roomKey).addPlayer(playerName, MACAddress, clientID);
 	}
 	
+	/**
+	 * Method for setting the location of a Player
+	 * @param roomKey - The room key of the room
+	 * @param clientID - The integer ID of the Player
+	 * @param location - The location coordinates as an array
+	 */
 	public synchronized static void setLocation(String roomKey, int clientID, double[] location) {
 		Server.ROOMS.get(roomKey).setPlayerLocation(location, clientID);
 	}
 	
-	public synchronized static void pingResponse(String roomKey,int clientID, int ping) {
+	/**
+	 * Method for setting the ping of a Player
+	 * @param roomKey - The room key of the room
+	 * @param clientID - The integer ID of the Player
+	 * @param ping - The integer ping of the Player
+	 */
+	public synchronized static void pingResponse(String roomKey, int clientID, int ping) {
 		Server.ROOMS.get(roomKey).setPlayerPing(ping, clientID);
 	}
 	
+	/**
+	 * Method for informing the room that a Player has performed a capture
+	 * @param roomKey - The room key of the room
+	 * @param clientID - The integer ID of the pursuer
+	 */
 	public synchronized static void catchPerformed(String roomKey, int clientID) {
 		Server.ROOMS.get(roomKey).catchPerformed(clientID);
 	}
 	
+	/**
+	 * Method for informing the room that a Player has been captured
+	 * @param roomKey - The room key of the room
+	 * @param clientID - The integer ID of the caught player
+	 */
 	public synchronized static void captured(String roomKey, int clientID) {
 		Server.ROOMS.get(roomKey).captured(clientID);
 	}
 	
+	/**
+	 * Method for using an ability
+	 * @param roomKey - The room key of the room
+	 * @param clientID - The integer ID of the player
+	 * @param ability - The ability ID of the ability that the player is using
+	 */
 	public synchronized static void abilityUsage(String roomKey, int clientID, byte ability) {
 		Server.ROOMS.get(roomKey).abilityUsage(ability, clientID);
 	}
@@ -189,80 +279,99 @@ public class Server {
 		Server.ROOMS.get(roomKey).report(reportedID, clientID);
 	}
 	
+	/**
+	 * Method that kicks a player from a game
+	 * @param roomKey - The room key of the room
+	 * @param clientID - The integer ID of the kicked player
+	 */
 	public synchronized static void kickPlayer(String roomKey, int clientID) {
-		Server.ROOMS.get(roomKey).quitPlayer(clientID, Packet.DISCONNECT_KICK); //Should do the same as when the player quits? Unless we dont want to keep a record of their data
+		//Currently Kick does the same as Quit - May want to change so that we keep the player's data
+		Server.ROOMS.get(roomKey).quitPlayer(clientID, Packet.DISCONNECT_KICK);
 	}
 	
+	/**
+	 * Method that quits a player from a game
+	 * @param roomKey - The room key of the room
+	 * @param clientID - The integer ID of the player that is quitting
+	 */
 	public synchronized static void playerQuit(String roomKey, int clientID) {
 		Server.ROOMS.get(roomKey).quitPlayer(clientID, Packet.DISCONNECT_QUIT);
 	}
 	
+	/**
+	 * Method that sets the time limit of a game
+	 * @param roomKey - The room key of the room
+	 * @param time - The integer time limit
+	 */
 	public synchronized static void setTimeLimit(String roomKey, int time) {
 		Server.ROOMS.get(roomKey).setTimeLimit(time);
 	}
 	
+	/**
+	 * Method that sets the boundary update time
+	 * @param roomKey - The room key of the room
+	 * @param updates - An array of integers where the first element is the time interval and the second element is the percentage decrease
+	 */
 	public synchronized static void setBoundariesUpdates(String roomKey, int[] updates) {
 		Server.ROOMS.get(roomKey).setBoundariesUpdates(updates);
 	}
 	
+	/**
+	 * Method that sets the boundaries of a game
+	 * @param roomKey - The room key of the room
+	 * @param boundaries - The centre coordinates of boundaries as an array
+	 * @param radius - The integer radius of the boundary circle
+	 */
 	public synchronized static void setBoundaries(String roomKey, double[] boundaries, int radius) {
 		Server.ROOMS.get(roomKey).setBoundaryLimit(boundaries, radius);
 	}
 	
+	/**
+	 * Method that sets the score limit of a game
+	 * @param roomKey - The room key of the room
+	 * @param score - The integer score limit of the game
+	 */
 	public synchronized static void setScoreLimit(String roomKey, int score) {
 		Server.ROOMS.get(roomKey).setScoreLimit(score);
 	}
 	
+	/**
+	 * Method that toggles voting features in a game
+	 * @param roomKey - The room key of the room
+	 */
 	public synchronized static void toggleVoting(String roomKey) {
 		Server.ROOMS.get(roomKey).toggleVoting();
 	}
 	
+	/**
+	 * Method that sets acknowledgement of a player in a room
+	 * @param roomKey - The room key of the room
+	 * @param clientID - The integer ID of the acknowledging player
+	 */
 	public synchronized static void acknowledgement(String roomKey, int clientID) {
 		Server.ROOMS.get(roomKey).acknowledgePlayer(clientID);
 	}
 	
+	/**
+	 * Method that changes the host of a game
+	 * @param roomKey - The room key of the room
+	 * @param clientID - The integer ID of the new host
+	 */
 	public synchronized static void changeHost(String roomKey, int clientID) {
 		Server.ROOMS.get(roomKey).changeHost(clientID);
 	}
 	
+	/**
+	 * Method that changes the game type of a game
+	 * @param roomKey - The room key of the room
+	 * @param gameType - The byte ID of the new game type
+	 */
 	public synchronized static void changeGameType(String roomKey, byte gameType) {
 		Server.ROOMS.get(roomKey).changeGameType(gameType);
 	}
+
 	
-	public synchronized static void endGame(String roomKey) {
-		Server.ROOMS.get(roomKey).endGame();
-	}
-	
-	public synchronized static void startGame(String roomKey) {
-		//Server.ROOMS.get(roomKey).startGame();
-	}
-	
-	public synchronized static void closeRoom(String key) {
-		//Server.ROOMS.get(key).close();
-		//while(Server.ROOMS.get(key).getState() != "Finished"){ }
-		Server.ROOMS.remove(key);
-		for(int i = 0; i < lastRoom; i++){
-			if(Server.ROOMKEYS.containsKey(i)){
-				if(Server.ROOMKEYS.get(i).equals(key)){
-					Server.ROOMKEYS.remove(i);
-					break;
-				}
-			}
-		}
-	}
-	
-	public synchronized static void createRoom(int clientID, String roomName, String clientName, double[] MACAddress){
-		String key = generateRoomKey();
-		Server.ROOMS.put(key, new Room(roomName, clientID, clientName, MACAddress));
-		Server.ROOMKEYS.put(lastRoom, key);
-		lastRoom++;
-		RoomKeyPacket rkp = new RoomKeyPacket();
-		rkp.putRoomKey(key);
-		Server.sendPacket(clientID, rkp);
-		serverListener.setRoomKey(clientID, key);
-	}
-	
-	
+	///////////////////////////////////////////////////////////////////////////////////////////////////
 	///TIMER IMPLEMENTATION - DOES NOT WORK BECAUSE ENDGAME HAS TO BE STATIC
 	/**
 	 * Creates and starts a timer based on the room and the time limit
@@ -290,9 +399,5 @@ public class Server {
 			Server.ROOMS.get(roomKey).endGame();
 		}
 	}
-	
-//	public static void printRooms(){
-//		
-//	}
 	
 }

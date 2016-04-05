@@ -92,8 +92,12 @@ public class Room {
 		return state;	
 	}
 	
-	private void startGame() {
+	/**
+	 * Method for starting the game
+	 */
+	public void startGame() {
 		//Needs to check what the vote result is countVotes() - Will return the game mode voted for
+		//Needs to check that there are enough players
 		roomState = State.STARTING;
 		broadcastLeaderboard();
 		TimeRemainingPacket timeRemaining = new TimeRemainingPacket();
@@ -108,11 +112,18 @@ public class Room {
 		broadcast(gameStart);
 	}
 	
+	/**
+	 * Method to end the game
+	 */
 	public void endGame() {
 		roomState = State.ENDING;
 		GameEndPacket gameEnd = new GameEndPacket();
 		broadcast(gameEnd);
 		//Functionality to end the game
+	}
+	
+	public void forceClose() {
+
 	}
 	
 	/**
