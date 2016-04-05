@@ -57,6 +57,10 @@ public class Room {
 		roomState = State.LOBBY;
 	}
 	
+	/**
+	 * Method that returns the state of the Room as a String
+	 * @return - State of the Room as a String
+	 */
 	public String getRoomState() {
 		String state = "";
 		switch (roomState) {
@@ -88,14 +92,74 @@ public class Room {
 		return state;	
 	}
 	
-	private void startGame(){
-		//Needs to check what the vote result is countVotes() - Will return the game mode voted for
-		roomState = State.STARTING;
+	/**
+	 * Method for starting the game
+	 */
+	public void startGame() {
+		//Counts votes and set it as the current game mode
+		currentGame.changeGameType(countVotes()); 
+	
+		switch(currentGame.getType()) {
+		
+		//Default Game Mode
+		case Packet.GAMETYPE_DEFAULT :
+			//Minimum Player Count has to be 4
+			if (getPlayerCount() < 5) {
+				roomState = State.STARTING;
+				//Broadcasts the time limit to all the Players
+				TimeRemainingPacket timeRemaining = new TimeRemainingPacket();
+				timeRemaining.putTimeRemaining(currentGame.getTimeLimit());
+				broadcast(timeRemaining);
+				//Broadcasts the boundaries to all the Player
+				BoundaryUpdatePacket boundaryUpdate = new BoundaryUpdatePacket();
+				double longitude = currentGame.getBoundariesCentre()[0];
+				double latitude = currentGame.getBoundariesCentre()[1];
+				boundaryUpdate.putBoundaryUpdate(longitude, latitude, currentGame.getBoundaryRadius());
+				broadcast(boundaryUpdate);
+				//Sends all Players their targets - MAY WANT TO WAIT A BIT UNTIL PLAYERS SPREAD OUT A BIT AS PLAYERS MIGHT FOLLOW OTHER
+				for (int i = 0; i < players.size(); i++) {
+					assignTargets(players.get(i).getID());
+				}
+				//Broadcasts the starting Leaderboard to all Players
+				broadcastLeaderboard();
+				//Starts the Game
+				GameStartPacket gameStart = new GameStartPacket();
+				broadcast(gameStart);
+				roomState = State.GAME;
+			}
+			else {
+				NAKPacket nPacket = new NAKPacket();
+				nPacket.notEnoughPlayers();
+				Server.sendPacket(hostID, nPacket); 
+			}
+			break;
+			
+		case Packet.GAMETYPE_MAN_HUNT :
+			break;
+			
+		case Packet.GAMETYPE_TEAM :
+			break;
+			
+		default :
+			//ERROR
+			break;
+				
+		}
 	}
 	
+	/**
+	 * Method to end the game
+	 */
 	public void endGame() {
 		roomState = State.ENDING;
+		GameEndPacket gameEnd = new GameEndPacket();
+		broadcast(gameEnd);
 		//Functionality to end the game
+		roomState = State.FINISHED;
+	}
+	
+	public void forceClose() {
+
 	}
 	
 	/**
@@ -104,13 +168,19 @@ public class Room {
 	 */
 	public void catchPerformed(int clientID) {
 		int targetID = players.get(playerIDMap.get(clientID)).getTarget(); // ID of Target that has been caught
-		//PACKET NEEDS TO BE SENT TO THE TARGET TO ACTIVATE THE BUTTON THAT ALLOWS THEM TO BE CAUGHT
+		//Packet is sent to the target to activate a button on their screen that allows them to be caught
+		CaughtPacket cp = new CaughtPacket();
+		Server.sendPacket(targetID, cp);
 		//Checks if the capture is successful
 		if (checkCaptured(targetID)) {
 			players.get(playerIDMap.get(targetID)).setState("CHANGING"); //Changes the state of the player to changing
+			//Notifies all players that a successful capture has occurred
+			CapturePacket capturePacket = new CapturePacket();
+			capturePacket.putCapture(targetID, clientID);
+			broadcast(capturePacket);
 			leaderboard.updatePlayerScore(clientID, 100);
-			//SEND LEADERBOARD PACKETS TO ALL CLIENTS
-			//Change the Target assignTargets(clientID);
+			broadcastLeaderboard();
+			//Change the Target assignTargets(clientID); - UNCOMMENT ONCE METHOD COMPLETED
 		}
 		else {
 			//Something needs to happen if response didn't come in
@@ -215,6 +285,7 @@ public class Room {
 				}
 			}
 		}
+		broadcastLeaderboard();
 	}
 	
 	private void removeTeams(){
@@ -223,6 +294,7 @@ public class Room {
 				leaderboard.updateTeam(players.get(i).getID(), 0);
 			}
 		}
+		broadcastLeaderboard();
 	}
 	
 	/**
@@ -232,7 +304,6 @@ public class Room {
 	 * @param clientID - The integer ID of the new player
 	 */
 	public void addPlayer(String playerName, double[] MACAddress, int clientID) {
-		//need to broadcast relevant leaderboard and player joined
 		//Checks if the room is full
 		if(roomSize == 16) {
 			NAKPacket np = new NAKPacket();
@@ -240,7 +311,7 @@ public class Room {
 			Server.sendPacket(clientID, np);
 			return;
 		}
-		//Checks if the players data has been previously saved
+		//Checks if the player's data has been previously saved
 		for(int i = 0; i < players.size(); i++){
 			if(players.get(i).getState().equals("DISCONNECTED") && players.get(i).getMACAddress().equals(MACAddress)) {
 				players.get(i).setID(clientID);
@@ -252,6 +323,12 @@ public class Room {
 		players.add(new Player(playerName, MACAddress)); //Creates a new Player instance and adds it to list of players
 		playerIDMap.put(clientID, players.size());
 		leaderboard.addPlayer(clientID, playerName);
+		//Sends a New Player Packet to all Players
+		NewPlayerPacket npp = new NewPlayerPacket();
+		npp.putPlayerName(playerName);
+		broadcast(npp);
+		//Sends updated leaderboard with new player to all Players
+		broadcastLeaderboard();
 		//Increases the Max Player ID if its a new player
 		if(clientID > maxPlayerID) { 
 			maxPlayerID = clientID; 
@@ -259,15 +336,21 @@ public class Room {
 		roomSize++;
 	}
 	
-	//Currently this does kicking + Removing - May want to change this at a later point
 	/**
 	 * Method that removes the player from the game
 	 * @param clientID - The integer ID of the player being removed
 	 */
-	public void quitPlayer(int clientID) {
+	public void quitPlayer(int clientID, byte reason) {
 		roomSize--;
 		players.get(playerIDMap.get(clientID)).setState("DISCONNECTED");
 		leaderboard.removePlayer(clientID);
+		//Tells all players that a player has disconnected
+		DisconnectionPacket disconnectPacket = new DisconnectionPacket();
+		disconnectPacket.putPlayerID(clientID);
+		disconnectPacket.putDisconnectionReason(reason);
+		broadcast(disconnectPacket);
+		//Broadcasts updated leaderboard
+		broadcastLeaderboard();
 		//Needs to set a new host if the player is the host
 		if (clientID == hostID) {
 			setNewHost();			
@@ -327,6 +410,16 @@ public class Room {
 				Server.sendPacket(players.get(i).getID(), broadcastPacket);
 			}
 		}
+	}
+	
+	/**
+	 * Method that creates a new leaderboard packet instance and send the leaderboard to all players
+	 */
+	private void broadcastLeaderboard() {
+		LeaderboardPacket leaderboardPacket = new LeaderboardPacket();
+		leaderboardPacket.putLeaderboard(leaderboard);
+		//Broadcasts the updated leaderboard to all players
+		broadcast(leaderboardPacket);
 	}
 	
 	/**
@@ -468,8 +561,9 @@ public class Room {
 			//Checks if a third of the room has reported the player
 			if(count >=  (roomSize / 3)) {
 				//Removes the reported player if the count is too high
-				quitPlayer(reportedID);		
+				quitPlayer(reportedID, Packet.DISCONNECT_KICK);		
 				//TO DO: NEEDS TO BROADCAST TO ALL PLAYERS THAT THE PLAYER HAS BEEN KICKED
+				broadcastLeaderboard();
 				//Any Player that has the removed player as a reported player has their reported player reset
 				for(int i = 0; i < players.size(); i++) {
 					if(players.get(i).getReportedID() == reportedID) {

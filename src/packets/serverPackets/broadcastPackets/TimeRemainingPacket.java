@@ -13,13 +13,12 @@ public class TimeRemainingPacket extends Packet {
 		packet = data;
 	}
 	
-	public void putTimeReaming(int minutes, int seconds){
-		putInt(minutes);
+	public void putTimeRemaining(int seconds) {
 		putInt(seconds);
 	}
 	
-	public int[] getTimeRemaining(){
-		return new int[]{getInt(), getInt()};
+	public int getTimeRemaining(){
+		return getInt();
 	}
 	
 }

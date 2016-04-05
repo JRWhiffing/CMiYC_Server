@@ -75,7 +75,7 @@ public class Game {
 	}
 	
 	public void setBoundariesRadius(int boundaryRadius) {
-		this.boundaryRadius = boundaryRadius;
+		this.setBoundaryRadius(boundaryRadius);
 	}
 	
 	public double[] getBoundariesCentre() {
@@ -163,6 +163,16 @@ public class Game {
 			
 		}
 		return type;
+	}
+
+
+	public int getBoundaryRadius() {
+		return boundaryRadius;
+	}
+
+
+	public void setBoundaryRadius(int boundaryRadius) {
+		this.boundaryRadius = boundaryRadius;
 	}
 	
 }

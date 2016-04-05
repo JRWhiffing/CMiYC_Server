@@ -24,7 +24,7 @@ public class PacketParser {
 	 */
 	public PacketParser(int clientID) {
 		this.clientID = clientID;
-		hostActionParser = new HostActionPacketParser(clientID); //Creates the Host Action Packet Parser for the host
+		hostActionParser = new HostActionPacketParser(clientID); //Creates the Host Action Packet Parser for if/when the player is host
 	}
 	
 	/**
@@ -42,10 +42,9 @@ public class PacketParser {
 		case Packet.LOCATION :
 			LocationPacket locationPacket = new LocationPacket(packet);
 			Server.setLocation(roomKey, clientID, locationPacket.getLocation());
-			//sendPacket();
 			break;
 		
-		//Ping	
+		//Ping	- NEEDS DOING
 		case Packet.PING_RESPONSE :
 			int ping = 2; //NEEDS TO GENERATE THE PING
 			Server.pingResponse(roomKey, clientID, ping);
