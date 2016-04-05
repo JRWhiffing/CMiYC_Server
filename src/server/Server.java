@@ -100,8 +100,9 @@ public class Server {
 	 */
 	public static void closeClient(String roomKey, int clientID) {
 		if(roomKey != null){
-			playerQuit(roomKey, clientID);
-		}
+			//Server.ROOMS.get(roomKey).removePlayer(client);
+		} 
+		playerQuit(roomKey, clientID);
 		serverListener.closeClient(clientID);
 	}
 	
