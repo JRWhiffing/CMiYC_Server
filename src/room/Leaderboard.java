@@ -72,6 +72,26 @@ public class Leaderboard {
 		return leaderboard.size();
 	}
 	
+	/**
+	 * Method that checks whether a Player has reached the score limit
+	 * Loops the whole leaderboard and checks every player
+	 * @param scoreLimit - Integer number scorelimit
+	 * @return - Boolean that tells whether the limit has been reached or not
+	 */
+	public boolean checkScoreLimitReached(int scoreLimit) {
+		//If no score limit has been set
+		if (scoreLimit < 1) {
+			return false;
+		}
+		//Loops every player in the leaderboard
+		for (int i = 0; i < leaderboard.size(); i++) {
+			if (leaderboard.get(i).getPlayerScore() >= scoreLimit) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	//bubble sort.
 	private void sortLeaderboard(){
 		LeaderboardPlayer tempPlayer;

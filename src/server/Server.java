@@ -172,7 +172,9 @@ public class Server {
 	public synchronized static void closeRoom(String roomKey) {
 		Server.ROOMS.get(roomKey).endGame();
 		//Waits for the Game the End
-		while(Server.ROOMS.get(roomKey).getRoomState() != "FINISHED") { }
+		while(Server.ROOMS.get(roomKey).getRoomState() != "FINISHED") { 
+			Server.ROOMS.get(roomKey).forceClose(); //Method incomplete
+		}
 		Server.ROOMS.remove(roomKey);
 		for(int i = 0; i < lastRoom; i++){
 			if(Server.ROOMKEYS.containsKey(i)){
@@ -189,7 +191,7 @@ public class Server {
 	 * @param roomKey - The room key of the room
 	 */
 	public synchronized static void startGame(String roomKey) {
-		Server.ROOMS.get(roomKey).startGame();
+		Server.ROOMS.get(roomKey).startGame(Server.ROOMS.get(roomKey));
 	}
 	
 	/**
@@ -368,36 +370,6 @@ public class Server {
 	 */
 	public synchronized static void changeGameType(String roomKey, byte gameType) {
 		Server.ROOMS.get(roomKey).changeGameType(gameType);
-	}
-
-	
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	///TIMER IMPLEMENTATION - DOES NOT WORK BECAUSE ENDGAME HAS TO BE STATIC
-	/**
-	 * Creates and starts a timer based on the room and the time limit
-	 * Should be called when the game is started
-	 * @param key The Room Key
-	 * @param time The time limit of the game
-	 */
-	public static void startTimer(String key, int time) {
-		Timer gameTimer = new Timer();
-		gameTimer.schedule(new EndGame(key), (long)time);
-	}
-	
-	/**
-	 * TimerTask which calls the run function when the timer reaches its time
-	 *
-	 */
-	 static class EndGame extends TimerTask {
-		String roomKey;
-		
-		public EndGame(String roomKey) {
-			this.roomKey = roomKey;
-		}
-		
-		public void run() {
-			Server.ROOMS.get(roomKey).endGame();
-		}
 	}
 	
 }

@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import packets.Packet;
 import packets.serverPackets.*;
@@ -95,7 +97,7 @@ public class Room {
 	/**
 	 * Method for starting the game
 	 */
-	public void startGame() {
+	public void startGame(Room gameRoom) {
 		//Counts votes and set it as the current game mode
 		currentGame.changeGameType(countVotes()); 
 	
@@ -125,6 +127,10 @@ public class Room {
 				//Starts the Game
 				GameStartPacket gameStart = new GameStartPacket();
 				broadcast(gameStart);
+				//Starts the timer that will end the game when the timer is up
+				if (currentGame.getTimeLimit() > 0) {
+					startTimer(gameRoom, currentGame.getTimeLimit());
+				}
 				roomState = State.GAME;
 			}
 			else {
@@ -150,14 +156,20 @@ public class Room {
 	/**
 	 * Method to end the game
 	 */
-	public void endGame() {
+	public synchronized void endGame() {
+		//Final time broadcast leaderboard so that client can determine winner
+		broadcastLeaderboard();
 		roomState = State.ENDING;
 		GameEndPacket gameEnd = new GameEndPacket();
-		broadcast(gameEnd);
-		//Functionality to end the game
+		broadcast(gameEnd);		
 		roomState = State.FINISHED;
+		//CHECK IF THERE IS ANOTHER GAME TO BE PLAYED BY SAME PLAYERS OR KICK ALL PLAYERS OUT OF GAME?
 	}
 	
+	//MAY NOT BE NEEDED
+	/**
+	 * Method to force close a game
+	 */
 	public void forceClose() {
 
 	}
@@ -179,6 +191,10 @@ public class Room {
 			capturePacket.putCapture(targetID, clientID);
 			broadcast(capturePacket);
 			leaderboard.updatePlayerScore(clientID, 100);
+			//Checks whether the score limit has been reached
+			if (leaderboard.checkScoreLimitReached(currentGame.getScoreLimit())) {
+				endGame();	
+			}
 			broadcastLeaderboard();
 			//Change the Target assignTargets(clientID); - UNCOMMENT ONCE METHOD COMPLETED
 		}
@@ -640,6 +656,43 @@ public class Room {
 	 */
 	public int size(){
 		return roomSize;
+	}
+	
+	/**
+	 * Creates and starts a timer based on the time limit
+	 * Room of the game that requires timer is referenced so that timer can use endGame method
+	 * @param gameRoom - A reference of the room that requires the timer
+	 * @param time - The time limit of the game
+	 */
+	public static void startTimer(Room gameRoom, int time) {
+		Timer gameTimer = new Timer();
+		//Sets off the timer
+		gameTimer.schedule(new EndGameTimerTask(gameRoom), (long)time);
+	}
+	
+	/**
+	 * TimerTask which calls the run function when the timer reaches its time
+	 * Used to signalise the end of the game
+	 *
+	 */
+	 static class EndGameTimerTask extends TimerTask {
+		Room gameRoom;
+		
+		/**
+		 * Constructor that's argument sets the Room global variable used in the TimerTask
+		 * @param gameRoom - Room instance that is used for a global variable
+		 */
+		public EndGameTimerTask(Room gameRoom) {
+			this.gameRoom = gameRoom;
+		}
+		
+		/**
+		 * Method is called when the TimerTask's timer has reached its time
+		 */
+		public void run() {
+			//Ends the game
+			gameRoom.endGame();
+		}
 	}
 	
 }
