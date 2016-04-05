@@ -13,7 +13,7 @@ public class ServerListener extends Thread{
 
 	private int portNumber;//port number
 	private ServerSocket listener;
-	private final HashMap<Integer, ClientHandler> clients = new HashMap<Integer, ClientHandler>();//various Threads
+	static private final HashMap<Integer, ClientHandler> clients = new HashMap<Integer, ClientHandler>();//various Threads
 	private int latestClientID = 0;
 	
 	ServerListener(){ //setting up the Socket before running the Thread.
@@ -28,8 +28,9 @@ public class ServerListener extends Thread{
 				Socket clientSocket = null;
 				System.out.println("Server: Waiting for a client on the port: "+portNumber);
 				clientSocket = listener.accept();
-				System.out.println("Server: Client found, passing to ClientHandler.");
 				latestClientID++;
+				System.out.println("Server: Client found, passing to ClientHandler" + latestClientID);
+				System.out.println(latestClientID);
 				if(clientSocket != null){
 					clients.put(latestClientID, new ClientHandler(clientSocket, latestClientID));
 				} else {
@@ -112,8 +113,10 @@ public class ServerListener extends Thread{
 	}
 	
 	public void closeClient(int clientNum){
-		clients.get(clientNum).close();
-		clients.remove(clientNum);
+		if(clients.containsKey(clientNum)){
+			clients.get(clientNum).close();
+			clients.remove(clientNum);	
+		}
 	}
 	
 	public void setRoomKey(int clientID, String key){
@@ -121,9 +124,7 @@ public class ServerListener extends Thread{
 	}
 	
 	public void sendPacket(int clientID, Packet serverPacket){
-		System.out.println("Still Going");
 		if(clients.containsKey(clientID)){
-			System.out.println("Client Thread Found");
 			clients.get(clientID).sendPacket(serverPacket);
 		}
 	}

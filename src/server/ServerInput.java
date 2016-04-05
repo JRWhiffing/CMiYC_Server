@@ -35,16 +35,18 @@ public class ServerInput extends Thread{
 			Server.closeServer();
 		} finally {
 			Server.closeClient(roomKey, clientID);
-			close();
 		}
 	}
 	
 	public void close(){
-		if (clientSocket != null){
-			try {
-				clientSocket.close();
-			} catch (IOException ioe) {
-				System.err.println(ioe.getMessage());
+		if(clientSocket != null){
+			if (!clientSocket.isClosed()){
+				try {
+					clientSocket.close();
+				} catch (IOException ioe) {
+					System.err.println(ioe.getMessage());
+				}
+				System.out.println("Input Closing");
 			}
 		}
 		if (!Thread.currentThread().isInterrupted()){

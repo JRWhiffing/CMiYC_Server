@@ -91,7 +91,7 @@ public class Server {
 	public static void closeClient(String roomKey, int clientID) {
 		if(roomKey != null){
 			//Server.ROOMS.get(roomKey).removePlayer(client);
-		}
+		} 
 		serverListener.closeClient(clientID);
 	}
 	

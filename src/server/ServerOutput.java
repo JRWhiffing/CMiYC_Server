@@ -8,7 +8,7 @@ import packets.Packet;
 
 public class ServerOutput extends Thread{
 	private final Socket clientSocket;
-	private LinkedList<Packet> packetQueue;
+	private LinkedList<Packet> packetQueue = new LinkedList<Packet>();
 	private boolean active;
 
 	public ServerOutput(Socket cs){
@@ -19,7 +19,7 @@ public class ServerOutput extends Thread{
 	@Override
 	public void run(){
 		while(active){
-			if(packetQueue.size() > 0){
+			if(!packetQueue.isEmpty()){
 				for(Packet serverPacket : packetQueue){
 					sendPacket(serverPacket.getPacket());
 				}
@@ -46,10 +46,13 @@ public class ServerOutput extends Thread{
 	
 	public void close(){
 		if (clientSocket != null){
-			try {
-				clientSocket.close();
-			} catch (IOException ioe) {
-				System.err.println(ioe.getMessage());
+			if(!clientSocket.isClosed()){
+				try {
+					clientSocket.close();
+				} catch (IOException ioe) {
+					System.err.println(ioe.getMessage());
+				}
+				System.out.println("output closing");
 			}
 		}
 		if (!Thread.currentThread().isInterrupted()){

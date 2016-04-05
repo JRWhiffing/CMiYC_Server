@@ -13,8 +13,8 @@ public class ClientHandler {
 		this.clientID = clientID;
 		sInput = new ServerInput(cs, clientID);
 		sOutput = new ServerOutput(cs);
-		sInput.run();
-		sOutput.run();
+		sInput.start();
+		sOutput.start();
 	}
 	
 	public synchronized void sendPacket(Packet serverPacket) {
@@ -44,7 +44,7 @@ public class ClientHandler {
 				System.err.println("Sleep failed: " + e.getMessage());;
 			}
 		}
-		System.out.println("ClientHandler" + clientID + ": Client " + clientID + " has gone.");
+		System.out.println("Client " + clientID + " has gone.");
 	}
 	
 }
