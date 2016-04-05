@@ -96,20 +96,55 @@ public class Room {
 	 * Method for starting the game
 	 */
 	public void startGame() {
-		//Needs to check what the vote result is countVotes() - Will return the game mode voted for
-		//Needs to check that there are enough players
-		roomState = State.STARTING;
-		broadcastLeaderboard();
-		TimeRemainingPacket timeRemaining = new TimeRemainingPacket();
-		timeRemaining.putTimeRemaining(currentGame.getTimeLimit());
-		broadcast(timeRemaining);
-		BoundaryUpdatePacket boundaryUpdate = new BoundaryUpdatePacket();
-		double longitude = currentGame.getBoundariesCentre()[0];
-		double latitude = currentGame.getBoundariesCentre()[1];
-		boundaryUpdate.putBoundaryUpdate(longitude, latitude, currentGame.getBoundaryRadius());
-		broadcast(boundaryUpdate);
-		GameStartPacket gameStart = new GameStartPacket();
-		broadcast(gameStart);
+		//Counts votes and set it as the current game mode
+		currentGame.changeGameType(countVotes()); 
+	
+		switch(currentGame.getType()) {
+		
+		//Default Game Mode
+		case Packet.GAMETYPE_DEFAULT :
+			//Minimum Player Count has to be 4
+			if (getPlayerCount() < 5) {
+				roomState = State.STARTING;
+				//Broadcasts the time limit to all the Players
+				TimeRemainingPacket timeRemaining = new TimeRemainingPacket();
+				timeRemaining.putTimeRemaining(currentGame.getTimeLimit());
+				broadcast(timeRemaining);
+				//Broadcasts the boundaries to all the Player
+				BoundaryUpdatePacket boundaryUpdate = new BoundaryUpdatePacket();
+				double longitude = currentGame.getBoundariesCentre()[0];
+				double latitude = currentGame.getBoundariesCentre()[1];
+				boundaryUpdate.putBoundaryUpdate(longitude, latitude, currentGame.getBoundaryRadius());
+				broadcast(boundaryUpdate);
+				//Sends all Players their targets - MAY WANT TO WAIT A BIT UNTIL PLAYERS SPREAD OUT A BIT AS PLAYERS MIGHT FOLLOW OTHER
+				for (int i = 0; i < players.size(); i++) {
+					assignTargets(players.get(i).getID());
+				}
+				//Broadcasts the starting Leaderboard to all Players
+				broadcastLeaderboard();
+				//Starts the Game
+				GameStartPacket gameStart = new GameStartPacket();
+				broadcast(gameStart);
+				roomState = State.GAME;
+			}
+			else {
+				NAKPacket nPacket = new NAKPacket();
+				nPacket.notEnoughPlayers();
+				Server.sendPacket(hostID, nPacket); 
+			}
+			break;
+			
+		case Packet.GAMETYPE_MAN_HUNT :
+			break;
+			
+		case Packet.GAMETYPE_TEAM :
+			break;
+			
+		default :
+			//ERROR
+			break;
+				
+		}
 	}
 	
 	/**
@@ -120,6 +155,7 @@ public class Room {
 		GameEndPacket gameEnd = new GameEndPacket();
 		broadcast(gameEnd);
 		//Functionality to end the game
+		roomState = State.FINISHED;
 	}
 	
 	public void forceClose() {
