@@ -138,6 +138,13 @@ public class Server {
 		return key;
 	}
 	
+	/**
+	 * Method for when a new Player has joined
+	 * @param roomKey - The room key of the room
+	 * @param MACAddress - The MAC Address of the Player that has joined
+	 * @param playerName - The name of the Player that has joined as a String
+	 * @param clientID - The integer ID of the Player that has joined
+	 */
 	public synchronized static void playerJoin(String roomKey, double[] MACAddress, String playerName, int clientID) {
 		Server.ROOMS.get(roomKey).addPlayer(playerName, MACAddress, clientID);
 	}
@@ -183,11 +190,11 @@ public class Server {
 	}
 	
 	public synchronized static void kickPlayer(String roomKey, int clientID) {
-		Server.ROOMS.get(roomKey).quitPlayer(clientID); //Should do the same as when the player quits? Unless we dont want to keep a record of their data
+		Server.ROOMS.get(roomKey).quitPlayer(clientID, Packet.DISCONNECT_KICK); //Should do the same as when the player quits? Unless we dont want to keep a record of their data
 	}
 	
 	public synchronized static void playerQuit(String roomKey, int clientID) {
-		Server.ROOMS.get(roomKey).quitPlayer(clientID);
+		Server.ROOMS.get(roomKey).quitPlayer(clientID, Packet.DISCONNECT_QUIT);
 	}
 	
 	public synchronized static void setTimeLimit(String roomKey, int time) {

@@ -92,14 +92,26 @@ public class Room {
 		return state;	
 	}
 	
-	private void startGame(){
+	private void startGame() {
 		//Needs to check what the vote result is countVotes() - Will return the game mode voted for
 		roomState = State.STARTING;
 		broadcastLeaderboard();
+		TimeRemainingPacket timeRemaining = new TimeRemainingPacket();
+		timeRemaining.putTimeRemaining(currentGame.getTimeLimit());
+		broadcast(timeRemaining);
+		BoundaryUpdatePacket boundaryUpdate = new BoundaryUpdatePacket();
+		double longitude = currentGame.getBoundariesCentre()[0];
+		double latitude = currentGame.getBoundariesCentre()[1];
+		boundaryUpdate.putBoundaryUpdate(longitude, latitude, currentGame.getBoundaryRadius());
+		broadcast(boundaryUpdate);
+		GameStartPacket gameStart = new GameStartPacket();
+		broadcast(gameStart);
 	}
 	
 	public void endGame() {
 		roomState = State.ENDING;
+		GameEndPacket gameEnd = new GameEndPacket();
+		broadcast(gameEnd);
 		//Functionality to end the game
 	}
 	
@@ -115,6 +127,10 @@ public class Room {
 		//Checks if the capture is successful
 		if (checkCaptured(targetID)) {
 			players.get(playerIDMap.get(targetID)).setState("CHANGING"); //Changes the state of the player to changing
+			//Notifies all players that a successful capture has occurred
+			CapturePacket capturePacket = new CapturePacket();
+			capturePacket.putCapture(targetID, clientID);
+			broadcast(capturePacket);
 			leaderboard.updatePlayerScore(clientID, 100);
 			broadcastLeaderboard();
 			//Change the Target assignTargets(clientID); - UNCOMMENT ONCE METHOD COMPLETED
@@ -241,7 +257,6 @@ public class Room {
 	 * @param clientID - The integer ID of the new player
 	 */
 	public void addPlayer(String playerName, double[] MACAddress, int clientID) {
-		//need to broadcast relevant leaderboard and player joined
 		//Checks if the room is full
 		if(roomSize == 16) {
 			NAKPacket np = new NAKPacket();
@@ -249,7 +264,7 @@ public class Room {
 			Server.sendPacket(clientID, np);
 			return;
 		}
-		//Checks if the players data has been previously saved
+		//Checks if the player's data has been previously saved
 		for(int i = 0; i < players.size(); i++){
 			if(players.get(i).getState().equals("DISCONNECTED") && players.get(i).getMACAddress().equals(MACAddress)) {
 				players.get(i).setID(clientID);
@@ -261,6 +276,11 @@ public class Room {
 		players.add(new Player(playerName, MACAddress)); //Creates a new Player instance and adds it to list of players
 		playerIDMap.put(clientID, players.size());
 		leaderboard.addPlayer(clientID, playerName);
+		//Sends a New Player Packet to all Players
+		NewPlayerPacket npp = new NewPlayerPacket();
+		npp.putPlayerName(playerName);
+		broadcast(npp);
+		//Sends updated leaderboard with new player to all Players
 		broadcastLeaderboard();
 		//Increases the Max Player ID if its a new player
 		if(clientID > maxPlayerID) { 
@@ -269,15 +289,20 @@ public class Room {
 		roomSize++;
 	}
 	
-	//Currently this does kicking + Removing - May want to change this at a later point
 	/**
 	 * Method that removes the player from the game
 	 * @param clientID - The integer ID of the player being removed
 	 */
-	public void quitPlayer(int clientID) {
+	public void quitPlayer(int clientID, byte reason) {
 		roomSize--;
 		players.get(playerIDMap.get(clientID)).setState("DISCONNECTED");
 		leaderboard.removePlayer(clientID);
+		//Tells all players that a player has disconnected
+		DisconnectionPacket disconnectPacket = new DisconnectionPacket();
+		disconnectPacket.putPlayerID(clientID);
+		disconnectPacket.putDisconnectionReason(reason);
+		broadcast(disconnectPacket);
+		//Broadcasts updated leaderboard
 		broadcastLeaderboard();
 		//Needs to set a new host if the player is the host
 		if (clientID == hostID) {
@@ -489,7 +514,7 @@ public class Room {
 			//Checks if a third of the room has reported the player
 			if(count >=  (roomSize / 3)) {
 				//Removes the reported player if the count is too high
-				quitPlayer(reportedID);		
+				quitPlayer(reportedID, Packet.DISCONNECT_KICK);		
 				//TO DO: NEEDS TO BROADCAST TO ALL PLAYERS THAT THE PLAYER HAS BEEN KICKED
 				broadcastLeaderboard();
 				//Any Player that has the removed player as a reported player has their reported player reset

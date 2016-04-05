@@ -42,10 +42,9 @@ public class PacketParser {
 		case Packet.LOCATION :
 			LocationPacket locationPacket = new LocationPacket(packet);
 			Server.setLocation(roomKey, clientID, locationPacket.getLocation());
-			//sendPacket();
 			break;
 		
-		//Ping	
+		//Ping	- NEEDS DOING
 		case Packet.PING_RESPONSE :
 			int ping = 2; //NEEDS TO GENERATE THE PING
 			Server.pingResponse(roomKey, clientID, ping);
