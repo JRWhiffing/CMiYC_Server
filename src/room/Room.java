@@ -57,6 +57,10 @@ public class Room {
 		roomState = State.LOBBY;
 	}
 	
+	/**
+	 * Method that returns the state of the Room as a String
+	 * @return - State of the Room as a String
+	 */
 	public String getRoomState() {
 		String state = "";
 		switch (roomState) {
@@ -91,6 +95,7 @@ public class Room {
 	private void startGame(){
 		//Needs to check what the vote result is countVotes() - Will return the game mode voted for
 		roomState = State.STARTING;
+		broadcastLeaderboard();
 	}
 	
 	public void endGame() {
@@ -104,13 +109,15 @@ public class Room {
 	 */
 	public void catchPerformed(int clientID) {
 		int targetID = players.get(playerIDMap.get(clientID)).getTarget(); // ID of Target that has been caught
-		//PACKET NEEDS TO BE SENT TO THE TARGET TO ACTIVATE THE BUTTON THAT ALLOWS THEM TO BE CAUGHT
+		//Packet is sent to the target to activate a button on their screen that allows them to be caught
+		CaughtPacket cp = new CaughtPacket();
+		Server.sendPacket(targetID, cp);
 		//Checks if the capture is successful
 		if (checkCaptured(targetID)) {
 			players.get(playerIDMap.get(targetID)).setState("CHANGING"); //Changes the state of the player to changing
 			leaderboard.updatePlayerScore(clientID, 100);
-			//SEND LEADERBOARD PACKETS TO ALL CLIENTS
-			//Change the Target assignTargets(clientID);
+			broadcastLeaderboard();
+			//Change the Target assignTargets(clientID); - UNCOMMENT ONCE METHOD COMPLETED
 		}
 		else {
 			//Something needs to happen if response didn't come in
@@ -215,6 +222,7 @@ public class Room {
 				}
 			}
 		}
+		broadcastLeaderboard();
 	}
 	
 	private void removeTeams(){
@@ -223,6 +231,7 @@ public class Room {
 				leaderboard.updateTeam(players.get(i).getID(), 0);
 			}
 		}
+		broadcastLeaderboard();
 	}
 	
 	/**
@@ -252,6 +261,7 @@ public class Room {
 		players.add(new Player(playerName, MACAddress)); //Creates a new Player instance and adds it to list of players
 		playerIDMap.put(clientID, players.size());
 		leaderboard.addPlayer(clientID, playerName);
+		broadcastLeaderboard();
 		//Increases the Max Player ID if its a new player
 		if(clientID > maxPlayerID) { 
 			maxPlayerID = clientID; 
@@ -268,6 +278,7 @@ public class Room {
 		roomSize--;
 		players.get(playerIDMap.get(clientID)).setState("DISCONNECTED");
 		leaderboard.removePlayer(clientID);
+		broadcastLeaderboard();
 		//Needs to set a new host if the player is the host
 		if (clientID == hostID) {
 			setNewHost();			
@@ -327,6 +338,16 @@ public class Room {
 				Server.sendPacket(players.get(i).getID(), broadcastPacket);
 			}
 		}
+	}
+	
+	/**
+	 * Method that creates a new leaderboard packet instance and send the leaderboard to all players
+	 */
+	private void broadcastLeaderboard() {
+		LeaderboardPacket leaderboardPacket = new LeaderboardPacket();
+		leaderboardPacket.putLeaderboard(leaderboard);
+		//Broadcasts the updated leaderboard to all players
+		broadcast(leaderboardPacket);
 	}
 	
 	/**
@@ -470,6 +491,7 @@ public class Room {
 				//Removes the reported player if the count is too high
 				quitPlayer(reportedID);		
 				//TO DO: NEEDS TO BROADCAST TO ALL PLAYERS THAT THE PLAYER HAS BEEN KICKED
+				broadcastLeaderboard();
 				//Any Player that has the removed player as a reported player has their reported player reset
 				for(int i = 0; i < players.size(); i++) {
 					if(players.get(i).getReportedID() == reportedID) {

@@ -295,6 +295,7 @@ public abstract class Packet {
 	public static final byte KICK = 0x0C;
 	public static final byte NAK = 0x0D;
 	public static final byte HOST = 0x0E;
+	public static final byte CAUGHT = 0x0F;
 		
 	//Broadcast IDs
 	public static final byte BROADCAST_TIME_REMAINING = 0x01;
