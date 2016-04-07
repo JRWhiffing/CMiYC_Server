@@ -1,5 +1,6 @@
 package server;
 
+import java.awt.EventQueue;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Arrays;
@@ -12,10 +13,20 @@ public class ServerInput extends Thread{
 	private final int clientID;
 	private String roomKey = null;
 	
-	public ServerInput(Socket cs, int clientID){
-		this.clientID = clientID;
+	public ServerInput(Socket cs, int cID){
+		clientID = cID;
 		clientSocket = cs;
 		pp = new PacketParser(clientID);
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					TestingInterface frame = new TestingInterface(clientID);
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 	
 	@Override
@@ -46,7 +57,6 @@ public class ServerInput extends Thread{
 				} catch (IOException ioe) {
 					System.err.println(ioe.getMessage());
 				}
-				System.out.println("Input Closing");
 			}
 		}
 		if (!Thread.currentThread().isInterrupted()){

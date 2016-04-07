@@ -44,4 +44,12 @@ public class LocationPacket extends Packet {
 		return new double[]{getDouble(), getDouble()};
 	}
 	
+	public void putID(int ID){
+		putInt(ID);
+	}
+	
+	public int getID(){
+		return getInt();
+	}
+	
 }
