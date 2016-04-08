@@ -35,6 +35,7 @@ public class Room {
 	private Leaderboard leaderboard;
 	private List<Player> players;
 	private HashMap<Integer, Integer> playerIDMap; //Player ClientID -> Player Instance in players
+	private Timer gameTimer;
 	private int maxPlayerID;
 	private int hostID;
 	
@@ -159,20 +160,13 @@ public class Room {
 	 */
 	public synchronized void endGame() {
 		//Final time broadcast leaderboard so that client can determine winner
+		gameTimer.cancel();
 		broadcastLeaderboard();
 		roomState = State.ENDING;
 		GameEndPacket gameEnd = new GameEndPacket();
 		broadcast(gameEnd);		
 		roomState = State.FINISHED;
 		//CHECK IF THERE IS ANOTHER GAME TO BE PLAYED BY SAME PLAYERS OR KICK ALL PLAYERS OUT OF GAME?
-	}
-	
-	//MAY NOT BE NEEDED
-	/**
-	 * Method to force close a game
-	 */
-	public void forceClose() {
-
 	}
 	
 	/**
@@ -679,8 +673,8 @@ public class Room {
 	 * @param gameRoom - A reference of the room that requires the timer
 	 * @param time - The time limit of the game
 	 */
-	public static void startTimer(Room gameRoom, int time) {
-		Timer gameTimer = new Timer();
+	public void startTimer(Room gameRoom, int time) {
+		gameTimer = new Timer();
 		//Sets off the timer
 		gameTimer.schedule(new EndGameTimerTask(gameRoom), (long)time);
 	}

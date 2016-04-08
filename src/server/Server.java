@@ -160,9 +160,7 @@ public class Server {
 	public synchronized static void closeRoom(String roomKey) {
 		Server.ROOMS.get(roomKey).endGame();
 		//Waits for the Game the End
-		while(Server.ROOMS.get(roomKey).getRoomState() != "FINISHED") { 
-			Server.ROOMS.get(roomKey).forceClose(); //Method incomplete
-		}
+		while(Server.ROOMS.get(roomKey).getRoomState() != "FINISHED") { }
 		Server.ROOMS.remove(roomKey);
 		for(int i = 0; i < lastRoom; i++){
 			if(Server.ROOMKEYS.containsKey(i)){
