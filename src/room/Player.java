@@ -33,9 +33,10 @@ public class Player {
 	 * @param playerName - The name of the player
 	 * @param MACAddress - The MAC Address of the player
 	 */
-	public Player(String playerName, double[] MACAddress) {
+	public Player(String playerName, double[] MACAddress, int clientID) {
 		this.playerName = playerName;
 		this.playerMACAddress = MACAddress;	
+		this.clientID = clientID;
 		state = playerState.CONNECTED;
 		playerTarget = -1;
 		reportedID = -1;

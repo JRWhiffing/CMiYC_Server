@@ -99,9 +99,6 @@ public class Server {
 	 * @param clientID - Integer ID of the Client
 	 */
 	public static void closeClient(String roomKey, int clientID) {
-		if(roomKey != null){
-			//Server.ROOMS.get(roomKey).removePlayer(client);
-		} 
 		playerQuit(roomKey, clientID);
 		serverListener.closeClient(clientID);
 	}
@@ -290,6 +287,7 @@ public class Server {
 	public synchronized static void kickPlayer(String roomKey, int clientID) {
 		//Currently Kick does the same as Quit - May want to change so that we keep the player's data
 		Server.ROOMS.get(roomKey).quitPlayer(clientID, Packet.DISCONNECT_KICK);
+		serverListener.closeClient(clientID);
 	}
 	
 	/**

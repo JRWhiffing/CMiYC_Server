@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -164,6 +165,27 @@ public class Room {
 		broadcast(gameEnd);		
 		roomState = State.FINISHED;
 		//CHECK IF THERE IS ANOTHER GAME TO BE PLAYED BY SAME PLAYERS OR KICK ALL PLAYERS OUT OF GAME?
+	}
+	
+	public void startPingTimer(Room gameRoom, int timeLimit) {
+		Timer pingTimer = new Timer();
+		pingTimer.schedule(new PingTimerTask(gameRoom), 5, (long)timeLimit);
+	}
+	
+	 static class PingTimerTask extends TimerTask {
+		
+		Room gameRoom;
+		public PingTimerTask(Room gameRoom) {
+			this.gameRoom = gameRoom;
+		}
+		
+		public void run() {
+			for(int i = 0; i < gameRoom.players.size(); i++) {
+				if(!gameRoom.players.get(i).getState().equals("DISCONNECTED") && !gameRoom.players.get(i).getState().equals("KICKED")) {
+					gameRoom.players.get(i).getID();
+				}
+			}
+		}
 	}
 	
 	//MAY NOT BE NEEDED
@@ -336,7 +358,7 @@ public class Room {
 				return;
 			}
 		}
-		players.add(new Player(playerName, MACAddress)); //Creates a new Player instance and adds it to list of players
+		players.add(new Player(playerName, MACAddress, clientID)); //Creates a new Player instance and adds it to list of players
 		playerIDMap.put(clientID, players.size());
 		leaderboard.addPlayer(clientID, playerName);
 		//Sends a New Player Packet to all Players
@@ -392,6 +414,20 @@ public class Room {
 			}
 		}
 		return playerCount;
+	}
+	
+	/**
+	 * Method that checks which players are playing and have no been disconnected or kicked
+	 * @return - List of available players
+	 */
+	public List<Player> getAvailablePlayerList() {
+		List<Player> availablePlayers = new ArrayList<Player>();
+		for(int i = 0; i < players.size(); i++) {
+			if(!players.get(i).getState().equals("DISCONNECTED") && !players.get(i).getState().equals("KICKED")) {
+				availablePlayers.add(players.get(i));
+			}
+		}
+		return availablePlayers;	
 	}
 	
 	/**
