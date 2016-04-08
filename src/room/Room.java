@@ -167,27 +167,6 @@ public class Room {
 		//CHECK IF THERE IS ANOTHER GAME TO BE PLAYED BY SAME PLAYERS OR KICK ALL PLAYERS OUT OF GAME?
 	}
 	
-	public void startPingTimer(Room gameRoom, int timeLimit) {
-		Timer pingTimer = new Timer();
-		pingTimer.schedule(new PingTimerTask(gameRoom), 5, (long)timeLimit);
-	}
-	
-	 static class PingTimerTask extends TimerTask {
-		
-		Room gameRoom;
-		public PingTimerTask(Room gameRoom) {
-			this.gameRoom = gameRoom;
-		}
-		
-		public void run() {
-			for(int i = 0; i < gameRoom.players.size(); i++) {
-				if(!gameRoom.players.get(i).getState().equals("DISCONNECTED") && !gameRoom.players.get(i).getState().equals("KICKED")) {
-					gameRoom.players.get(i).getID();
-				}
-			}
-		}
-	}
-	
 	//MAY NOT BE NEEDED
 	/**
 	 * Method to force close a game
@@ -707,9 +686,9 @@ public class Room {
 	}
 	
 	/**
-	 * TimerTask which calls the run function when the timer reaches its time
-	 * Used to signalise the end of the game
-	 *
+	 * 	TimerTask which calls the run function when the timer reaches its time
+	 * 	Used to signalise the end of the game
+	 *	@author Adam
 	 */
 	 static class EndGameTimerTask extends TimerTask {
 		Room gameRoom;
@@ -730,5 +709,61 @@ public class Room {
 			gameRoom.endGame();
 		}
 	}
+	 
+	 /**
+	 * Method that stops the Player timer to prevent kicking
+	 * @param clientID - The integer ID of the Player
+	 */
+	public synchronized void interruptPlayerTimer(int clientID) {
+		players.get(playerIDMap.get(clientID)).interruptPingWaitTimer();
+	}
+		
+	/**
+	 * Method that starts the ping timer where every 5 seconds it will test the ping of the players
+	 * @param gameRoom - The game room instance that the timer is referring to
+	 * @param roomKey - The String room key to gain access to the room
+	 */
+	public void startPingTimer(Room gameRoom, String roomKey) {
+		Timer pingTimer = new Timer();
+		//Timer repeats every 5 seconds, starting after a 1 second delay
+		pingTimer.scheduleAtFixedRate(new PingTimerTask(gameRoom, roomKey),1000, 5000);
+	}
+	
+	/**
+	 * TimerTask class that sends pings out every 5 seconds to all players 
+	 * and sets off waiting timers for each player in their instances
+	 * @author Adam
+	 *
+	 */
+	 static class PingTimerTask extends TimerTask {	
+		String roomKey;
+		Room gameRoom;
+			
+		/**
+		 * Constructor that sets the global variables used in the TimerTask
+		 * @param gameRoom - Room instance used to get the list of players
+		 * @param roomKey - String room key used to gain access to the room
+		 */
+		public PingTimerTask(Room gameRoom, String roomKey) {
+			this.gameRoom = gameRoom;
+			this.roomKey = roomKey;
+		}
+			
+		/**
+		 * Method that runs every 5 seconds
+		 */
+		public void run() {
+			//Loops to each player which is still in the game
+			for(int i = 0; i < gameRoom.players.size(); i++) {
+				if(!gameRoom.players.get(i).getState().equals("DISCONNECTED") && !gameRoom.players.get(i).getState().equals("KICKED")) {
+					int clientID = gameRoom.players.get(i).getID();
+					PingPacket pp = new PingPacket();
+					Server.sendPacket(clientID, pp);
+					//Starts the Ping Count Timer
+					gameRoom.players.get(i).startPingWaiting(roomKey);
+				}
+			}
+		}
+	}	 	 
 	
 }
