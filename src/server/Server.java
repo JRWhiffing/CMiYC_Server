@@ -95,19 +95,6 @@ public class Server {
 	}
 	
 	/**
-	 * Method for closing a client
-	 * @param roomKey - The room key used to find the room the client is in
-	 * @param clientID - Integer ID of the Client
-	 */
-	public static void closeClient(String roomKey, int clientID) {
-		if(roomKey != null){
-			//Server.ROOMS.get(roomKey).removePlayer(client);
-		} 
-		playerQuit(roomKey, clientID);
-		serverListener.closeClient(clientID);
-	}
-	
-	/**
 	 * Method for sending a packet to a client
 	 * @param clientID - Integer ID of the Client
 	 * @param serverPacket - Packet that needs to be sent to client
@@ -182,9 +169,7 @@ public class Server {
 	public synchronized static void closeRoom(String roomKey) {
 		Server.ROOMS.get(roomKey).endGame();
 		//Waits for the Game the End
-		while(Server.ROOMS.get(roomKey).getRoomState() != "FINISHED") { 
-			Server.ROOMS.get(roomKey).forceClose(); //Method incomplete
-		}
+		while(Server.ROOMS.get(roomKey).getRoomState() != "FINISHED") { }
 		Server.ROOMS.remove(roomKey);
 		for(int i = 0; i < lastRoom; i++){
 			if(Server.ROOMKEYS.containsKey(i)){
@@ -234,13 +219,12 @@ public class Server {
 	}
 	
 	/**
-	 * Method for setting the ping of a Player
+	 * Method for interrupting the player timer to determine the ping
 	 * @param roomKey - The room key of the room
 	 * @param clientID - The integer ID of the Player
-	 * @param ping - The integer ping of the Player
 	 */
-	public synchronized static void pingResponse(String roomKey, int clientID, int ping) {
-		Server.ROOMS.get(roomKey).setPlayerPing(ping, clientID);
+	public synchronized static void pingResponse(String roomKey, int clientID) {
+		Server.ROOMS.get(roomKey).interruptPlayerTimer(clientID);;
 	}
 	
 	/**
@@ -299,6 +283,12 @@ public class Server {
 	public synchronized static void kickPlayer(String roomKey, int clientID) {
 		//Currently Kick does the same as Quit - May want to change so that we keep the player's data
 		Server.ROOMS.get(roomKey).quitPlayer(clientID, Packet.DISCONNECT_KICK);
+		serverListener.closeClient(clientID);
+	}
+	
+	public synchronized static void disconnectPlayer(String roomKey, int clientID) {
+		Server.ROOMS.get(roomKey).quitPlayer(clientID, Packet.DISCONNECT_POOR_CONNECTION);
+		serverListener.closeClient(clientID);
 	}
 	
 	/**
@@ -306,8 +296,9 @@ public class Server {
 	 * @param roomKey - The room key of the room
 	 * @param clientID - The integer ID of the player that is quitting
 	 */
-	public synchronized static void playerQuit(String roomKey, int clientID) {
+	public synchronized static void quitPlayer(String roomKey, int clientID) {
 		Server.ROOMS.get(roomKey).quitPlayer(clientID, Packet.DISCONNECT_QUIT);
+		serverListener.closeClient(clientID);
 	}
 	
 	/**

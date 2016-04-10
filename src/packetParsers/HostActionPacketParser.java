@@ -121,7 +121,7 @@ public class HostActionPacketParser {
 			}
 			System.err.println("Unrecognised packet: \"" + bytes +
 					"\"\n From client: " + clientID + ", in room: " + roomKey);
-			Server.closeClient(roomKey, clientID);
+			Server.quitPlayer(roomKey, clientID);
 			break;
 		}
 	}

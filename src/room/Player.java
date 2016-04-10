@@ -1,5 +1,10 @@
 package room;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import server.Server;
+
 /**
  * Class that contains all the Player data
  * @authors James and Adam
@@ -22,6 +27,7 @@ public class Player {
 	private double[] playerLocation; //Longitude Latitude
 	private byte vote; //Player's vote
 	private boolean playerAcknowledgement;
+	private Timer pingWaitTimer;
 
 	private int playerTarget; //ID of Target - No Needed Anymore?
 	private int previousTarget;
@@ -34,9 +40,10 @@ public class Player {
 	 * @param playerName - The name of the player
 	 * @param MACAddress - The MAC Address of the player
 	 */
-	public Player(String playerName, double[] MACAddress) {
+	public Player(String playerName, double[] MACAddress, int clientID) {
 		this.playerName = playerName;
 		this.playerMACAddress = MACAddress;	
+		this.clientID = clientID;
 		state = playerState.CONNECTED;
 		playerTarget = -1;
 		reportedID = -1;
@@ -108,6 +115,50 @@ public class Player {
 			case "INACTIVE":
 				this.state = playerState.INACTIVE;
 				break;
+		}
+	}
+	
+	/**
+	 * Method that interrupts the Timer task to stop Player from getting disconnected
+	 */
+	public void interruptPingWaitTimer() {
+		pingWaitTimer.cancel();
+		pingWaitTimer.purge();
+	}
+	
+	/**
+	 * Method that starts the timer that counts the ping
+	 * @param roomKey - String key to game access to the room the player is in
+	 */
+	public void startPingWaiting(String roomKey) {
+		this.pingWaitTimer = new Timer();
+		pingWaitTimer.schedule(new PingWaitTimerTask(roomKey, clientID), 3000);
+	}
+	
+	/**
+	 * TimerTask class that disconnects the Player from the game if the ping is above 2 seconds
+	 * @author Adam
+	 *
+	 */
+	static class PingWaitTimerTask extends TimerTask {
+		String roomKey;
+		int clientID;
+		
+		/**
+		 * Constructor that sets the global variables needed to disconnect the player from the game
+		 * @param roomKey - String key to game access to the room the player is in
+		 * @param clientID - Integer ID of the Player
+		 */
+		public PingWaitTimerTask(String roomKey, int clientID) {
+			this.roomKey = roomKey;
+			this.clientID = clientID;
+		}
+		/**
+		 * Method that is run if the Server does not recieve a Ping Packet from the Player within 2 seconds
+		 */
+		public void run() {
+			//Disconnects the Player from the Game
+			Server.disconnectPlayer(roomKey, clientID);
 		}
 	}
 	

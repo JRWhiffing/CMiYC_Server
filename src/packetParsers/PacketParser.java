@@ -44,11 +44,9 @@ public class PacketParser {
 			Server.setLocation(roomKey, clientID, locationPacket.getLocation());
 			break;
 		
-		//Ping	- NEEDS DOING
+		//Ping Response from Client
 		case Packet.PING_RESPONSE :
-			int ping = 2; //NEEDS TO GENERATE THE PING
-			Server.pingResponse(roomKey, clientID, ping);
-			//Server needs to send back ping response - nope, this is the response from the client.
+			Server.pingResponse(roomKey, clientID);
 			break;
 		
 		//The client has caught its target
@@ -86,7 +84,7 @@ public class PacketParser {
 			
 		//The client wishes to quit the game	
 		case Packet.QUIT : //Client quits
-			Server.playerQuit(roomKey, clientID);
+			Server.quitPlayer(roomKey, clientID);
 			//Server sends broadcast to all clients notifying that a player has left
 			break;
 		
@@ -125,7 +123,7 @@ public class PacketParser {
 			}
 			System.err.println("Unrecognised packet: \"" + bytes +
 					"\"\n From client: " + clientID + ", in room: " + roomKey);
-			Server.closeClient(roomKey, clientID);
+			Server.quitPlayer(roomKey, clientID);
 			break;
 		}
 	}
