@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -17,6 +18,9 @@ import javax.swing.border.EmptyBorder;
 import packets.serverPackets.*;
 import packets.serverPackets.broadcastPackets.*;
 import packets.serverPackets.lobbyInfoPackets.*;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import javax.swing.JScrollPane;
 
 /**
  * A graphical interface to send packets to the server (to debug and test the server) and to
@@ -26,66 +30,98 @@ import packets.serverPackets.lobbyInfoPackets.*;
  *
  */
 
-public class TestingInterface extends JFrame implements ActionListener {
+public class TestingInterface implements ActionListener {
 
 	private int clientID;
 	private JButton[] serverPackets = new JButton[13];
 	private JButton[] lobbyInfoPackets = new JButton[7];
 	private JButton[] broadcastPackets = new JButton[8];
 	private JPanel contentPane;
+	public JFrame frame;
 
 	/**
 	 * Create the frame.
 	 */
 	public TestingInterface(int clientID) {
+		frame = new JFrame("Testing Interface");
 		this.clientID = clientID;
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 750, 500);
-		contentPane = new JPanel(new GridBagLayout());
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.setBounds(100, 100, 750, 500);
+		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(new BorderLayout(0, 0));
-		setContentPane(contentPane);
-		createMenu();
+		frame.setContentPane(contentPane);
+		initialize();
 	}
 	
-	private void createMenu(){
-		GridBagConstraints gbcSettings = new GridBagConstraints();
-		gbcSettings.anchor = GridBagConstraints.NORTH;
-		gbcSettings.fill = GridBagConstraints.BOTH;
-		gbcSettings.weightx = 1;
-		gbcSettings.weighty = 1;
+	private void initialize(){
+		GridBagLayout gbl_contentPane = new GridBagLayout();
+		gbl_contentPane.columnWidths = new int[]{144, 144, 144, 144, 0};
+		gbl_contentPane.rowHeights = new int[]{290, 0};
+		gbl_contentPane.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0};
+		gbl_contentPane.rowWeights = new double[]{1.0, Double.MIN_VALUE};
+		contentPane.setLayout(gbl_contentPane);
+		
 		JLabel serv = new JLabel("Server packets");
-		serv.add(contentPane, gbcSettings);
+		GridBagConstraints gbc_serv = new GridBagConstraints();
+		gbc_serv.anchor = GridBagConstraints.NORTH;
+		gbc_serv.fill = GridBagConstraints.HORIZONTAL;
+		gbc_serv.insets = new Insets(0, 0, 0, 5);
+		gbc_serv.gridx = 0;
+		gbc_serv.gridy = 0;
+		contentPane.add(serv, gbc_serv);
 		for(int i = 0; i < 13; i++){
 			serverPackets[i] = new JButton(""+i);
 			serverPackets[i].setPreferredSize(new Dimension(70, 70));
-			gbcSettings.gridheight = 10;
-			gbcSettings.gridwidth = i * 11;
-			serverPackets[i].add(contentPane, gbcSettings);
+			serverPackets[i].addActionListener(this);
+			gbc_serv.gridy = i + 1;
+			contentPane.add(serverPackets[i], gbc_serv);
 		}
+		
 		JLabel lobinf = new JLabel("Lobby packets");
-		lobinf.add(contentPane, gbcSettings);
+		GridBagConstraints gbc_lobinf = new GridBagConstraints();
+		gbc_lobinf.anchor = GridBagConstraints.NORTH;
+		gbc_lobinf.fill = GridBagConstraints.HORIZONTAL;
+		gbc_lobinf.insets = new Insets(0, 0, 0, 5);
+		gbc_lobinf.gridx = 1;
+		gbc_lobinf.gridy = 0;
+		contentPane.add(lobinf, gbc_lobinf);
 		for(int i = 0; i < 7; i++){
 			lobbyInfoPackets[i] = new JButton(""+i);
 			lobbyInfoPackets[i].setPreferredSize(new Dimension(70, 70));
-			gbcSettings.gridheight = 80;
-			gbcSettings.gridwidth = i * 11;
-			lobbyInfoPackets[i].add(contentPane, gbcSettings);
+			lobbyInfoPackets[i].addActionListener(this);
+			gbc_lobinf.gridy = i + 1;
+			contentPane.add(lobbyInfoPackets[i], gbc_lobinf);
 		}
+		
 		JLabel broad = new JLabel("Broadcast packets");
-		broad.add(contentPane, gbcSettings);
+		GridBagConstraints gbc_broad = new GridBagConstraints();
+		gbc_broad.insets = new Insets(0, 0, 0, 5);
+		gbc_broad.anchor = GridBagConstraints.NORTH;
+		gbc_broad.fill = GridBagConstraints.HORIZONTAL;
+		gbc_broad.gridx = 2;
+		gbc_broad.gridy = 0;
+		contentPane.add(broad, gbc_broad);
 		for(int i = 0; i < 8; i++){
 			broadcastPackets[i] = new JButton(""+i);
 			broadcastPackets[i].setPreferredSize(new Dimension(70, 70));
-			gbcSettings.gridheight = 170;
-			gbcSettings.gridwidth = i * 11;
-			broadcastPackets[i].add(contentPane, gbcSettings);
+			broadcastPackets[i].addActionListener(this);
+			gbc_broad.gridy = i + 1;
+			contentPane.add(broadcastPackets[i], gbc_broad);
 		}
+		
+		JScrollPane scrollPane = new JScrollPane();
+		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
+		gbc_scrollPane.insets = new Insets(0, 0, 0, 5);
+		gbc_scrollPane.fill = GridBagConstraints.BOTH;
+		gbc_scrollPane.gridx = 3;
+		gbc_scrollPane.gridy = 0;
+		contentPane.add(scrollPane, gbc_scrollPane);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == serverPackets[0]){
+			System.out.println("Test");
 			packets.LocationPacket lp =  new packets.LocationPacket();
 			lp.putLocation(10401, 40104);
 			Server.sendPacket(clientID, lp);
@@ -94,7 +130,7 @@ public class TestingInterface extends JFrame implements ActionListener {
 			Server.sendPacket(clientID, pp);
 		} else if(e.getSource() == serverPackets[2]){
 			TargetPacket tp = new TargetPacket();
-			tp.putTargetID(new int[1337]);
+			tp.putTargetID(new int[]{1337});
 			Server.sendPacket(clientID, tp);
 		} else if(e.getSource() == serverPackets[3]){
 			SpawnRegionPacket srp = new SpawnRegionPacket();

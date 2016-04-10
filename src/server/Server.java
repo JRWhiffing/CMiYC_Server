@@ -118,6 +118,14 @@ public class Server {
 	}
 	
 	/**
+	 * Method to return the room object
+	 * @param roomKey - The room key of the room
+	 */
+	public static Room getRoom(String roomKey){
+		return Server.ROOMS.get(roomKey);
+	}
+	
+	/**
 	 * Method for closing the server
 	 */
 	public static void closeServer() {

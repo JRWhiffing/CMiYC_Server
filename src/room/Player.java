@@ -25,6 +25,7 @@ public class Player {
 
 	private int playerTarget; //ID of Target - No Needed Anymore?
 	private int previousTarget;
+	private int pursuerID;//if currently being captured by a pursuer.
 	private int pursuerCount;
 	private int playerTeam;
 	
@@ -214,6 +215,18 @@ public class Player {
 	 */
 	public int getPursuerCount() {
 		return pursuerCount;
+	}
+	
+	/**
+	 * setting the ID of the pursuer capturing the player
+	 * @param pID - The ID of their pursuer
+	 */
+	public void setPlayerPursuer(int pID){
+		pursuerID = pID;
+	}
+	
+	public int getPursuer(){
+		return pursuerID;
 	}
 	
 	/**

@@ -21,7 +21,7 @@ import server.Server;
  */
 public class Room {
 
-	private int roomNumber; //Is this needed?
+	private String roomKey; //Is this needed?
 	private String roomName;
 	private Game currentGame;
 	private int roomSize;
@@ -122,6 +122,7 @@ public class Room {
 				for (int i = 0; i < players.size(); i++) {
 					assignTargets(players.get(i).getID());
 				}
+				removeTeams();
 				//Broadcasts the starting Leaderboard to all Players
 				broadcastLeaderboard();
 				//Starts the Game
@@ -141,9 +142,13 @@ public class Room {
 			break;
 			
 		case Packet.GAMETYPE_MAN_HUNT :
+			
+			assignTeams(true);
 			break;
 			
 		case Packet.GAMETYPE_TEAM :
+			
+			assignTeams(false);
 			break;
 			
 		default :
@@ -175,6 +180,14 @@ public class Room {
 	}
 	
 	/**
+	 * returns a player with a specific ID
+	 * @param clientID - ID of the player to be returned
+	 */
+	public Player getPlayer(int clientID){
+		return players.get(clientID);
+	}
+	
+	/**
 	 * Method for when a catch has been performed by a player
 	 * @param clientID - The integer ID of the player that has performed the capture
 	 */
@@ -182,25 +195,10 @@ public class Room {
 		int targetID = players.get(playerIDMap.get(clientID)).getTarget(); // ID of Target that has been caught
 		//Packet is sent to the target to activate a button on their screen that allows them to be caught
 		CaughtPacket cp = new CaughtPacket();
+		players.get(targetID).setPlayerPursuer(clientID);
 		Server.sendPacket(targetID, cp);
-		//Checks if the capture is successful
-		if (checkCaptured(targetID)) {
-			players.get(playerIDMap.get(targetID)).setState("CHANGING"); //Changes the state of the player to changing
-			//Notifies all players that a successful capture has occurred
-			CapturePacket capturePacket = new CapturePacket();
-			capturePacket.putCapture(targetID, clientID);
-			broadcast(capturePacket);
-			leaderboard.updatePlayerScore(clientID, 100);
-			//Checks whether the score limit has been reached
-			if (leaderboard.checkScoreLimitReached(currentGame.getScoreLimit())) {
-				endGame();	
-			}
-			broadcastLeaderboard();
-			//Change the Target assignTargets(clientID); - UNCOMMENT ONCE METHOD COMPLETED
-		}
-		else {
-			//Something needs to happen if response didn't come in
-		}
+		CaptureTimer cT = new CaptureTimer(roomKey, clientID, targetID);
+		cT.start();
 	}
 	
 	/**
@@ -227,7 +225,19 @@ public class Room {
 	 * @param clientID - The integer ID of the player that has been captured
 	 */
 	public void captured(int clientID) {
-		players.get(playerIDMap.get(clientID)).setState("CAUGHT"); //Changes the player's state to being captured
+		int pursuerID = players.get(clientID).getPursuer();
+		players.get(clientID).setPlayerPursuer(-1);
+		players.get(clientID).setState("CAUGHT");
+		assignTargets(pursuerID);
+		players.get(pursuerID).setState("CONNECTED");
+		assignTargets(clientID);
+		players.get(clientID).setState("CONNECTED");
+		//Notifies all players that a successful capture has occurred
+		CapturePacket capturePacket = new CapturePacket();
+		capturePacket.putCapture(clientID, pursuerID);
+		broadcast(capturePacket);
+		leaderboard.updatePlayerScore(pursuerID, 100);
+		broadcastLeaderboard();
 	}
 	
 	private void assignTargets(int clientID){
@@ -273,8 +283,9 @@ public class Room {
 		}
 	}
 	
-	private void assignTeams(){
+	private void assignTeams(boolean manhunt){
 		int team1 = roomSize / 2;
+		if(manhunt){ team1 = 1;}
 		int team2 = roomSize - team1;
 		Random rng = new Random();
 		for(int i = 0; i < players.size(); i++){
@@ -624,14 +635,6 @@ public class Room {
 			//ERROR
 			break;
 		}
-	}
-	
-	/**
-	 * Method that returns the Room Number
-	 * @return - The room number as an integer
-	 */
-	public int getRoomNumber(){
-		return roomNumber;
 	}
 	
 	/**

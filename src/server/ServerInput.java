@@ -20,8 +20,8 @@ public class ServerInput extends Thread{
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					TestingInterface frame = new TestingInterface(clientID);
-					frame.setVisible(true);
+					TestingInterface window = new TestingInterface(clientID);
+					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
