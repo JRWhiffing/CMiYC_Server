@@ -21,8 +21,14 @@ public class ServerOutput extends Thread{
 		while(active){
 			if(!packetQueue.isEmpty()){
 				for(Packet serverPacket : packetQueue){
+					packetQueue.remove(); //removing the head as iterator won't
 					sendPacket(serverPacket.getPacket());
 				}
+			}
+			try { //sleeping in order to ensure packet queue is checked.
+				Thread.currentThread().sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 	}

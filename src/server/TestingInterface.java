@@ -21,6 +21,7 @@ import packets.serverPackets.lobbyInfoPackets.*;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 /**
  * A graphical interface to send packets to the server (to debug and test the server) and to
@@ -36,6 +37,7 @@ public class TestingInterface implements ActionListener {
 	private JButton[] serverPackets = new JButton[13];
 	private JButton[] lobbyInfoPackets = new JButton[7];
 	private JButton[] broadcastPackets = new JButton[8];
+	public static JTextArea ta= new JTextArea();
 	private JPanel contentPane;
 	public JFrame frame;
 
@@ -108,20 +110,19 @@ public class TestingInterface implements ActionListener {
 			gbc_broad.gridy = i + 1;
 			contentPane.add(broadcastPackets[i], gbc_broad);
 		}
-		
-		JScrollPane scrollPane = new JScrollPane();
+		ta.setEditable(false);
+		ta.setWrapStyleWord(true);
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
 		gbc_scrollPane.insets = new Insets(0, 0, 0, 5);
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
 		gbc_scrollPane.gridx = 3;
 		gbc_scrollPane.gridy = 0;
-		contentPane.add(scrollPane, gbc_scrollPane);
+		contentPane.add(ta, gbc_scrollPane);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == serverPackets[0]){
-			System.out.println("Test");
 			packets.LocationPacket lp =  new packets.LocationPacket();
 			lp.putLocation(10401, 40104);
 			Server.sendPacket(clientID, lp);
@@ -129,6 +130,7 @@ public class TestingInterface implements ActionListener {
 			PingPacket pp =  new PingPacket();
 			Server.sendPacket(clientID, pp);
 		} else if(e.getSource() == serverPackets[2]){
+			System.out.println(new int[]{1337}.length);
 			TargetPacket tp = new TargetPacket();
 			tp.putTargetID(new int[]{1337});
 			Server.sendPacket(clientID, tp);
@@ -150,6 +152,7 @@ public class TestingInterface implements ActionListener {
 			RoomClosePacket rcp = new RoomClosePacket();
 			Server.sendPacket(clientID, rcp);
 		} else if(e.getSource() == serverPackets[8]){
+			System.out.println("Testing".length());
 			RoomKeyPacket rkp = new RoomKeyPacket();
 			rkp.putRoomKey("Testing");
 			Server.sendPacket(clientID, rkp);
@@ -199,5 +202,5 @@ public class TestingInterface implements ActionListener {
 			
 		}
 	}
-
+	
 }

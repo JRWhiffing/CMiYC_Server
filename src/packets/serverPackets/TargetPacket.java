@@ -13,7 +13,8 @@ public class TargetPacket extends Packet {
 	}
 	
 	public void putTargetID(int[] targetID){
-		putInt(targetID.length);
+		int integer = targetID.length;
+		putInt(1);
 		for(int i = 0; i < targetID.length; i++){
 			putInt(targetID[i]);
 		}

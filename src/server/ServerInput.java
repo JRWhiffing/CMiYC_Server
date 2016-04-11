@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Arrays;
 
+import packets.GenericPacket;
 import packetParsers.PacketParser;
 
 public class ServerInput extends Thread{
@@ -37,6 +38,8 @@ public class ServerInput extends Thread{
 			while((read = clientSocket.getInputStream().read(temp, 0, temp.length)) > -1){
 				byte[] clientPacket = new byte[0];
 				System.out.println("Message Recieved, Processing.");
+				GenericPacket gp = new GenericPacket(clientPacket);
+				TestingInterface.ta.append(gp.toString() + "\n------------------------\n");
 				clientPacket = Arrays.copyOfRange(temp, 0, read);
 				pp.processPacket(clientPacket);
 				temp = new byte[512];
@@ -45,7 +48,7 @@ public class ServerInput extends Thread{
 			System.err.println(e.getMessage());
 			Server.closeServer();
 		} finally {
-			Server.quitPlayer(roomKey, clientID);
+			Server.quitPlayer(roomKey, read);
 		}
 	}
 	
