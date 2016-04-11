@@ -8,7 +8,7 @@ public class Game {
 		TEAM, SINGLE, MANHUNT //etc.
 	}
 	private GameType gameType;
-	private Leaderboard leaderboard;
+	private Leaderboard gameLeaderboard;
 	private int scoreLimit;
 	private int timeLimit;
 	private double[] boundariesCentre;

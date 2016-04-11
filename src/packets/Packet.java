@@ -78,10 +78,12 @@ public abstract class Packet {
 		double d_;
 		byte[] double_;
 		//Double Data Type occupies eight bytes of space
+		System.out.println(toString());
+		System.out.println("Reading double: " + packet.length);
 		double_ = Arrays.copyOf(packet, 8);
 		d_ = ByteBuffer.wrap(double_).getDouble();
 		packet = Arrays.copyOfRange(packet, 8, packet.length);
-		
+		System.out.println("Didn't fail here");
 		//printPacket();
 		
 		return d_;
@@ -93,8 +95,7 @@ public abstract class Packet {
 	 */
 	protected void putDouble(double d_) {
 		//Double Data Type occupies eight bytes of space
-		byte[] double_ = new byte[8];
-		ByteBuffer.wrap(double_).putDouble(d_);
+		byte[] double_ = ByteBuffer.allocate(8).putDouble(d_).array();
 		
 		packet = Arrays.copyOf(packet, packet.length + 8);
 		
@@ -128,8 +129,7 @@ public abstract class Packet {
 	 */
 	protected void putInt(int integer) {
 		//Int Data Type occupies four bytes of space
-		byte[] int_ = new byte[4];
-		ByteBuffer.wrap(int_).putDouble(integer);
+		byte[] int_ = ByteBuffer.allocate(4).putInt(integer).array();
 		
 		packet = Arrays.copyOf(packet, packet.length + 4);
 		
@@ -146,12 +146,14 @@ public abstract class Packet {
 	 */
 	protected String getString() {
 		String string_ = "";
+		System.out.println("Getting string");
 		//Extracts the length of the String to know how much to read
 		int length = getInt();
+		System.out.println(length);
 		for (int i = 0; i < length; i++) {
 			string_ += getChar();
 		}
-		
+		System.out.println(string_);
 		return string_;
 	}
 	
@@ -306,7 +308,6 @@ public abstract class Packet {
 	public static final byte BROADCAST_BOUNDARY_UPDATE = 0x06;
 	public static final byte BROADCAST_NEW_HOST = 0x07;
 	public static final byte BROADCAST_NEW_PLAYER = 0x08;
-	public static final byte BROADCAST_PLAYER_READY = 0x09;
 		
 	//Lobby Information IDs
 	public static final byte LOBBYINFO_GAMETYPE = 0x01;

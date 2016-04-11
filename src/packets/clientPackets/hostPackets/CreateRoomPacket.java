@@ -10,6 +10,7 @@ public class CreateRoomPacket extends Packet {
 	}
 	
 	public CreateRoomPacket(byte[] data){
+		System.out.println("Setting data");
 		packet = data;
 	}
 	

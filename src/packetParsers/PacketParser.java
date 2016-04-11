@@ -33,14 +33,15 @@ public class PacketParser {
 	 */
 	public void processPacket(byte[] packet) {
 		byte dataID = packet[0]; //First byte is the host packet ID
-		packet = Arrays.copyOf(packet, 1); //Removes the ID from the packet so only data is left
+		System.out.println("Data ID: "+dataID);
+		byte[] data = Arrays.copyOfRange(packet, 1, packet.length); //Removes the ID from the packet so only data is left
 		
 		//Each Case is a Protocol
 		switch (dataID) {
 		
 		//Location of the Client
 		case Packet.LOCATION :
-			LocationPacket locationPacket = new LocationPacket(packet);
+			LocationPacket locationPacket = new LocationPacket(data);
 			Server.setLocation(roomKey, clientID, locationPacket.getLocation());
 			break;
 		
@@ -64,21 +65,21 @@ public class PacketParser {
 		
 		//The client has used an ability	
 		case Packet.ABILITY_USAGE :
-			AbilityUsagePacket abilityPacket = new AbilityUsagePacket(packet);
+			AbilityUsagePacket abilityPacket = new AbilityUsagePacket(data);
 			Server.abilityUsage(roomKey, clientID, abilityPacket.getAbility());
 			//Server may need response if ability changes an element of the game
 			break;
 			
 		//A vote for picking the game type	
 		case Packet.VOTE :
-			VotePacket votePacket = new VotePacket(packet);
+			VotePacket votePacket = new VotePacket(data);
 			Server.vote(roomKey, clientID, votePacket.getVote());
 			//Server sends a response updating vote count
 			break;
 			
 		//A player has been reported	
 		case Packet.REPORT :
-			ReportPacket reportPacket = new ReportPacket(packet);
+			ReportPacket reportPacket = new ReportPacket(data);
 			Server.playerReported(roomKey, reportPacket.getReport(), clientID);
 			break;
 			
@@ -90,14 +91,15 @@ public class PacketParser {
 		
 		//The client wishes to join the game	
 		case Packet.JOIN :
-			JoinPacket joinPacket = new JoinPacket(packet);
+			JoinPacket joinPacket = new JoinPacket(data);
 			Server.playerJoin(joinPacket.getRoomKey(), joinPacket.getMACAddress(), joinPacket.getPlayerName(), clientID);
 			break;
 		
 		//The client performs a host action	- Needs to make sure he is host
 		case Packet.HOST_ACTION :
 			//The packet is assessed by the Host Action Parser
-			hostActionParser.processHostAction(dataID, packet);
+			System.out.println("Handling host packet");
+			hostActionParser.processHostAction(dataID, data);
 			break;
 		
 		//Client sends an acknowledge of the last packet	
@@ -119,7 +121,7 @@ public class PacketParser {
 		default : 
 			String bytes = dataID + " | ";
 			for (int i = 0; i < packet.length; i ++) {
-				bytes += packet[i] + " | ";
+				bytes += data[i] + " | ";
 			}
 			System.err.println("Unrecognised packet: \"" + bytes +
 					"\"\n From client: " + clientID + ", in room: " + roomKey);

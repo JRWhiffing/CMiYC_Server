@@ -23,9 +23,11 @@ public class LeaderboardPacket extends Packet {
 			putInt(board.getPlayerScore(i));
 			putInt(board.getPlayerTeam(i));
 		}
+		System.out.println(toString());
 	}
 	
 	public Leaderboard getLeaderboard(){
+		System.out.println(toString());
 		int size = getInt();
 		Leaderboard board = new Leaderboard();
 		for(int i = 0; i < size; i++){

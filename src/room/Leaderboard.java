@@ -18,6 +18,7 @@ public class Leaderboard {
 	public void addPlayer(int playerID, String playerName){
 		leaderboard.add(new LeaderboardPlayer(playerID, playerName, 0, 0));
 		playerIDMap.put(playerID, leaderboard.size() - 1);
+		System.out.println("Adding a player to the leaderboard");
 		if(playerID > maxPlayerID){ maxPlayerID = playerID; }
 	}
 	

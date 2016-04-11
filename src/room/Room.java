@@ -32,7 +32,7 @@ public class Room {
 	}
 	private State roomState;
 
-	private Leaderboard leaderboard;
+	private Leaderboard lobbyLeaderboard;
 	private List<Player> players;
 	private HashMap<Integer, Integer> playerIDMap; //Player ClientID -> Player Instance in players
 	private Timer gameTimer;
@@ -40,7 +40,7 @@ public class Room {
 	private int hostID;
 	
 	/**
-	 * Constructor that sets up all the global variables and creates a new game instance and a new leaderboard
+	 * Constructor that sets up all the global variables and creates a new game instance and a new lobbyLeaderboard
 	 * @param roomName - The name of the Room as a String
 	 * @param clientID - The integer ID of the Player that created the room (This will be the host)
 	 * @param hostName - The name of the player as a String
@@ -54,10 +54,10 @@ public class Room {
 		players = Collections.synchronizedList( new ArrayList<Player>());
 		playerIDMap = new HashMap<Integer, Integer>();
 		currentGame = new Game((byte)0x00, 0, 0, 0, new double[] {0.0,0.0}, 0, 0); //Creates a new game
+		System.out.println("Room created, adding player");
+		lobbyLeaderboard = new Leaderboard(); //Creates a new lobbyLeaderboard
 		addPlayer(hostName, MACAddress, clientID); //Adds the first player to the player list
 		roomSize++;
-		leaderboard = new Leaderboard(); //Creates a new leaderboard
-		leaderboard.addPlayer(clientID, hostName);	
 		roomState = State.LOBBY;
 	}
 	
@@ -164,7 +164,7 @@ public class Room {
 	 * Method to end the game
 	 */
 	public synchronized void endGame() {
-		//Final time broadcast leaderboard so that client can determine winner
+		//Final time broadcast lobbyLeaderboard so that client can determine winner
 		gameTimer.cancel();
 		broadcastLeaderboard();
 		roomState = State.ENDING;
@@ -231,7 +231,7 @@ public class Room {
 		CapturePacket capturePacket = new CapturePacket();
 		capturePacket.putCapture(clientID, pursuerID);
 		broadcast(capturePacket);
-		leaderboard.updatePlayerScore(pursuerID, 100);
+		lobbyLeaderboard.updatePlayerScore(pursuerID, 100);
 		broadcastLeaderboard();
 	}
 	
@@ -287,21 +287,21 @@ public class Room {
 			if(players.get(i).getState().equals("CONNECTED")){
 				if(team1 == 0){
 					players.get(i).setTeam(2);
-					leaderboard.updateTeam(players.get(i).getID(), 2);
+					lobbyLeaderboard.updateTeam(players.get(i).getID(), 2);
 					team2--;
 				} else if(team2 == 0){
 					players.get(i).setTeam(1);
-					leaderboard.updateTeam(players.get(i).getID(), 1);
+					lobbyLeaderboard.updateTeam(players.get(i).getID(), 1);
 					team1--;
 				} else{
 					int team = rng.nextInt(2);
 					if(team == 1){
 						players.get(i).setTeam(1);
-						leaderboard.updateTeam(players.get(i).getID(), 1);
+						lobbyLeaderboard.updateTeam(players.get(i).getID(), 1);
 						team1--;
 					} else {
 						players.get(i).setTeam(2);
-						leaderboard.updateTeam(players.get(i).getID(), 2);
+						lobbyLeaderboard.updateTeam(players.get(i).getID(), 2);
 						team2--;
 					}
 				}
@@ -313,7 +313,7 @@ public class Room {
 	private void removeTeams(){
 		for(int i = 0; i < players.size(); i++){
 			if(players.get(i).getState().equals("CONNECTED")){
-				leaderboard.updateTeam(players.get(i).getID(), 0);
+				lobbyLeaderboard.updateTeam(players.get(i).getID(), 0);
 			}
 		}
 		broadcastLeaderboard();
@@ -342,18 +342,23 @@ public class Room {
 				return;
 			}
 		}
+		System.out.println("creating player instance");
 		players.add(new Player(playerName, MACAddress, clientID)); //Creates a new Player instance and adds it to list of players
 		playerIDMap.put(clientID, players.size());
-		leaderboard.addPlayer(clientID, playerName);
+		System.out.println("Adding to lobbyLeaderboard");
+		lobbyLeaderboard.addPlayer(clientID, playerName);
 		//Sends a New Player Packet to all Players
 		NewPlayerPacket npp = new NewPlayerPacket();
 		npp.putPlayerName(playerName);
+		System.out.println("broadcasting new player arrival");
 		broadcast(npp);
-		//Sends updated leaderboard with new player to all Players
+		//Sends updated lobbyLeaderboard with new player to all Players
+		System.out.println("broadcasting lobbyLeaderboard");
 		broadcastLeaderboard();
 		//Increases the Max Player ID if its a new player
 		if(clientID > maxPlayerID) { 
 			maxPlayerID = clientID; 
+			System.out.println("Client ID larger than last known client ID");
 		}
 		roomSize++;
 	}
@@ -365,13 +370,13 @@ public class Room {
 	public void quitPlayer(int clientID, byte reason) {
 		roomSize--;
 		players.get(playerIDMap.get(clientID)).setState("DISCONNECTED");
-		leaderboard.removePlayer(clientID);
+		lobbyLeaderboard.removePlayer(clientID);
 		//Tells all players that a player has disconnected
 		DisconnectionPacket disconnectPacket = new DisconnectionPacket();
 		disconnectPacket.putPlayerID(clientID);
 		disconnectPacket.putDisconnectionReason(reason);
 		broadcast(disconnectPacket);
-		//Broadcasts updated leaderboard
+		//Broadcasts updated lobbyLeaderboard
 		broadcastLeaderboard();
 		//Needs to set a new host if the player is the host
 		if (clientID == hostID) {
@@ -441,21 +446,23 @@ public class Room {
 	 */
 	private void broadcast(Packet broadcastPacket){
 		for(int i = 0; i < players.size(); i++){
+			
 			//Finds only active players
 			if(!players.get(i).getState().equals("DISCONNECTED") && !players.get(i).getState().equals("KICKED")){
 				Server.sendPacket(players.get(i).getID(), broadcastPacket);
 			}
 		}
+		System.out.println("Leaderboard broadcasted");
 	}
 	
 	/**
-	 * Method that creates a new leaderboard packet instance and send the leaderboard to all players
+	 * Method that creates a new lobbyLeaderboard packet instance and send the lobbyLeaderboard to all players
 	 */
 	private void broadcastLeaderboard() {
-		LeaderboardPacket leaderboardPacket = new LeaderboardPacket();
-		leaderboardPacket.putLeaderboard(leaderboard);
-		//Broadcasts the updated leaderboard to all players
-		broadcast(leaderboardPacket);
+		LeaderboardPacket lobbyLeaderboardPacket = new LeaderboardPacket();
+		lobbyLeaderboardPacket.putLeaderboard(lobbyLeaderboard);
+		//Broadcasts the updated lobbyLeaderboard to all players
+		broadcast(lobbyLeaderboardPacket);
 	}
 	
 	/**

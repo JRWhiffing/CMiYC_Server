@@ -154,13 +154,13 @@ public class Server {
 	 */
 	public synchronized static void createRoom(int clientID, String roomName, String clientName, double[] MACAddress){
 		String key = generateRoomKey();
-		Server.ROOMS.put(key, new Room(roomName, clientID, clientName, MACAddress));
-		Server.ROOMKEYS.put(lastRoom, key);
+		Server.ROOMS.put("TEST", new Room(roomName, clientID, clientName, MACAddress));
+		Server.ROOMKEYS.put(lastRoom, "TEST");
 		lastRoom++;
 		RoomKeyPacket rkp = new RoomKeyPacket();
-		rkp.putRoomKey(key);
+		rkp.putRoomKey("TEST");
 		Server.sendPacket(clientID, rkp);
-		serverListener.setRoomKey(clientID, key);
+		serverListener.setRoomKey(clientID, "TEST");
 	}
 	/**
 	 * Method that closes the room
@@ -205,7 +205,7 @@ public class Server {
 	 * @param clientID - The integer ID of the Player that has joined
 	 */
 	public synchronized static void playerJoin(String roomKey, double[] MACAddress, String playerName, int clientID) {
-		Server.ROOMS.get(roomKey).addPlayer(playerName, MACAddress, clientID);
+		Server.ROOMS.get("TEST").addPlayer(playerName, MACAddress, clientID);
 	}
 	
 	/**

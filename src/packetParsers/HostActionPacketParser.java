@@ -32,8 +32,8 @@ public class HostActionPacketParser {
 	 */
 	public void processHostAction(int dataID, byte[] data) {
 		byte hostPacketID = data[0]; //First byte is the host packet ID
-		data = Arrays.copyOf(data, 1); //Removes the ID from the packet so only data is left
-		
+		data = Arrays.copyOfRange(data, 1, data.length ); //Removes the ID from the packet so only data is left
+		System.out.println("Parsing host packet: " + hostPacketID);
 		switch (hostPacketID) {
 		
 		//Allows voting to take place
@@ -69,6 +69,7 @@ public class HostActionPacketParser {
 		//Room Key not needed as it will create one now	
 		case Packet.HOST_ACTION_CREATE_ROOM :
 			CreateRoomPacket crp = new CreateRoomPacket(data);
+		System.out.println(crp.toString());
 			Server.createRoom(clientID, crp.getRoomName(), crp.getHostName(), crp.getMACAddress());
 			break;
 		

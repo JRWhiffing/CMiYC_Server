@@ -19,17 +19,17 @@ public class ServerOutput extends Thread{
 	@Override
 	public void run(){
 		while(active){
-			if(!packetQueue.isEmpty()){
-				for(Packet serverPacket : packetQueue){
-					packetQueue.remove(); //removing the head as iterator won't
-					sendPacket(serverPacket.getPacket());
+			try {
+				int queueSize;
+				if ((queueSize = packetQueue.size()) > 0) {
+					for (int i = 0; i < queueSize; i++) {
+						clientSocket.getOutputStream().write(packetQueue.pop().getPacket());
+					}
 				}
-			}
-			try { //sleeping in order to ensure packet queue is checked.
-				Thread.currentThread().sleep(10);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+				Thread.sleep(10);
+			} catch (IOException | InterruptedException e) {
+				break;
+			}	
 		}
 	}
 	

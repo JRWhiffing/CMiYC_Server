@@ -38,9 +38,9 @@ public class ServerInput extends Thread{
 			while((read = clientSocket.getInputStream().read(temp, 0, temp.length)) > -1){
 				byte[] clientPacket = new byte[0];
 				System.out.println("Message Recieved, Processing.");
+				clientPacket = Arrays.copyOfRange(temp, 0, read);
 				GenericPacket gp = new GenericPacket(clientPacket);
 				TestingInterface.ta.append(gp.toString() + "\n------------------------\n");
-				clientPacket = Arrays.copyOfRange(temp, 0, read);
 				pp.processPacket(clientPacket);
 				temp = new byte[512];
 			}
