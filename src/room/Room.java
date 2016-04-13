@@ -56,9 +56,9 @@ public class Room {
 		currentGame = new Game((byte)0x00, 0, 0, 0, new double[] {0.0,0.0}, 0, 0); //Creates a new game
 		System.out.println("Room created, adding player");
 		lobbyLeaderboard = new Leaderboard(); //Creates a new lobbyLeaderboard
+		roomState = State.LOBBY;
 		addPlayer(hostName, MACAddress, clientID); //Adds the first player to the player list
 		roomSize++;
-		roomState = State.LOBBY;
 		this.roomKey = roomKey;
 	}
 	
@@ -251,23 +251,17 @@ public class Room {
 		System.out.println("Assign target for player: " + clientID);
 		switch (currentGame.getType()) {
 		case Packet.GAMETYPE_DEFAULT:
-			System.out.println("Finding valid targets");
 			ArrayList<Player> validTargets = new ArrayList<Player>();
-			System.out.println("finding current players previous target");
 			int previousTarget = players.get(playerIDMap.get(clientID)).getPreviousTarget();
 			
 			for(int i = 0; i < players.size(); i++){
-				System.out.println("Checking if player"+i+" is a valid target");
-				if(players.get(i).getTarget() != clientID && i != previousTarget && i != playerIDMap.get(clientID)
+				System.out.println("Checking if player"+(i+1)+" is a valid target");
+				if(players.get(i).getTarget() != clientID && (i + 1) != previousTarget && i != playerIDMap.get(clientID)
 				   && players.get(i).getState().equals("CONNECTED")){
 					if((roomSize > 4 && players.get(i).getPursuerCount() < 3) || 
 					   (roomSize == 4 && players.get(i).getPursuerCount() < 2)){
 						validTargets.add(players.get(i));
-					} else{
-						System.out.println("Too many pursuers for player"+i+": "+players.get(i).getPursuerCount());
 					}
-				} else {
-					System.out.println("Player"+i+" is either a previous target, has the client as their target or is the client");
 				}
 			}
 			if(validTargets.isEmpty()){
@@ -363,8 +357,9 @@ public class Room {
 				players.get(i).setID(clientID);
 				playerIDMap.put(clientID, i);
 				players.get(i).setState("CONNECTED");
-				lobbyLeaderboard.addPlayer(clientID, playerName);
+				lobbyLeaderboard.addExistingPlayer(clientID, playerName, players.get(i).getPlayerScore(), players.get(i).getTeam());
 				System.out.println("Client Reconnected");
+				Server.sendPacket(clientID, new JoinSuccessPacket());
 				NewPlayerPacket npp = new NewPlayerPacket();
 				npp.putPlayerName(playerName);
 				System.out.println("broadcasting new player arrival");
@@ -385,12 +380,12 @@ public class Room {
 		System.out.println("Adding to lobbyLeaderboard");
 		lobbyLeaderboard.addPlayer(clientID, playerName);
 		//Sends a New Player Packet to all Players
+		Server.sendPacket(clientID, new JoinSuccessPacket());
 		NewPlayerPacket npp = new NewPlayerPacket();
 		npp.putPlayerName(playerName);
 		System.out.println("broadcasting new player arrival");
 		broadcast(npp);
 		//Sends updated lobbyLeaderboard with new player to all Players
-		System.out.println("broadcasting lobbyLeaderboard");
 		broadcastLeaderboard(true);
 		//Increases the Max Player ID if its a new player
 		if(clientID > maxPlayerID) { 

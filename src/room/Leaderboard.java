@@ -103,8 +103,11 @@ public class Leaderboard {
 	//bubble sort.
 	private void sortLeaderboard(){
 		LeaderboardPlayer tempPlayer;
-		for(int i = 0; i < leaderboard.size(); i++){
-			for(int j = leaderboard.size(); j > i + 1; j--){
+		if(leaderboard.size() < 2){
+			return;
+		}
+		for(int i = 0; i < leaderboard.size() - 1; i++){
+			for(int j = leaderboard.size() - 1; j >= i + 1; j--){
 				if(leaderboard.get(j).getPlayerScore() < leaderboard.get(j - 1).getPlayerScore()){
 					tempPlayer = leaderboard.get(j);
 					leaderboard.add(j, leaderboard.get(j - 1));

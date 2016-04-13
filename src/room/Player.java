@@ -198,6 +198,10 @@ public class Player {
 	public void setPlayerScore(int playerScore) {
 		this.playerScore += playerScore;
 	}
+	
+	public int getPlayerScore(){
+		return playerScore;
+	}
 
 	public void setPlayerLocation(double[] playerLocation) {
 		this.playerLocation = playerLocation;
@@ -229,6 +233,10 @@ public class Player {
 	
 	public void setTeam(int team){
 		playerTeam = team;
+	}
+	
+	public int getTeam(){
+		return playerTeam;
 	}
 	
 	public double[] getMACAddress(){
