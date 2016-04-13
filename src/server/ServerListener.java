@@ -1,6 +1,8 @@
 package server;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -59,14 +61,26 @@ public class ServerListener extends Thread{
 		boolean found = false;//has a valid port number been found?
 		InetAddress addr = null;
 		int portNum = 10401;
-		
-		try {//attempting to get the localhost IP.
-			addr = InetAddress.getByName("localhost");
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			System.err.println("InetAddress unresolved for local host");
-			System.exit(1);
+		boolean selectingIP = true;
+		BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
+		while(selectingIP){
+			System.out.println("Please enter the IP as folows: 'xxx.xxx.xxx.xxx'");
+			String input = "";
+			try {
+				input = inputReader.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			selectingIP = false;
+			try {//attempting to get the localhost IP.
+				addr = InetAddress.getByName(input);
+			} catch (UnknownHostException e) {
+				System.err.println("Invalid IP");
+				selectingIP = true;
+			}
 		}
+		System.out.println("IP accepted");
+		inputReader = null;
 		
 		//essentially looping through port numbers from 10401 until a free one is found.
 		while(!found){
@@ -87,7 +101,7 @@ public class ServerListener extends Thread{
 	private ServerSocket setListener(int portNum, InetAddress addr) throws Exception{
 		ServerSocket temp = null;
 		try {
-			temp = new ServerSocket(portNum, 0, InetAddress.getByAddress(new byte[]{(byte)138,(byte)38,(byte)171,(byte)226}));
+			temp = new ServerSocket(portNum, 0, addr/*InetAddress.getByAddress(new byte[]{(byte)138,(byte)38,(byte)188,(byte)238})*/);
 		} catch (IOException ioe) {
 			throw new Exception("Failed to secure socket: " + ioe.getMessage());
 		}

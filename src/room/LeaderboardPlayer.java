@@ -18,6 +18,10 @@ public class LeaderboardPlayer {
 		score += points;
 	}
 	
+	public void setScore(int points){
+		score = points;
+	}
+	
 	public void updateTeam(int team){
 		this.team = team;
 	}

@@ -1,6 +1,5 @@
 package server;
 
-import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -55,6 +54,7 @@ public class Server {
 								System.out.println("ROOM " + i + ROOMS.get(ROOMKEYS.get(i)).getRoomName() + " with RoomKey " + 
 								ROOMKEYS.get(i) + " is in State: " + ROOMS.get(ROOMKEYS.get(i)).getRoomState());
 								System.out.println("ROOM " + i + " has " + ROOMS.get(ROOMKEYS.get(i)).getPlayerCount() + " active players" );
+								System.out.println(ROOMS.get(ROOMKEYS.get(i)).getLeaderboard().toString());
 							}
 						}
 						else {
@@ -100,7 +100,6 @@ public class Server {
 	 * @param serverPacket - Packet that needs to be sent to client
 	 */
 	public synchronized static void sendPacket(int clientID, Packet serverPacket) {
-		System.out.println("Still Returning");
 		serverListener.sendPacket(clientID, serverPacket);
 	}
 	

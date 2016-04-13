@@ -23,11 +23,11 @@ public class Leaderboard {
 	}
 	
 	//re-adding a player who has rejoined the game or reconstructing leaderboard from packet received.
-	public void addExistingPlayer(int playerID, String playerName, int score, int team, boolean sort){
+	public void addExistingPlayer(int playerID, String playerName, int score, int team){
 		leaderboard.add(new LeaderboardPlayer(playerID, playerName, score, team));
 		playerIDMap.put(playerID, leaderboard.size() - 1);
 		if(playerID > maxPlayerID){ maxPlayerID = playerID; }
-		if(sort){sortLeaderboard();}
+		sortLeaderboard();
 	}
 	
 	public void removePlayer(int playerID){
@@ -44,13 +44,19 @@ public class Leaderboard {
 		maxPlayerID = tempMaxPlayerID;
 	}
 	
+	public void refresh(){
+		for (int i = 0; i < leaderboard.size(); i++) {
+			leaderboard.get(i).setScore(0);
+		}
+	}
+	
 	public void updatePlayerScore(int playerID, int points){
 		leaderboard.get(playerIDMap.get(playerID)).updateScore(points);
 		sortLeaderboard();
 	}
 	
 	public void updateTeam(int playerID, int team){
-		leaderboard.get(playerIDMap.get(playerID)).updateScore(team);
+		leaderboard.get(playerIDMap.get(playerID)).updateTeam(team);
 	}
 	
 	public int getPlayerID(int playerID){

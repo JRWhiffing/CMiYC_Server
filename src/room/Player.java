@@ -196,7 +196,7 @@ public class Player {
 	}
 	
 	public void setPlayerScore(int playerScore) {
-		this.playerScore = playerScore;
+		this.playerScore += playerScore;
 	}
 
 	public void setPlayerLocation(double[] playerLocation) {
@@ -209,6 +209,10 @@ public class Player {
 	
 	public int getPreviousTarget(){
 		return previousTarget;
+	}
+	
+	public void setPreviousTarget(int clientID){
+		previousTarget = clientID;
 	}
 	
 	public int getTarget(){

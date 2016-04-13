@@ -298,6 +298,7 @@ public abstract class Packet {
 	public static final byte NAK = 0x0D;
 	public static final byte HOST = 0x0E;
 	public static final byte CAUGHT = 0x0F;
+	public static final byte JOIN_SUCCESS = 0x10;
 		
 	//Broadcast IDs
 	public static final byte BROADCAST_TIME_REMAINING = 0x01;

@@ -110,18 +110,21 @@ public class Game {
 	public boolean getVotingAllowed() {
 		return votingAllowed;
 	}
-	
-	
-	
-	
-	//Gametype
-	//Score Limit
-	//Time Limit
-	//Team?
-	//Boundaries
-	//Boundary Update Interval
-	//Boundary Update Percentage
-	//etc.
+	public void setLeaderboard(Leaderboard lb){
+		gameLeaderboard = lb;
+	}
+	public void addPlayer(int id, String name){
+		gameLeaderboard.addPlayer(id, name);
+	}
+	public void addExistingPlayer(int id, String name, int score, int team){
+		gameLeaderboard.addExistingPlayer(id, name, score, team);
+	}
+	public void removePlayer(int id){
+		gameLeaderboard.removePlayer(id);
+	}
+	public Leaderboard getLeaderboard(){
+		return gameLeaderboard;
+	}
 	
 	public void changeGameType(byte type) {
 		switch (type) {
