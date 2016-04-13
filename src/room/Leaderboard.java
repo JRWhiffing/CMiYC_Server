@@ -31,6 +31,7 @@ public class Leaderboard {
 	}
 	
 	public void removePlayer(int playerID){
+		System.out.println("removing player (leaderboard)");
 		leaderboard.remove(playerIDMap.get(playerID));
 		int tempMaxPlayerID = 0;
 		for(int i = playerIDMap.get(playerID); i <= maxPlayerID; i++){

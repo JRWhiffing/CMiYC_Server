@@ -22,7 +22,7 @@ import server.Server;
  */
 public class Room {
 
-	private String roomKey; //Is this needed?
+	private final String roomKey; //Is this needed?
 	private String roomName;
 	private Game currentGame;
 	private int roomSize;
@@ -46,7 +46,7 @@ public class Room {
 	 * @param hostName - The name of the player as a String
 	 * @param MACAddress - The MAC Address of the player
 	 */
-	public Room(String roomName, int clientID, String hostName, double[] MACAddress) {
+	public Room(String roomName, int clientID, String hostName, double[] MACAddress, String roomKey) {
 		this.roomName = roomName;
 		this.hostID = clientID;
 		//Sets up global variables
@@ -59,6 +59,7 @@ public class Room {
 		addPlayer(hostName, MACAddress, clientID); //Adds the first player to the player list
 		roomSize++;
 		roomState = State.LOBBY;
+		this.roomKey = roomKey;
 	}
 	
 	/**
@@ -326,6 +327,7 @@ public class Room {
 	 * @param clientID - The integer ID of the new player
 	 */
 	public void addPlayer(String playerName, double[] MACAddress, int clientID) {
+		System.out.println("Adding player (Room)");
 		//Checks if the room is full
 		if(roomSize == 16) {
 			NAKPacket np = new NAKPacket();
@@ -339,12 +341,14 @@ public class Room {
 				players.get(i).setID(clientID);
 				playerIDMap.put(clientID, i);
 				players.get(i).setState("CONNECTED");
+				System.out.println("Client Reconnected");
 				return;
 			}
 		}
 		System.out.println("creating player instance");
 		players.add(new Player(playerName, MACAddress, clientID)); //Creates a new Player instance and adds it to list of players
-		playerIDMap.put(clientID, players.size());
+		playerIDMap.put(clientID, players.size() - 1);
+		System.out.println("Player added: "+clientID);
 		System.out.println("Adding to lobbyLeaderboard");
 		lobbyLeaderboard.addPlayer(clientID, playerName);
 		//Sends a New Player Packet to all Players
@@ -360,6 +364,7 @@ public class Room {
 			maxPlayerID = clientID; 
 			System.out.println("Client ID larger than last known client ID");
 		}
+		Server.setRoomKey(clientID, roomKey);
 		roomSize++;
 	}
 	
@@ -369,6 +374,7 @@ public class Room {
 	 */
 	public void quitPlayer(int clientID, byte reason) {
 		roomSize--;
+		System.out.println("attempting to remove player: "+ clientID);
 		players.get(playerIDMap.get(clientID)).setState("DISCONNECTED");
 		lobbyLeaderboard.removePlayer(clientID);
 		//Tells all players that a player has disconnected
@@ -382,6 +388,7 @@ public class Room {
 		if (clientID == hostID) {
 			setNewHost();			
 		}
+		System.out.println("Player removed");
 	}
 	
 	/**

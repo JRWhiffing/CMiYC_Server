@@ -87,7 +87,7 @@ public class ServerListener extends Thread{
 	private ServerSocket setListener(int portNum, InetAddress addr) throws Exception{
 		ServerSocket temp = null;
 		try {
-			temp = new ServerSocket(portNum, 0, addr);
+			temp = new ServerSocket(portNum, 0, InetAddress.getByAddress(new byte[]{(byte)138,(byte)38,(byte)171,(byte)226}));
 		} catch (IOException ioe) {
 			throw new Exception("Failed to secure socket: " + ioe.getMessage());
 		}

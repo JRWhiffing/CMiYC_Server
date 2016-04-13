@@ -154,7 +154,7 @@ public class Server {
 	 */
 	public synchronized static void createRoom(int clientID, String roomName, String clientName, double[] MACAddress){
 		String key = generateRoomKey();
-		Server.ROOMS.put("TEST", new Room(roomName, clientID, clientName, MACAddress));
+		Server.ROOMS.put("TEST", new Room(roomName, clientID, clientName, MACAddress, "TEST"));
 		Server.ROOMKEYS.put(lastRoom, "TEST");
 		lastRoom++;
 		RoomKeyPacket rkp = new RoomKeyPacket();
@@ -205,7 +205,8 @@ public class Server {
 	 * @param clientID - The integer ID of the Player that has joined
 	 */
 	public synchronized static void playerJoin(String roomKey, double[] MACAddress, String playerName, int clientID) {
-		Server.ROOMS.get("TEST").addPlayer(playerName, MACAddress, clientID);
+		System.out.println("adding player (Server)");
+		Server.ROOMS.get(roomKey).addPlayer(playerName, MACAddress, clientID);
 	}
 	
 	/**
@@ -371,6 +372,10 @@ public class Server {
 	 */
 	public synchronized static void changeGameType(String roomKey, byte gameType) {
 		Server.ROOMS.get(roomKey).changeGameType(gameType);
+	}
+	
+	public synchronized static void setRoomKey(int clientID, String key){
+		Server.serverListener.setRoomKey(clientID, key);
 	}
 	
 }

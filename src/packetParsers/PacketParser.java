@@ -85,6 +85,8 @@ public class PacketParser {
 			
 		//The client wishes to quit the game	
 		case Packet.QUIT : //Client quits
+			System.out.println("Quitting");
+			System.out.println(roomKey);
 			Server.quitPlayer(roomKey, clientID);
 			//Server sends broadcast to all clients notifying that a player has left
 			break;
@@ -92,6 +94,7 @@ public class PacketParser {
 		//The client wishes to join the game	
 		case Packet.JOIN :
 			JoinPacket joinPacket = new JoinPacket(data);
+			System.out.println("joining player (packet parser)");
 			Server.playerJoin(joinPacket.getRoomKey(), joinPacket.getMACAddress(), joinPacket.getPlayerName(), clientID);
 			break;
 		
@@ -105,17 +108,6 @@ public class PacketParser {
 		//Client sends an acknowledge of the last packet	
 		case Packet.ACK :
 			Server.acknowledgement(roomKey, clientID);
-			break;
-		
-		//Not needed anymore	
-		case Packet.BAD_SPAWN :
-			//Server.badSpawn(roomKey, clientID);
-			//Server will provide a new spawn
-			break;
-			
-		//Not needed anymore	
-		case Packet.PLAYER_READY :
-			//Server.playerReady(roomKey, clientID);
 			break;
 			
 		default : 
@@ -137,6 +129,7 @@ public class PacketParser {
 	 */
 	public void setRoomKey(String key) {
 		roomKey = key;
+		System.out.println(roomKey);
 		hostActionParser.setRoomKey(key);
 	}
 	
