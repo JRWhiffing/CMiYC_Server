@@ -157,6 +157,7 @@ public class Player {
 		 */
 		public void run() {
 			//Disconnects the Player from the Game
+			System.out.println("Kicking player due to high ping");
 			Server.disconnectPlayer(roomKey, clientID);
 		}
 	}

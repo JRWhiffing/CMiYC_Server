@@ -795,7 +795,7 @@ public class Room {
 	public void startPingTimer(Room gameRoom, String roomKey) {
 		Timer pingTimer = new Timer();
 		//Timer repeats every 5 seconds, starting after a 1 second delay
-		pingTimer.scheduleAtFixedRate(new PingTimerTask(gameRoom, roomKey),1000, 5000);
+		pingTimer.scheduleAtFixedRate(new PingTimerTask(gameRoom, roomKey), 100, 7000);
 	}
 	
 	/**
