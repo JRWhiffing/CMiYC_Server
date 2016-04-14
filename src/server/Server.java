@@ -153,13 +153,13 @@ public class Server {
 	 */
 	public synchronized static void createRoom(int clientID, String roomName, String clientName, double[] MACAddress){
 		String key = generateRoomKey();
-		Server.ROOMS.put("TEST", new Room(roomName, clientID, clientName, MACAddress, "TEST"));
-		Server.ROOMKEYS.put(lastRoom, "TEST");
+		Server.ROOMS.put(key, new Room(roomName, clientID, clientName, MACAddress, key));
+		Server.ROOMKEYS.put(lastRoom, key);
 		lastRoom++;
 		RoomKeyPacket rkp = new RoomKeyPacket();
-		rkp.putRoomKey("TEST");
+		rkp.putRoomKey(key);
 		Server.sendPacket(clientID, rkp);
-		serverListener.setRoomKey(clientID, "TEST");
+		serverListener.setRoomKey(clientID, key);
 	}
 	/**
 	 * Method that closes the room

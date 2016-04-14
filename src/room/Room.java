@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -54,11 +53,10 @@ public class Room {
 		players = Collections.synchronizedList( new ArrayList<Player>());
 		playerIDMap = new HashMap<Integer, Integer>();
 		currentGame = new Game((byte)0x00, 0, 0, 0, new double[] {0.0,0.0}, 0, 0); //Creates a new game
-		System.out.println("Room created, adding player");
+		System.out.println("Room " + roomKey + ": Room Created");
 		lobbyLeaderboard = new Leaderboard(); //Creates a new lobbyLeaderboard
 		roomState = State.LOBBY;
 		addPlayer(hostName, MACAddress, clientID); //Adds the first player to the player list
-		roomSize++;
 		this.roomKey = roomKey;
 	}
 	
@@ -103,13 +101,14 @@ public class Room {
 	public void startGame(Room gameRoom) {
 		//Counts votes and set it as the current game mode
 		currentGame.changeGameType(countVotes()); 
-	
+		
 		switch(currentGame.getType()) {
 		
 		//Default Game Mode
 		case Packet.GAMETYPE_DEFAULT :
 			//Minimum Player Count has to be 4
 			if (getPlayerCount() > 3) {
+				removeTeams();
 				Leaderboard gameLeaderboard = lobbyLeaderboard;
 				gameLeaderboard.refresh();
 				currentGame.setLeaderboard(gameLeaderboard);
@@ -124,22 +123,20 @@ public class Room {
 				double latitude = currentGame.getBoundariesCentre()[1];
 				boundaryUpdate.putBoundaryUpdate(longitude, latitude, currentGame.getBoundaryRadius());
 				broadcast(boundaryUpdate);
-				removeTeams();
-				//Sends all Players their targets - MAY WANT TO WAIT A BIT UNTIL PLAYERS SPREAD OUT A BIT AS PLAYERS MIGHT FOLLOW OTHER
 				for (int i = 0; i < players.size(); i++) {
 					players.get(i).setPreviousTarget(0);
 					players.get(i).setPlayerTarget(0);
 				}
+				//Sends all Players their targets - MAY WANT TO WAIT A BIT UNTIL PLAYERS SPREAD OUT A BIT AS PLAYERS MIGHT FOLLOW OTHER
 				for (int i = 0; i < players.size(); i++) {
 					assignTargets(players.get(i).getID());
 				}
 				//Broadcasts the starting Leaderboard to all Players
-				System.out.println("Targets assigned");
+				System.out.println("Room " + roomKey + ": Targets assigned");
 				broadcastLeaderboard(false);
 				//Starts the Game
 				GameStartPacket gameStart = new GameStartPacket();
 				broadcast(gameStart);
-				System.out.println("Telling users that the game has started");
 				//Starts the timer that will end the game when the timer is up
 				if (currentGame.getTimeLimit() > 0) {
 					startTimer(gameRoom, currentGame.getTimeLimit());
@@ -154,8 +151,44 @@ public class Room {
 			break;
 			
 		case Packet.GAMETYPE_MAN_HUNT :
-			
-			assignTeams(true);
+			if (getPlayerCount() > 1) {
+				assignTeams(true);
+				Leaderboard gameLeaderboard = lobbyLeaderboard;
+				gameLeaderboard.refresh();
+				currentGame.setLeaderboard(gameLeaderboard);
+				roomState = State.STARTING;
+				TimeRemainingPacket timeRemaining = new TimeRemainingPacket();
+				timeRemaining.putTimeRemaining(currentGame.getTimeLimit());
+				broadcast(timeRemaining);
+				//Broadcasts the boundaries to all the Player
+				BoundaryUpdatePacket boundaryUpdate = new BoundaryUpdatePacket();
+				double longitude = currentGame.getBoundariesCentre()[0];
+				double latitude = currentGame.getBoundariesCentre()[1];
+				boundaryUpdate.putBoundaryUpdate(longitude, latitude, currentGame.getBoundaryRadius());
+				broadcast(boundaryUpdate);
+				for (int i = 0; i < players.size(); i++) {
+					players.get(i).setPreviousTarget(0);
+					players.get(i).setPlayerTarget(0);
+				}
+				for (int i = 0; i < players.size(); i++) {
+					assignTargets(players.get(i).getID());
+				}
+				System.out.println("Room " + roomKey + ": Targets assigned");
+				broadcastLeaderboard(false);
+				//Starts the Game
+				GameStartPacket gameStart = new GameStartPacket();
+				broadcast(gameStart);
+				//Starts the timer that will end the game when the timer is up
+				if (currentGame.getTimeLimit() > 0) {
+					startTimer(gameRoom, currentGame.getTimeLimit());
+				}
+				roomState = State.GAME;
+				System.out.println("Room " + roomKey + ": Game Started");
+			} else {
+				NAKPacket nPacket = new NAKPacket();
+				nPacket.notEnoughPlayers();
+				Server.sendPacket(hostID, nPacket); 
+			}
 			break;
 			
 		case Packet.GAMETYPE_TEAM :
@@ -168,6 +201,7 @@ public class Room {
 			break;
 				
 		}
+		startPingTimer(Server.getRoom(roomKey), roomKey);
 	}
 	
 	/**
@@ -204,25 +238,7 @@ public class Room {
 		Server.sendPacket(targetID, cp);
 		CaptureTimer cT = new CaptureTimer(roomKey, clientID, targetID);
 		cT.start();
-	}
-	
-	/**
-	 * Method that check if the catch has been successful
-	 * @param targetID - The integer ID of the target
-	 * @return - Boolean as to whether the capture was successful or not
-	 */
-	private boolean checkCaptured(int targetID) {
-		long currentTime = System.currentTimeMillis(); //Find current system time
-		long maxTime = currentTime + 10000; //Checks for 10 seconds
-		//Loops for 10 seconds, waiting for a response
-		while(System.currentTimeMillis() < maxTime) {
-			if (players.get(playerIDMap.get(targetID)).checkCaught()) {
-				return true; //Returns true if the target states that they have been caught
-			}
-		}
-		return false; //Returns false if no response from target
-	}
-	
+	}	
 	
 	///Player presses caught button but pursuer hasn't pressed button yet. - This may need changing if the caught button only appears when pursuer presses button
 	/**
@@ -248,14 +264,13 @@ public class Room {
 	
 	private void assignTargets(int clientID){
 		//need to weight higher scoring players as more likely targets, also only a max of 3 pursuers.
-		System.out.println("Assign target for player: " + clientID);
+		System.out.println("Room " + roomKey + ": Assigning target for player" + clientID);
 		switch (currentGame.getType()) {
 		case Packet.GAMETYPE_DEFAULT:
 			ArrayList<Player> validTargets = new ArrayList<Player>();
 			int previousTarget = players.get(playerIDMap.get(clientID)).getPreviousTarget();
 			
 			for(int i = 0; i < players.size(); i++){
-				System.out.println("Checking if player"+(i+1)+" is a valid target");
 				if(players.get(i).getTarget() != clientID && (i + 1) != previousTarget && i != playerIDMap.get(clientID)
 				   && players.get(i).getState().equals("CONNECTED")){
 					if((roomSize > 4 && players.get(i).getPursuerCount() < 3) || 
@@ -265,23 +280,21 @@ public class Room {
 				}
 			}
 			if(validTargets.isEmpty()){
-				System.out.println("No valid targets for player: "+clientID);
+				System.out.println("Room " + roomKey + ": No valid targets for player"+clientID);
 				NAKPacket np = new NAKPacket();
 				np.setNAK(Packet.NAK_NO_VALID_TARGETS);
 				Server.sendPacket(clientID, np);
 				return;
 			}
-			System.out.println("Valid targets found");
 			Random rng = new Random();
 			int target = rng.nextInt(validTargets.size());
 			int targetID = validTargets.get(target).getID();
-			System.out.println("Player"+clientID+"'s target is going to be player: "+targetID);
+			System.out.println("Room " + roomKey + ": Player"+clientID+"'s target is going to be player"+targetID);
 			players.get(playerIDMap.get(clientID)).setPlayerTarget(targetID);
 			players.get(playerIDMap.get(targetID)).addPursuer();
 			TargetPacket tp = new TargetPacket();
 			tp.putTargetID(new int[]{targetID});
 			Server.sendPacket(clientID, tp);
-			System.out.println("Target successfully assigned to player: "+clientID);
 			break;
 			
 		case Packet.GAMETYPE_TEAM:
@@ -343,7 +356,7 @@ public class Room {
 	 * @param clientID - The integer ID of the new player
 	 */
 	public void addPlayer(String playerName, double[] MACAddress, int clientID) {
-		System.out.println("Adding player (Room)");
+		System.out.println("Room " + roomKey + ": Adding player");
 		//Checks if the room is full
 		if(roomSize == 16 || !getRoomState().equals("LOBBY")) {
 			NAKPacket np = new NAKPacket();
@@ -358,42 +371,36 @@ public class Room {
 				playerIDMap.put(clientID, i);
 				players.get(i).setState("CONNECTED");
 				lobbyLeaderboard.addExistingPlayer(clientID, playerName, players.get(i).getPlayerScore(), players.get(i).getTeam());
-				System.out.println("Client Reconnected");
+				System.out.println("Room " + roomKey + ": Client Reconnected");
 				Server.sendPacket(clientID, new JoinSuccessPacket());
 				NewPlayerPacket npp = new NewPlayerPacket();
 				npp.putPlayerName(playerName);
-				System.out.println("broadcasting new player arrival");
 				broadcast(npp);
 				if(clientID > maxPlayerID) { 
 					maxPlayerID = clientID; 
-					System.out.println("Client ID larger than last known client ID");
 				}
 				Server.setRoomKey(clientID, roomKey);
 				roomSize++;
 				return;
 			}
 		}
-		System.out.println("creating player instance");
 		players.add(new Player(playerName, MACAddress, clientID)); //Creates a new Player instance and adds it to list of players
 		playerIDMap.put(clientID, players.size() - 1);
-		System.out.println("Player added: "+clientID);
-		System.out.println("Adding to lobbyLeaderboard");
 		lobbyLeaderboard.addPlayer(clientID, playerName);
 		//Sends a New Player Packet to all Players
 		Server.sendPacket(clientID, new JoinSuccessPacket());
 		NewPlayerPacket npp = new NewPlayerPacket();
 		npp.putPlayerName(playerName);
-		System.out.println("broadcasting new player arrival");
 		broadcast(npp);
 		//Sends updated lobbyLeaderboard with new player to all Players
 		broadcastLeaderboard(true);
 		//Increases the Max Player ID if its a new player
 		if(clientID > maxPlayerID) { 
-			maxPlayerID = clientID; 
-			System.out.println("Client ID larger than last known client ID");
+			maxPlayerID = clientID;
 		}
 		Server.setRoomKey(clientID, roomKey);
 		roomSize++;
+		System.out.println("Room " + roomKey + ": Player"+clientID+" added");
 	}
 	
 	/**
@@ -402,12 +409,17 @@ public class Room {
 	 */
 	public void quitPlayer(int clientID, byte reason) {
 		roomSize--;
-		System.out.println("attempting to remove player: "+ clientID);
+		System.out.println("Room " + roomKey + ": Attempting to remove player"+ clientID);
 		players.get(playerIDMap.get(clientID)).setState("DISCONNECTED");
 		lobbyLeaderboard.removePlayer(clientID);
 		if(!getRoomState().equals("LOBBY")){
 			currentGame.removePlayer(clientID);
 		}
+		
+		//////////////////////////////////////////
+		//stop the ping timer if in game session//
+		//////////////////////////////////////////
+		
 		//Tells all players that a player has disconnected
 		DisconnectionPacket disconnectPacket = new DisconnectionPacket();
 		disconnectPacket.putPlayerID(clientID);
@@ -423,7 +435,6 @@ public class Room {
 		if (clientID == hostID) {
 			setNewHost();			
 		}
-		System.out.println("Player removed");
 	}
 	
 	/**
@@ -501,12 +512,17 @@ public class Room {
 	 * Method that creates a new lobbyLeaderboard packet instance and send the lobbyLeaderboard to all players
 	 */
 	private void broadcastLeaderboard(boolean lobby) {
-		LeaderboardPacket lobbyLeaderboardPacket = new LeaderboardPacket();
-		if(lobby){ lobbyLeaderboardPacket.putLeaderboard(lobbyLeaderboard); } 
-		else { lobbyLeaderboardPacket.putLeaderboard(lobbyLeaderboard); }
+		Packet leaderboardPacket;
+		if(lobby){ 
+			leaderboardPacket = new LeaderboardPacket();
+			((LeaderboardPacket)leaderboardPacket).putLeaderboard(lobbyLeaderboard);
+		} 
+		else { 
+			leaderboardPacket = new LeaderboardPacket();
+			((packets.serverPackets.broadcastPackets.LeaderboardPacket) leaderboardPacket).putLeaderboard(currentGame.getLeaderboard());
+		}
 		//Broadcasts the updated lobbyLeaderboard to all players
-		broadcast(lobbyLeaderboardPacket);
-		System.out.println("Leaderboard broadcasted");
+		broadcast(leaderboardPacket);
 	}
 	
 	/**
@@ -516,15 +532,6 @@ public class Room {
 	 */
 	public void setPlayerLocation(double[] location, int clientID) {
 		players.get(playerIDMap.get(clientID)).setPlayerLocation(location);
-	}
-	
-	/**
-	 * Method to set the current ping of the player
-	 * @param ping - The ping of the player as an integer
-	 * @param clientID - The integer ID of the player
-	 */
-	public void setPlayerPing(int ping, int clientID) {
-		players.get(playerIDMap.get(clientID)).setPlayerPing(ping);
 	}
 	
 	/**

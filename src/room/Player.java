@@ -21,7 +21,6 @@ public class Player {
 	private int clientID;
 	private double[] playerMACAddress;
 	private int playerScore;
-	private int playerPing;
 	private int reportedID;
 	private int reportedCount;
 	private double[] playerLocation; //Longitude Latitude
@@ -189,10 +188,6 @@ public class Player {
 			previousTarget = playerTarget;
 		}
 		playerTarget = targetID;
-	}
-	
-	public void setPlayerPing(int playerPing) {
-		this.playerPing = playerPing;
 	}
 	
 	public void setPlayerScore(int playerScore) {
