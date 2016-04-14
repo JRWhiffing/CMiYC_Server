@@ -33,7 +33,6 @@ public class PacketParser {
 	 */
 	public void processPacket(byte[] packet) {
 		byte dataID = packet[0]; //First byte is the host packet ID
-		System.out.println("Data ID: "+dataID);
 		byte[] data = Arrays.copyOfRange(packet, 1, packet.length); //Removes the ID from the packet so only data is left
 		
 		//Each Case is a Protocol
@@ -86,7 +85,6 @@ public class PacketParser {
 		//The client wishes to quit the game	
 		case Packet.QUIT : //Client quits
 			System.out.println("Quitting");
-			System.out.println(roomKey);
 			Server.quitPlayer(roomKey, clientID);
 			//Server sends broadcast to all clients notifying that a player has left
 			break;
@@ -94,14 +92,12 @@ public class PacketParser {
 		//The client wishes to join the game	
 		case Packet.JOIN :
 			JoinPacket joinPacket = new JoinPacket(data);
-			System.out.println("joining player (packet parser)");
 			Server.playerJoin(joinPacket.getRoomKey(), joinPacket.getMACAddress(), joinPacket.getPlayerName(), clientID);
 			break;
 		
 		//The client performs a host action	- Needs to make sure he is host
 		case Packet.HOST_ACTION :
 			//The packet is assessed by the Host Action Parser
-			System.out.println("Handling host packet");
 			hostActionParser.processHostAction(dataID, data);
 			break;
 		
@@ -129,7 +125,6 @@ public class PacketParser {
 	 */
 	public void setRoomKey(String key) {
 		roomKey = key;
-		System.out.println(roomKey);
 		hostActionParser.setRoomKey(key);
 	}
 	

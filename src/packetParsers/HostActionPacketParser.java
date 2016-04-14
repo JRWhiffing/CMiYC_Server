@@ -33,7 +33,6 @@ public class HostActionPacketParser {
 	public void processHostAction(int dataID, byte[] data) {
 		byte hostPacketID = data[0]; //First byte is the host packet ID
 		data = Arrays.copyOfRange(data, 1, data.length ); //Removes the ID from the packet so only data is left
-		System.out.println("Parsing host packet: " + hostPacketID);
 		switch (hostPacketID) {
 		
 		//Allows voting to take place

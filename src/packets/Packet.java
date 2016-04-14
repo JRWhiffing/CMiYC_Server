@@ -78,12 +78,9 @@ public abstract class Packet {
 		double d_;
 		byte[] double_;
 		//Double Data Type occupies eight bytes of space
-		System.out.println(toString());
-		System.out.println("Reading double: " + packet.length);
 		double_ = Arrays.copyOf(packet, 8);
 		d_ = ByteBuffer.wrap(double_).getDouble();
 		packet = Arrays.copyOfRange(packet, 8, packet.length);
-		System.out.println("Didn't fail here");
 		//printPacket();
 		
 		return d_;
@@ -146,14 +143,11 @@ public abstract class Packet {
 	 */
 	protected String getString() {
 		String string_ = "";
-		System.out.println("Getting string");
 		//Extracts the length of the String to know how much to read
 		int length = getInt();
-		System.out.println(length);
 		for (int i = 0; i < length; i++) {
 			string_ += getChar();
 		}
-		System.out.println(string_);
 		return string_;
 	}
 	
