@@ -19,7 +19,7 @@ public class Player {
 	
 	private String playerName;
 	private int clientID;
-	private double[] playerMACAddress;
+	private String playerMACAddress;
 	private int playerScore;
 	private int reportedID;
 	private int reportedCount;
@@ -39,7 +39,7 @@ public class Player {
 	 * @param playerName - The name of the player
 	 * @param MACAddress - The MAC Address of the player
 	 */
-	public Player(String playerName, double[] MACAddress, int clientID) {
+	public Player(String playerName, String MACAddress, int clientID) {
 		this.playerName = playerName;
 		this.playerMACAddress = MACAddress;	
 		this.clientID = clientID;
@@ -235,7 +235,7 @@ public class Player {
 		return playerTeam;
 	}
 	
-	public double[] getMACAddress(){
+	public String getMACAddress(){
 		return playerMACAddress;
 	}
 	

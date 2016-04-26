@@ -45,7 +45,7 @@ public class Room {
 	 * @param hostName - The name of the player as a String
 	 * @param MACAddress - The MAC Address of the player
 	 */
-	public Room(String roomName, int clientID, String hostName, double[] MACAddress, String roomKey) {
+	public Room(String roomName, int clientID, String hostName, String MACAddress, String roomKey) {
 		this.roomName = roomName;
 		this.hostID = clientID;
 		//Sets up global variables
@@ -355,7 +355,7 @@ public class Room {
 	 * @param MACAddress - The MAC Address of the new player
 	 * @param clientID - The integer ID of the new player
 	 */
-	public void addPlayer(String playerName, double[] MACAddress, int clientID) {
+	public void addPlayer(String playerName, String MACAddress, int clientID) {
 		System.out.println("Room " + roomKey + ": Adding player");
 		//Checks if the room is full
 		if(roomSize == 16 || !getRoomState().equals("LOBBY")) {

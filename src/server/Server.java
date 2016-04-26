@@ -151,7 +151,7 @@ public class Server {
 	 * @param clientName - The name of the First Player
 	 * @param MACAddress - The MAC Address of the First Player
 	 */
-	public synchronized static void createRoom(int clientID, String roomName, String clientName, double[] MACAddress){
+	public synchronized static void createRoom(int clientID, String roomName, String clientName, String MACAddress){
 		String key = generateRoomKey();
 		Server.ROOMS.put(key, new Room(roomName, clientID, clientName, MACAddress, key));
 		Server.ROOMKEYS.put(lastRoom, key);
@@ -203,7 +203,7 @@ public class Server {
 	 * @param playerName - The name of the Player that has joined as a String
 	 * @param clientID - The integer ID of the Player that has joined
 	 */
-	public synchronized static void playerJoin(String roomKey, double[] MACAddress, String playerName, int clientID) {
+	public synchronized static void playerJoin(String roomKey, String MACAddress, String playerName, int clientID) {
 		System.out.println("adding player (Server)");
 		Server.ROOMS.get(roomKey).addPlayer(playerName, MACAddress, clientID);
 	}

@@ -22,10 +22,8 @@ public class CreateRoomPacket extends Packet {
 		putString(name);
 	}
 	
-	public void putMACAddress(double[] address){
-		for(int i = 0; i < 6; i++){
-			putDouble(address[i]);
-		}
+	public void putMACAddress(String address){
+		putString(address);
 	}
 	
 	public String getRoomName(){
@@ -36,12 +34,8 @@ public class CreateRoomPacket extends Packet {
 		return getString();
 	}
 	
-	public double[] getMACAddress(){
-		double[] address = new double[6];
-		for(int i = 0; i < 6; i++){
-			address[i] = getDouble();
-		}
-		return address;
+	public String getMACAddress(){
+		return getString();
 	}
 	
 }
