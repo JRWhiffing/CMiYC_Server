@@ -48,6 +48,7 @@ public class Room {
 	public Room(String roomName, int clientID, String hostName, String MACAddress, String roomKey) {
 		this.roomName = roomName;
 		this.hostID = clientID;
+		this.roomKey = roomKey;
 		//Sets up global variables
 		maxPlayerID = 0;
 		players = Collections.synchronizedList( new ArrayList<Player>());
@@ -57,7 +58,6 @@ public class Room {
 		lobbyLeaderboard = new Leaderboard(); //Creates a new lobbyLeaderboard
 		roomState = State.LOBBY;
 		addPlayer(hostName, MACAddress, clientID); //Adds the first player to the player list
-		this.roomKey = roomKey;
 	}
 	
 	/**
@@ -384,6 +384,10 @@ public class Room {
 				return;
 			}
 		}
+		Server.setRoomKey(clientID, roomKey);
+		RoomKeyPacket rkp = new RoomKeyPacket();
+		rkp.putRoomKey(roomKey);
+		Server.sendPacket(clientID, rkp);
 		players.add(new Player(playerName, MACAddress, clientID)); //Creates a new Player instance and adds it to list of players
 		playerIDMap.put(clientID, players.size() - 1);
 		lobbyLeaderboard.addPlayer(clientID, playerName);
@@ -398,7 +402,6 @@ public class Room {
 		if(clientID > maxPlayerID) { 
 			maxPlayerID = clientID;
 		}
-		Server.setRoomKey(clientID, roomKey);
 		roomSize++;
 		System.out.println("Room " + roomKey + ": Player"+clientID+" added");
 	}

@@ -202,6 +202,10 @@ public abstract class Packet {
 		System.out.println(toString());
 	}
 	
+	public int size(){
+		return packet.length;
+	}
+	
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * PACKET DATA IDs

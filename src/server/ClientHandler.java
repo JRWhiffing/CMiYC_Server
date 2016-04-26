@@ -18,7 +18,7 @@ public class ClientHandler {
 	}
 	
 	public synchronized void sendPacket(Packet serverPacket) {
-		System.out.println("Sending Packet");
+		System.out.println("Sending Packet: "+ serverPacket.size());
 		sOutput.addPacketToQueue(serverPacket);
 	}
 	

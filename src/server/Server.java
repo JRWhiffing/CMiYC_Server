@@ -135,6 +135,7 @@ public class Server {
 				key += Integer.toString(char_, 36);
 			}
 			//Checks if there is a room key already with that string
+			key = key.toUpperCase();
 			if(Server.ROOMS.containsKey(key)) {
 				key = "";
 			} else {
@@ -156,9 +157,6 @@ public class Server {
 		Server.ROOMS.put(key, new Room(roomName, clientID, clientName, MACAddress, key));
 		Server.ROOMKEYS.put(lastRoom, key);
 		lastRoom++;
-		RoomKeyPacket rkp = new RoomKeyPacket();
-		rkp.putRoomKey(key);
-		Server.sendPacket(clientID, rkp);
 		serverListener.setRoomKey(clientID, key);
 	}
 	/**
