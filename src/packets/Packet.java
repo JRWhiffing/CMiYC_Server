@@ -232,6 +232,7 @@ public abstract class Packet {
 	public static final byte NAK_NOT_ENOUGH_PLAYERS = 0x02;
 	public static final byte NAK_ROOM_FULL = 0x03;
 	public static final byte NAK_NO_VALID_TARGETS = 0x04;
+	public static final byte NAK_ROOM_IN_GAME = 0x05;
 	
 	//Disconnect IDs
 	public static final byte DISCONNECT_QUIT = 0X01;
@@ -316,4 +317,5 @@ public abstract class Packet {
 	public static final byte LOBBYINFO_LEADERBOARD = 0x05;
 	public static final byte LOBBYINFO_ROOM_NAME = 0x06;
 	public static final byte LOBBYINFO_VOTES = 0x07;
+	public static final byte LOBBYINFO_BOUNDARY_UPDATES = 0x08;
 }

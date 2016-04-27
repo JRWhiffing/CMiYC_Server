@@ -11,6 +11,10 @@ import java.util.TimerTask;
 import packets.Packet;
 import packets.serverPackets.*;
 import packets.serverPackets.broadcastPackets.*;
+import packets.serverPackets.lobbyInfoPackets.BoundariesPacket;
+import packets.serverPackets.lobbyInfoPackets.ScoreLimitPacket;
+import packets.serverPackets.lobbyInfoPackets.TimeLimitPacket;
+import packets.serverPackets.lobbyInfoPackets.VotesPacket;
 import server.Server;
 
 /**
@@ -37,6 +41,7 @@ public class Room {
 	private Timer gameTimer;
 	private int maxPlayerID;
 	private int hostID;
+	private boolean votesEnabled = true;
 	
 	/**
 	 * Constructor that sets up all the global variables and creates a new game instance and a new lobbyLeaderboard
@@ -358,11 +363,15 @@ public class Room {
 	public void addPlayer(String playerName, String MACAddress, int clientID) {
 		System.out.println("Room " + roomKey + ": Adding player");
 		//Checks if the room is full
-		if(roomSize == 16 || !getRoomState().equals("LOBBY")) {
+		if(roomSize == 16) {
 			NAKPacket np = new NAKPacket();
 			np.setNAK(Packet.NAK_ROOM_FULL);
 			Server.sendPacket(clientID, np);
 			return;
+		} else if (!getRoomState().equals("LOBBY")){
+			NAKPacket np = new NAKPacket();
+			np.setNAK(Packet.NAK_ROOM_IN_GAME);
+			Server.sendPacket(clientID, np);
 		}
 		//Checks if the player's data has been previously saved
 		for(int i = 0; i < players.size(); i++){
@@ -543,6 +552,9 @@ public class Room {
 	 */
 	public void setTimeLimit(int time) {
 		currentGame.setTimeLimit(time);
+		TimeLimitPacket tlp = new TimeLimitPacket();
+		tlp.putTimeLimit(time);
+		broadcast(tlp);
 	}
 	
 	/**
@@ -551,6 +563,9 @@ public class Room {
 	 */
 	public void setScoreLimit(int score) {
 		currentGame.setScoreLimit(score);
+		ScoreLimitPacket slp = new ScoreLimitPacket();
+		slp.putScoreLimit(score);
+		broadcast(slp);
 	}
 	
 	/**
@@ -561,6 +576,9 @@ public class Room {
 	public void setBoundaryLimit(double[] boundariesCoordinates, int radius) {
 		currentGame.setBoundariesCentre(boundariesCoordinates);
 		currentGame.setBoundariesRadius(radius);
+		BoundariesPacket bp = new BoundariesPacket();
+		bp.putBoundaries(boundariesCoordinates[0], boundariesCoordinates[1], radius);
+		broadcast(bp);
 	}
 	
 	/**
@@ -570,6 +588,8 @@ public class Room {
 	public void setBoundariesUpdates(int[] updates) {
 		currentGame.setBoundariesUpdateInterval(updates[0]);
 		currentGame.setBoundariesUpdatePercentage(updates[1]);
+		packets.serverPackets.lobbyInfoPackets.BoundaryUpdatePacket bup = new packets.serverPackets.lobbyInfoPackets.BoundaryUpdatePacket();
+		bup.putBoundaryUpdates(updates[0], updates[1]);
 	}
 	
 	/**
@@ -577,6 +597,14 @@ public class Room {
 	 */
 	public void toggleVoting() {
 		currentGame.allowVoting();
+		VotesPacket vp = new VotesPacket();
+		votesEnabled = !votesEnabled;
+		if(votesEnabled){
+			vp.VotesEnabled();
+		} else {
+			vp.VotesDisabled();
+		}
+		broadcast(vp);
 	}
 	
 	/**
