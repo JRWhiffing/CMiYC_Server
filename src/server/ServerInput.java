@@ -1,11 +1,13 @@
 package server;
 
 import java.awt.EventQueue;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Arrays;
 
 import packets.GenericPacket;
+import packets.Packet;
 import packetParsers.PacketParser;
 
 public class ServerInput extends Thread{
@@ -18,16 +20,6 @@ public class ServerInput extends Thread{
 		clientID = cID;
 		clientSocket = cs;
 		pp = new PacketParser(clientID);
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					TestingInterface window = new TestingInterface(clientID);
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
 	}
 	
 	@Override
@@ -35,14 +27,26 @@ public class ServerInput extends Thread{
 		int read = -1;
 		byte[] temp = new byte[512];
 		try{
-			while((read = clientSocket.getInputStream().read(temp, 0, temp.length)) > -1){
-				byte[] clientPacket = new byte[0];
-				System.out.println("Message Recieved, Processing.");
-				clientPacket = Arrays.copyOfRange(temp, 0, read);
-				GenericPacket gp = new GenericPacket(clientPacket);
-				TestingInterface.ta.append(gp.toString() + "\n------------------------\n");
-				pp.processPacket(clientPacket);
-				temp = new byte[512];
+//			while((read = clientSocket.getInputStream().read(temp, 0, temp.length)) > -1){
+//				byte[] clientPacket = new byte[0];
+//				System.out.println("Message Recieved, Processing.");
+//				clientPacket = Arrays.copyOfRange(temp, 0, read);
+//				GenericPacket gp = new GenericPacket(clientPacket);
+//				TestingInterface.ta.append(gp.toString() + "\n------------------------\n");
+//				pp.processPacket(clientPacket);
+//				temp = new byte[512];
+			int length;
+			DataInputStream stream = new DataInputStream(clientSocket.getInputStream());
+			while(true){
+				if((length = stream.readInt()) > 0){
+					byte[] data = new byte[length];
+                    stream.readFully(data);
+					Packet packet = new GenericPacket(data);
+					System.out.println(packet.toString() + "\n------------------------\n");
+					//TestingInterface.ta.append(packet.toString() + "\n------------------------\n");
+					pp.processPacket(data);
+					length = 0;
+				}
 			}
 		} catch (Exception e){
 			System.err.println(e.getMessage());
