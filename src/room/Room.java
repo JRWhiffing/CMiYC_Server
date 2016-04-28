@@ -405,10 +405,9 @@ public class Room {
 		playerIDMap.put(clientID, players.size() - 1);
 		lobbyLeaderboard.addPlayer(clientID, playerName);
 		//Sends a New Player Packet to all Players
-		if(clientID != hostID){
-			Server.sendPacket(clientID, new JoinSuccessPacket());
-			System.out.println("Printing JoinSuccessPacket");
-		}
+		JoinSuccessPacket jsp = new JoinSuccessPacket();
+		jsp.putPlayerID(clientID);
+		Server.sendPacket(clientID, jsp);
 		NewPlayerPacket npp = new NewPlayerPacket();
 		npp.putPlayerName(playerName);
 		broadcast(npp);

@@ -211,11 +211,11 @@ public class TestingInterface implements ActionListener {
 //			NewPlayerPacket npp = new NewPlayerPacket();
 //			npp.putPlayerName("Marvin");
 //			Server.sendPacket(clientID, npp);
-//		} else if(e.getSource() == lobbyInfoPackets[0]){
-//			GametypePacket gtp = new GametypePacket();
-//			gtp.putGametype((byte)0x01);
-//			Server.sendPacket(clientID, gtp);
-//		} else if(e.getSource() == lobbyInfoPackets[1]){
+		if(e.getSource() == lobbyInfoPackets[0]){
+			GametypePacket gtp = new GametypePacket();
+			gtp.putGametype((byte)0x01);
+			Server.sendPacket(clientID, gtp);
+		}// else if(e.getSource() == lobbyInfoPackets[1]){
 //			TimeLimitPacket tlp = new TimeLimitPacket();
 //			tlp.putTimeLimit(600);
 //			Server.sendPacket(clientID, tlp);
