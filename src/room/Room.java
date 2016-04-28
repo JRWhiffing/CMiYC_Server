@@ -240,6 +240,7 @@ public class Room {
 		int targetID = players.get(playerIDMap.get(clientID)).getTarget(); // ID of Target that has been caught
 		//Packet is sent to the target to activate a button on their screen that allows them to be caught
 		CaughtPacket cp = new CaughtPacket();
+		players.get(clientID).setState("CHANGING");
 		players.get(targetID).setPlayerPursuer(clientID);
 		Server.sendPacket(targetID, cp);
 		CaptureTimer cT = new CaptureTimer(roomKey, clientID, targetID);
@@ -253,11 +254,15 @@ public class Room {
 	 */
 	public void captured(int clientID) {
 		int pursuerID = players.get(clientID).getPursuer();
+		CatchSuccessPacket csp = new CatchSuccessPacket();
+		csp.putSuccess((byte) 0x01);
+		Server.sendPacket(pursuerID, csp);
 		players.get(clientID).setPlayerPursuer(-1);
 		players.get(clientID).setState("CAUGHT");
 		assignTargets(pursuerID);
 		assignTargets(clientID);
 		players.get(clientID).setState("CONNECTED");
+		players.get(pursuerID).setState("CONNECTED");
 		//Notifies all players that a successful capture has occurred
 		CapturePacket capturePacket = new CapturePacket();
 		capturePacket.putCapture(clientID, pursuerID);

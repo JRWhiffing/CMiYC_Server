@@ -1,5 +1,6 @@
 package room;
 
+import packets.serverPackets.CatchSuccessPacket;
 import server.Server;
 
 /**
@@ -31,10 +32,9 @@ public class CaptureTimer extends Thread {
 			e.printStackTrace();
 		}
 		if(!Server.getRoom(roomKey).getPlayer(pursuerID).getState().equals("CONNECTED")){
-			//MESSAGE client that capture refused.
-			//change player state to connected
-		} else {
-			//do nothing?
+			CatchSuccessPacket csp = new CatchSuccessPacket();
+			csp.putSuccess((byte) 0x00);
+			Server.sendPacket(pursuerID, csp);
 		}
 	}
 	
