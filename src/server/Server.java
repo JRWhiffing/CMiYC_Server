@@ -100,6 +100,7 @@ public class Server {
 	 * @param serverPacket - Packet that needs to be sent to client
 	 */
 	public synchronized static void sendPacket(int clientID, Packet serverPacket) {
+		serverPacket.appendlength();
 		serverListener.sendPacket(clientID, serverPacket);
 	}
 	

@@ -20,13 +20,11 @@ public class ServerOutput extends Thread{
 	public void run(){
 		while(active){
 			try {
-				int queueSize;
-				if ((queueSize = packetQueue.size()) > 0) {
-					for (int i = 0; i < queueSize; i++) {
-						clientSocket.getOutputStream().write(packetQueue.pop().getPacket());
-						clientSocket.getOutputStream().flush();
-						System.out.println("Packet Sent");
-					}
+				if ((packetQueue.size()) > 0) {
+					clientSocket.getOutputStream().write(packetQueue.pop().getPacket());
+					clientSocket.getOutputStream().flush();
+					Thread.sleep(10);
+					System.out.println("Packet Sent");
 				}
 				Thread.sleep(10);
 			} catch (IOException | InterruptedException e) {
