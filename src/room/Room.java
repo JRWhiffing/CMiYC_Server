@@ -112,7 +112,7 @@ public class Room {
 		//Default Game Mode
 		case Packet.GAMETYPE_DEFAULT :
 			//Minimum Player Count has to be 4
-			if (getPlayerCount() > 3) {
+			if (getPlayerCount() > 1) {
 				removeTeams();
 				Leaderboard gameLeaderboard = lobbyLeaderboard;
 				gameLeaderboard.refresh();
@@ -281,6 +281,9 @@ public class Room {
 					if((roomSize > 4 && players.get(i).getPursuerCount() < 3) || 
 					   (roomSize == 4 && players.get(i).getPursuerCount() < 2)){
 						validTargets.add(players.get(i));
+					} else {
+						validTargets.add(players.get(i));
+						break;
 					}
 				}
 			}
@@ -401,12 +404,18 @@ public class Room {
 		playerIDMap.put(clientID, players.size() - 1);
 		lobbyLeaderboard.addPlayer(clientID, playerName);
 		//Sends a New Player Packet to all Players
-		Server.sendPacket(clientID, new JoinSuccessPacket());
+		if(clientID != hostID){
+			Server.sendPacket(clientID, new JoinSuccessPacket());
+			System.out.println("Printing JoinSuccessPacket");
+		}
 		NewPlayerPacket npp = new NewPlayerPacket();
 		npp.putPlayerName(playerName);
 		broadcast(npp);
 		//Sends updated lobbyLeaderboard with new player to all Players
 		broadcastLeaderboard(true);
+		ScoreLimitPacket slp = new ScoreLimitPacket();
+		slp.putScoreLimit(currentGame.getScoreLimit());
+		Server.sendPacket(clientID, slp);
 		//Increases the Max Player ID if its a new player
 		if(clientID > maxPlayerID) { 
 			maxPlayerID = clientID;

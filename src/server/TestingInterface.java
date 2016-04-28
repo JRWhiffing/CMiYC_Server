@@ -45,10 +45,10 @@ public class TestingInterface implements ActionListener {
 	private static JScrollPane jsp = new JScrollPane(ta);
 	private JPanel contentPane;
 	public JFrame frame;
-
-	/**
-	 * Create the frame.
-	 */
+//
+//	/**
+//	 * Create the frame.
+//	 */
 	public TestingInterface(int clientID) {
 		frame = new JFrame("Testing Interface");
 		this.clientID = clientID;
@@ -59,7 +59,7 @@ public class TestingInterface implements ActionListener {
 		frame.setContentPane(contentPane);
 		initialize();
 	}
-	
+//	
 	private void initialize(){
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[]{144, 144, 144, 144, 0};
@@ -127,123 +127,123 @@ public class TestingInterface implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getSource() == serverPackets[0]){
-			packets.LocationPacket lp =  new packets.LocationPacket();
-			lp.putLocation(10401, 40104);
-			Server.sendPacket(clientID, lp);
-		} else if(e.getSource() == serverPackets[1]){
-			PingPacket pp =  new PingPacket();
-			Server.sendPacket(clientID, pp);
-		} else if(e.getSource() == serverPackets[2]){
-			System.out.println(new int[]{1337}.length);
-			TargetPacket tp = new TargetPacket();
-			tp.putTargetID(new int[]{1337});
-			Server.sendPacket(clientID, tp);
-		} else if(e.getSource() == serverPackets[3]){
-			SpawnRegionPacket srp = new SpawnRegionPacket();
-			srp.putSpawnPoint(5678, 1234);
-			Server.sendPacket(clientID, srp);
-		} else if(e.getSource() == serverPackets[4]){
-			AbilityUsagePacket aup = new AbilityUsagePacket();
-			aup.putAbility((byte)0x03);
-			Server.sendPacket(clientID, aup);
-		} else if(e.getSource() == serverPackets[5]){
-			GameStartPacket gsp = new GameStartPacket();
-			Server.sendPacket(clientID, gsp);
-		} else if(e.getSource() == serverPackets[6]){
-			GameEndPacket gep = new GameEndPacket();
-			Server.sendPacket(clientID, gep);
-		} else if(e.getSource() == serverPackets[7]){
-			RoomClosePacket rcp = new RoomClosePacket();
-			Server.sendPacket(clientID, rcp);
-		} else if(e.getSource() == serverPackets[8]){
-			System.out.println("Testing".length());
-			RoomKeyPacket rkp = new RoomKeyPacket();
-			rkp.putRoomKey("Testing");
-			Server.sendPacket(clientID, rkp);
-		} else if(e.getSource() == serverPackets[9]){
-			KickPacket kp = new KickPacket();
-			kp.putKickReason((byte)0x01);
-			Server.sendPacket(clientID, kp);
-		} else if(e.getSource() == serverPackets[10]){
-			NAKPacket nakp = new NAKPacket();
-			nakp.setNAK((byte)0x01);
-			Server.sendPacket(clientID, nakp);
-		} else if(e.getSource() == serverPackets[11]){
-			HostPacket hp = new HostPacket();
-			Server.sendPacket(clientID, hp);
-		} else if(e.getSource() == serverPackets[12]){
-			CaughtPacket cp = new CaughtPacket();
-			Server.sendPacket(clientID, cp);
-		} else if(e.getSource() == broadcastPackets[0]){
-			TimeRemainingPacket trp = new TimeRemainingPacket();
-			trp.putTimeRemaining(900);
-			Server.sendPacket(clientID, trp);
-		} else if(e.getSource() == broadcastPackets[1]){
-			LeaderboardPacket lbp = new LeaderboardPacket();
-			Leaderboard lb = new Leaderboard();
-			lb.addPlayer(1, "Steve");
-			lb.addPlayer(2, "Max");
-			lb.toString();
-			lbp.putLeaderboard(lb);
-			Server.sendPacket(clientID, lbp);
-		} else if(e.getSource() == broadcastPackets[2]){
-			CapturePacket cp = new CapturePacket();
-			cp.putCapture(1, 2);
-			Server.sendPacket(clientID, cp);
-		} else if(e.getSource() == broadcastPackets[3]){
-			VotesPacket vp = new VotesPacket();
-			vp.putVotes(new int[]{1,2,3});
-			Server.sendPacket(clientID, vp);
-		} else if(e.getSource() == broadcastPackets[4]){
-			DisconnectionPacket qp = new DisconnectionPacket();
-			qp.putPlayerID(1);
-			qp.putDisconnectionReason((byte)0x01);
-			Server.sendPacket(clientID, qp);
-		} else if(e.getSource() == broadcastPackets[5]){
-			BoundaryUpdatePacket bup = new BoundaryUpdatePacket();
-			bup.putBoundaryUpdate(10401, 40104, 5000);
-		} else if(e.getSource() == broadcastPackets[6]){
-			NewHostPacket nhp = new NewHostPacket();
-			nhp.putPlayerID(2);
-			Server.sendPacket(clientID, nhp);
-		} else if(e.getSource() == broadcastPackets[7]){
-			NewPlayerPacket npp = new NewPlayerPacket();
-			npp.putPlayerName("Marvin");
-			Server.sendPacket(clientID, npp);
-		} else if(e.getSource() == lobbyInfoPackets[0]){
-			GametypePacket gtp = new GametypePacket();
-			gtp.putGametype((byte)0x01);
-			Server.sendPacket(clientID, gtp);
-		} else if(e.getSource() == lobbyInfoPackets[1]){
-			TimeLimitPacket tlp = new TimeLimitPacket();
-			tlp.putTimeLimit(600);
-			Server.sendPacket(clientID, tlp);
-		} else if(e.getSource() == lobbyInfoPackets[2]){
-			ScoreLimitPacket slp = new ScoreLimitPacket();
-			slp.putScoreLimit(10);
-			Server.sendPacket(clientID, slp);
-		} else if(e.getSource() == lobbyInfoPackets[3]){
-			BoundariesPacket bp = new BoundariesPacket();
-			bp.putBoundaries(10401, 40104, 2500);
-			Server.sendPacket(clientID, bp);
-		} else if(e.getSource() == lobbyInfoPackets[4]){
-			packets.serverPackets.lobbyInfoPackets.LeaderboardPacket lbp = new packets.serverPackets.lobbyInfoPackets.LeaderboardPacket();
-			Leaderboard lb = new Leaderboard();
-			lb.addPlayer(1, "Steve");
-			lb.addPlayer(2, "Max");
-			lb.toString();
-			lbp.putLeaderboard(lb);
-			Server.sendPacket(clientID, lbp);
-		} else if(e.getSource() == lobbyInfoPackets[5]){
-			RoomNamePacket rnp = new RoomNamePacket();
-			rnp.putRoomName("Rick-Astley");
-			Server.sendPacket(clientID, rnp);
-		} else if(e.getSource() == lobbyInfoPackets[6]){
-			packets.serverPackets.lobbyInfoPackets.VotesPacket vp = new packets.serverPackets.lobbyInfoPackets.VotesPacket();
-			vp.putVotes(new int[]{1,2,3});
-			Server.sendPacket(clientID, vp);
-		}
+//		if(e.getSource() == serverPackets[0]){
+//			packets.LocationPacket lp =  new packets.LocationPacket();
+//			lp.putLocation(10401, 40104);
+//			Server.sendPacket(clientID, lp);
+//		} else if(e.getSource() == serverPackets[1]){
+//			PingPacket pp =  new PingPacket();
+//			Server.sendPacket(clientID, pp);
+//		} else if(e.getSource() == serverPackets[2]){
+//			System.out.println(new int[]{1337}.length);
+//			TargetPacket tp = new TargetPacket();
+//			tp.putTargetID(new int[]{1337});
+//			Server.sendPacket(clientID, tp);
+//		} else if(e.getSource() == serverPackets[3]){
+//			SpawnRegionPacket srp = new SpawnRegionPacket();
+//			srp.putSpawnPoint(5678, 1234);
+//			Server.sendPacket(clientID, srp);
+//		} else if(e.getSource() == serverPackets[4]){
+//			AbilityUsagePacket aup = new AbilityUsagePacket();
+//			aup.putAbility((byte)0x03);
+//			Server.sendPacket(clientID, aup);
+//		} else if(e.getSource() == serverPackets[5]){
+//			GameStartPacket gsp = new GameStartPacket();
+//			Server.sendPacket(clientID, gsp);
+//		} else if(e.getSource() == serverPackets[6]){
+//			GameEndPacket gep = new GameEndPacket();
+//			Server.sendPacket(clientID, gep);
+//		} else if(e.getSource() == serverPackets[7]){
+//			RoomClosePacket rcp = new RoomClosePacket();
+//			Server.sendPacket(clientID, rcp);
+//		} else if(e.getSource() == serverPackets[8]){
+//			System.out.println("Testing".length());
+//			RoomKeyPacket rkp = new RoomKeyPacket();
+//			rkp.putRoomKey("Testing");
+//			Server.sendPacket(clientID, rkp);
+//		} else if(e.getSource() == serverPackets[9]){
+//			KickPacket kp = new KickPacket();
+//			kp.putKickReason((byte)0x01);
+//			Server.sendPacket(clientID, kp);
+//		} else if(e.getSource() == serverPackets[10]){
+//			NAKPacket nakp = new NAKPacket();
+//			nakp.setNAK((byte)0x01);
+//			Server.sendPacket(clientID, nakp);
+//		} else if(e.getSource() == serverPackets[11]){
+//			HostPacket hp = new HostPacket();
+//			Server.sendPacket(clientID, hp);
+//		} else if(e.getSource() == serverPackets[12]){
+//			CaughtPacket cp = new CaughtPacket();
+//			Server.sendPacket(clientID, cp);
+//		} else if(e.getSource() == broadcastPackets[0]){
+//			TimeRemainingPacket trp = new TimeRemainingPacket();
+//			trp.putTimeRemaining(900);
+//			Server.sendPacket(clientID, trp);
+//		} else if(e.getSource() == broadcastPackets[1]){
+//			LeaderboardPacket lbp = new LeaderboardPacket();
+//			Leaderboard lb = new Leaderboard();
+//			lb.addPlayer(1, "Steve");
+//			lb.addPlayer(2, "Max");
+//			lb.toString();
+//			lbp.putLeaderboard(lb);
+//			Server.sendPacket(clientID, lbp);
+//		} else if(e.getSource() == broadcastPackets[2]){
+//			CapturePacket cp = new CapturePacket();
+//			cp.putCapture(1, 2);
+//			Server.sendPacket(clientID, cp);
+//		} else if(e.getSource() == broadcastPackets[3]){
+//			VotesPacket vp = new VotesPacket();
+//			vp.putVotes(new int[]{1,2,3});
+//			Server.sendPacket(clientID, vp);
+//		} else if(e.getSource() == broadcastPackets[4]){
+//			DisconnectionPacket qp = new DisconnectionPacket();
+//			qp.putPlayerID(1);
+//			qp.putDisconnectionReason((byte)0x01);
+//			Server.sendPacket(clientID, qp);
+//		} else if(e.getSource() == broadcastPackets[5]){
+//			LobbyInfo.BoundaryUpdatePacket bup = new BoundaryUpdatePacket();
+//			bup.putBoundaryUpdate(10401, 40104, 5000);
+//		} else if(e.getSource() == broadcastPackets[6]){
+//			NewHostPacket nhp = new NewHostPacket();
+//			nhp.putPlayerID(2);
+//			Server.sendPacket(clientID, nhp);
+//		} else if(e.getSource() == broadcastPackets[7]){
+//			NewPlayerPacket npp = new NewPlayerPacket();
+//			npp.putPlayerName("Marvin");
+//			Server.sendPacket(clientID, npp);
+//		} else if(e.getSource() == lobbyInfoPackets[0]){
+//			GametypePacket gtp = new GametypePacket();
+//			gtp.putGametype((byte)0x01);
+//			Server.sendPacket(clientID, gtp);
+//		} else if(e.getSource() == lobbyInfoPackets[1]){
+//			TimeLimitPacket tlp = new TimeLimitPacket();
+//			tlp.putTimeLimit(600);
+//			Server.sendPacket(clientID, tlp);
+//		} else if(e.getSource() == lobbyInfoPackets[2]){
+//			ScoreLimitPacket slp = new ScoreLimitPacket();
+//			slp.putScoreLimit(10);
+//			Server.sendPacket(clientID, slp);
+//		} else if(e.getSource() == lobbyInfoPackets[3]){
+//			BoundariesPacket bp = new BoundariesPacket();
+//			bp.putBoundaries(10401, 40104, 2500);
+//			Server.sendPacket(clientID, bp);
+//		} else if(e.getSource() == lobbyInfoPackets[4]){
+//			packets.serverPackets.lobbyInfoPackets.LeaderboardPacket lbp = new packets.serverPackets.lobbyInfoPackets.LeaderboardPacket();
+//			Leaderboard lb = new Leaderboard();
+//			lb.addPlayer(1, "Steve");
+//			lb.addPlayer(2, "Max");
+//			lb.toString();
+//			lbp.putLeaderboard(lb);
+//			Server.sendPacket(clientID, lbp);
+//		} else if(e.getSource() == lobbyInfoPackets[5]){
+//			RoomNamePacket rnp = new RoomNamePacket();
+//			rnp.putRoomName("Rick-Astley");
+//			Server.sendPacket(clientID, rnp);
+//		} else if(e.getSource() == lobbyInfoPackets[6]){
+//			packets.serverPackets.lobbyInfoPackets.VotesPacket vp = new packets.serverPackets.lobbyInfoPackets.VotesPacket();
+//			vp.putVotes(new int[]{1,2,3});
+//			Server.sendPacket(clientID, vp);
+//		}
 	}
-	
+//	
 }
