@@ -207,7 +207,7 @@ public class Room {
 			break;
 				
 		}
-		startPingTimer(Server.getRoom(roomKey), roomKey);
+		//startPingTimer(Server.getRoom(roomKey), roomKey);
 	}
 	
 	/**
