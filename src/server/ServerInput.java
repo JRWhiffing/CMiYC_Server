@@ -52,7 +52,7 @@ public class ServerInput extends Thread{
 			System.err.println(e.getMessage());
 			Server.closeServer();
 		} finally {
-			Server.quitPlayer(roomKey, read);
+			Server.quitPlayer(roomKey, clientID);
 		}
 	}
 	
