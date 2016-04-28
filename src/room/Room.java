@@ -12,6 +12,7 @@ import packets.Packet;
 import packets.serverPackets.*;
 import packets.serverPackets.broadcastPackets.*;
 import packets.serverPackets.lobbyInfoPackets.BoundariesPacket;
+import packets.serverPackets.lobbyInfoPackets.GametypePacket;
 import packets.serverPackets.lobbyInfoPackets.ScoreLimitPacket;
 import packets.serverPackets.lobbyInfoPackets.TimeLimitPacket;
 import packets.serverPackets.lobbyInfoPackets.VotesPacket;
@@ -415,7 +416,13 @@ public class Room {
 		broadcastLeaderboard(true);
 		ScoreLimitPacket slp = new ScoreLimitPacket();
 		slp.putScoreLimit(currentGame.getScoreLimit());
+		TimeLimitPacket tlp = new TimeLimitPacket();
+		tlp.putTimeLimit(currentGame.getTimeLimit());
+		GametypePacket gtp = new GametypePacket();
+		gtp.putGametype(currentGame.getType());
 		Server.sendPacket(clientID, slp);
+		Server.sendPacket(clientID, tlp);
+		Server.sendPacket(clientID, gtp);
 		//Increases the Max Player ID if its a new player
 		if(clientID > maxPlayerID) { 
 			maxPlayerID = clientID;

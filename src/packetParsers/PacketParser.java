@@ -92,7 +92,7 @@ public class PacketParser {
 		//The client wishes to join the game	
 		case Packet.JOIN :
 			JoinPacket joinPacket = new JoinPacket(data);
-			Server.playerJoin(joinPacket.getRoomKey(), joinPacket.getMACAddress(), joinPacket.getPlayerName(), clientID);
+			Server.playerJoin(joinPacket.getRoomKey().toUpperCase(), joinPacket.getMACAddress(), joinPacket.getPlayerName(), clientID);
 			break;
 		
 		//The client performs a host action	- Needs to make sure he is host
