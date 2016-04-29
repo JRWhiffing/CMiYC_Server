@@ -535,11 +535,13 @@ public class Room {
 	 * @param broadcastPacket - The packet that needs sending
 	 */
 	private void broadcast(Packet broadcastPacket){
+		broadcastPacket.appendlength();
 		for(int i = 0; i < players.size(); i++){
 			
 			//Finds only active players
 			if(!players.get(i).getState().equals("DISCONNECTED") && !players.get(i).getState().equals("KICKED")){
-				Server.sendPacket(players.get(i).getID(), broadcastPacket);
+				System.out.println(broadcastPacket.toString());
+				Server.broadcastPacket(players.get(i).getID(), broadcastPacket);
 			}
 		}
 	}

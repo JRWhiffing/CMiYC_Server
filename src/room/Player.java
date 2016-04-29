@@ -23,7 +23,7 @@ public class Player {
 	private int playerScore;
 	private int reportedID;
 	private int reportedCount;
-	private double[] playerLocation; //Longitude Latitude
+	private double[] playerLocation = new double[]{1000,1000}; //Longitude Latitude
 	private byte vote; //Player's vote
 	private boolean playerAcknowledgement;
 	private Timer pingWaitTimer;

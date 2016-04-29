@@ -100,7 +100,19 @@ public class Server {
 	 * @param serverPacket - Packet that needs to be sent to client
 	 */
 	public synchronized static void sendPacket(int clientID, Packet serverPacket) {
+		System.out.println("packet size: " + serverPacket.size() + "\nPacket["+serverPacket.toString()+"]");
 		serverPacket.appendlength();
+		System.out.println("new packet size: "+serverPacket.size());
+		serverListener.sendPacket(clientID, serverPacket);
+	}
+	
+	/**
+	 * Method for sending a packet to a client
+	 * @param clientID - Integer ID of the Client
+	 * @param serverPacket - Packet that needs to be sent to client
+	 */
+	public synchronized static void broadcastPacket(int clientID, Packet serverPacket) {
+		System.out.println("packet size: " + serverPacket.size() + "\nPacket["+serverPacket.toString()+"]");
 		serverListener.sendPacket(clientID, serverPacket);
 	}
 	
