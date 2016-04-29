@@ -905,6 +905,9 @@ public class Room {
 		 */
 		public void run() {
 			//Loops to each player which is still in the game
+			if(roomSize < 1){
+				lt.cancel();
+			}
 			for(int i = 0; i < players.size(); i++) {
 				if(!players.get(i).getState().equals("DISCONNECTED") && !players.get(i).getState().equals("KICKED")) {
 					int clientID = players.get(i).getID();
