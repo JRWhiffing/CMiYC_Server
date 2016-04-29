@@ -27,7 +27,7 @@ public class CaptureTimer extends Thread {
 		//How long should the server wait for the capture to be 
 		//acknowledged by the target? currently 4 seconds.
 		try {
-			Thread.currentThread().sleep(4000);
+			Thread.currentThread().sleep(6500);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
