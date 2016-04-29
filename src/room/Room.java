@@ -8,6 +8,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import packets.LocationPacket;
 import packets.Packet;
 import packets.serverPackets.*;
 import packets.serverPackets.broadcastPackets.*;
@@ -43,6 +44,7 @@ public class Room {
 	private int maxPlayerID;
 	private int hostID;
 	private boolean votesEnabled = true;
+	private Timer lt;
 	
 	/**
 	 * Constructor that sets up all the global variables and creates a new game instance and a new lobbyLeaderboard
@@ -207,6 +209,7 @@ public class Room {
 			break;
 				
 		}
+		startLocationTimer();
 		//startPingTimer(Server.getRoom(roomKey), roomKey);
 	}
 	
@@ -215,6 +218,7 @@ public class Room {
 	 */
 	public synchronized void endGame() {
 		//Final time broadcast gameLeaderboard so that client can determine winner
+		lt.cancel();
 		gameTimer.cancel();
 		broadcastLeaderboard(false);
 		roomState = State.ENDING;
@@ -884,6 +888,36 @@ public class Room {
 				}
 			}
 		}
-	}	 	 
+	}
+	 
+	 public void startLocationTimer() {
+			lt = new Timer();
+			//Timer repeats every 5 seconds, starting after a 1 second delay
+			lt.scheduleAtFixedRate(new LocationTimerTask(), 6000, 10);
+		}
+	 
+	 class LocationTimerTask extends TimerTask {
+			
+		/**
+		 * Method that runs every 5 seconds
+		 */
+		public void run() {
+			//Loops to each player which is still in the game
+			for(int i = 0; i < players.size(); i++) {
+				if(!players.get(i).getState().equals("DISCONNECTED") && !players.get(i).getState().equals("KICKED")) {
+					int clientID = players.get(i).getID();
+					double[] pos = players.get(i).getPlayerLocation();
+					LocationPacket lp = new LocationPacket();
+					lp.putID(clientID);
+					lp.putLocation(pos[0], pos[1]);
+					broadcast(lp);
+				}
+			}
+		}
+	}
+	 
+	 public void stopLocationBroadcast(){
+		 lt.cancel();
+	 }
 	
 }

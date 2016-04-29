@@ -46,6 +46,8 @@ public class ServerInput extends Thread{
 					//TestingInterface.ta.append(packet.toString() + "\n------------------------\n");
 					pp.processPacket(data);
 					length = 0;
+				} else if(length == 0){
+					System.err.println("0 length packet???");
 				}
 			}
 		} catch (Exception e){
