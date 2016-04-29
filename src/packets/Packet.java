@@ -121,7 +121,6 @@ public abstract class Packet {
 	}
 	
 	public void appendlength(){
-		System.out.println("packet: "+size() + " ["+toString()+"]");
 		int length = packet.length;
 		byte[] oldPacket = packet;
 		packet = new byte[0];
@@ -130,7 +129,9 @@ public abstract class Packet {
 		System.arraycopy(packet, 0, newPacket, 0, packet.length);
 		System.arraycopy(oldPacket, 0, newPacket, packet.length, oldPacket.length);
 		packet = newPacket;
-		System.out.println("packet: "+size() + " ["+toString()+"]");
+		if(packet[4] != 1){
+			System.out.println("Packet: size-"+length+" contents-["+toString()+"]");
+		}
 	}
 	
 	/**
